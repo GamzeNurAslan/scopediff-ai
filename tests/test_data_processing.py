@@ -1,6 +1,12 @@
 import pandas as pd
 import pytest
 
+from backend.app.data_loader import (
+    FileLoadingError,
+    load_requirements_excel,
+    standardize_column_name,
+)
+
 from backend.app.validators import (
     DataValidationError,
     validate_requirements_dataframe,
@@ -114,3 +120,78 @@ def test_empty_dataframe_raises_error() -> None:
         validate_requirements_dataframe(dataframe)
 
     assert "Dosya en az bir gereksinim içermelidir." in str(exception.value)
+
+def test_standardize_column_name() -> None:
+    assert standardize_column_name("Requirement ID") == "requirement_id"
+    assert standardize_column_name("Requirement-Text") == "requirement_text"
+    assert standardize_column_name(" Module ") == "module"
+
+
+def test_load_requirements_excel_returns_processed_dataframe(
+    tmp_path,
+) -> None:
+    dataframe = pd.DataFrame(
+        {
+            "Requirement ID": ["REQ-001"],
+            "Requirement Text": [
+                "  Port kontrolü   EN FAZLA 3 kez yapılmalıdır. "
+            ],
+            "Module": ["Resource"],
+            "Version": ["1.0"],
+        }
+    )
+
+    file_path = tmp_path / "requirements.xlsx"
+    dataframe.to_excel(file_path, index=False)
+
+    result = load_requirements_excel(file_path)
+
+    assert result.loc[0, "requirement_id"] == "REQ-001"
+    assert result.loc[0, "original_text"] == (
+        "Port kontrolü EN FAZLA 3 kez yapılmalıdır."
+    )
+    assert result.loc[0, "normalized_text"] == (
+        "port kontrolü en fazla 3 kez yapılmalıdır."
+    )
+
+
+def test_load_requirements_excel_missing_file_raises_error(
+    tmp_path,
+) -> None:
+    file_path = tmp_path / "missing.xlsx"
+
+    with pytest.raises(FileLoadingError) as exception:
+        load_requirements_excel(file_path)
+
+    assert "Dosya bulunamadı" in str(exception.value)
+
+
+def test_load_requirements_excel_rejects_unsupported_extension(
+    tmp_path,
+) -> None:
+    file_path = tmp_path / "requirements.csv"
+    file_path.write_text("test", encoding="utf-8")
+
+    with pytest.raises(FileLoadingError) as exception:
+        load_requirements_excel(file_path)
+
+    assert "Yalnızca .xlsx" in str(exception.value)
+
+
+def test_load_requirements_excel_validates_required_columns(
+    tmp_path,
+) -> None:
+    dataframe = pd.DataFrame(
+        {
+            "Requirement ID": ["REQ-001"],
+            "Requirement Text": ["Port kontrolü yapılmalıdır."],
+        }
+    )
+
+    file_path = tmp_path / "requirements.xlsx"
+    dataframe.to_excel(file_path, index=False)
+
+    with pytest.raises(DataValidationError) as exception:
+        load_requirements_excel(file_path)
+
+    assert "Eksik zorunlu sütunlar" in str(exception.value)
