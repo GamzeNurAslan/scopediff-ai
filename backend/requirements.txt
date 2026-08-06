@@ -3,3 +3,4 @@ openpyxl
 pydantic
 pytest
 scikit-learn
+sentence-transformers
