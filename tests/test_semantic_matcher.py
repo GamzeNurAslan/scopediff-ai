@@ -9,10 +9,6 @@ from backend.app.matching.semantic_matcher import (
 
 
 class FakeSentenceTransformer:
-    """
-    Test sırasında gerçek modeli indirmeden kontrollü
-    embedding üretir.
-    """
 
     def encode(
         self,
