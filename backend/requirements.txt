@@ -4,3 +4,7 @@ pydantic
 pytest
 scikit-learn
 sentence-transformers
+fastapi
+uvicorn[standard]
+sqlalchemy
+python-multipart
