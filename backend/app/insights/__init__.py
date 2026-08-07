@@ -3,7 +3,14 @@ from backend.app.insights.contradiction_detector import (
     RequirementContradictionDetector,
 )
 
+from backend.app.insights.impact_analyzer import (
+    ImpactCandidate,
+    RequirementImpactAnalyzer,
+)
+
 __all__ = [
     "ContradictionCandidate",
     "RequirementContradictionDetector",
+    "ImpactCandidate",
+    "RequirementImpactAnalyzer",
 ]
