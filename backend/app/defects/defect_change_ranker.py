@@ -16,7 +16,7 @@ from backend.app.text_preprocessor import normalize_text
 @dataclass(frozen=True)
 class DefectChangeCandidate:
     """Bir defect için incelenmesi gereken aday değişikliği temsil eder."""
-
+    change_id: str | None
     old_requirement_id: str | None
     new_requirement_id: str | None
     change_type: str
@@ -464,6 +464,13 @@ class DefectChangeRanker:
             if relevance_score < min_relevance:
                 continue
 
+            change_id = None
+
+            if "change_id" in row.index:
+                change_id = self._safe_optional_id(
+                    row["change_id"]
+                )
+
             old_id = self._safe_optional_id(
                 row["old_requirement_id"]
             )
@@ -474,6 +481,7 @@ class DefectChangeRanker:
 
             candidates.append(
                 DefectChangeCandidate(
+                    change_id=change_id,
                     old_requirement_id=old_id,
                     new_requirement_id=new_id,
                     change_type=str(
@@ -520,21 +528,18 @@ class DefectChangeRanker:
         ):
             ranked_candidates.append(
                 DefectChangeCandidate(
+                    change_id=candidate.change_id,
                     old_requirement_id=(
                         candidate.old_requirement_id
                     ),
                     new_requirement_id=(
                         candidate.new_requirement_id
                     ),
-                    change_type=(
-                        candidate.change_type
-                    ),
+                    change_type=candidate.change_type,
                     semantic_similarity=(
                         candidate.semantic_similarity
                     ),
-                    risk_score=(
-                        candidate.risk_score
-                    ),
+                    risk_score=candidate.risk_score,
                     keyword_overlap=(
                         candidate.keyword_overlap
                     ),
@@ -574,6 +579,7 @@ class DefectChangeRanker:
     @staticmethod
     def _result_columns() -> list[str]:
         return [
+            "change_id",
             "old_requirement_id",
             "new_requirement_id",
             "change_type",
