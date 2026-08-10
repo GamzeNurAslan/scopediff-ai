@@ -25,6 +25,9 @@ from sqlalchemy.orm import (
 )
 from starlette.background import BackgroundTask
 
+from backend.app.api.history_routes import (
+    router as history_router,
+)
 from backend.app.data_loader import (
     FileLoadingError,
     load_requirements_excel,
@@ -50,6 +53,10 @@ from backend.app.reports.excel_report import (
 
 
 router = APIRouter()
+
+router.include_router(
+    history_router
+)
 
 
 # =========================================================
@@ -140,9 +147,12 @@ class DefectRankingResponse(
 class AnalysisSummary(BaseModel):
     id: int
     analysis_name: str
+
     source_version: str | None
     target_version: str | None
+
     created_at: datetime
+
     requirement_change_count: int
     defect_ranking_count: int
 
@@ -150,8 +160,10 @@ class AnalysisSummary(BaseModel):
 class AnalysisDetail(BaseModel):
     id: int
     analysis_name: str
+
     source_version: str | None
     target_version: str | None
+
     created_at: datetime
 
     requirement_changes: list[
@@ -214,6 +226,7 @@ class DefectCandidateResponse(BaseModel):
     relevance_score: float
 
     rank: int
+
     reason: str
 
 
@@ -289,15 +302,25 @@ def _to_detail(
                     or []
                 ),
 
-                change_type=change.change_type,
+                change_type=(
+                    change.change_type
+                ),
 
-                risk_score=change.risk_score,
+                risk_score=(
+                    change.risk_score
+                ),
 
-                risk_level=change.risk_level,
+                risk_level=(
+                    change.risk_level
+                ),
 
-                confidence=change.confidence,
+                confidence=(
+                    change.confidence
+                ),
 
-                explanation=change.explanation,
+                explanation=(
+                    change.explanation
+                ),
             )
             for change
             in analysis.requirement_changes
@@ -307,11 +330,17 @@ def _to_detail(
             DefectRankingResponse(
                 id=ranking.id,
 
-                defect_id=ranking.defect_id,
+                defect_id=(
+                    ranking.defect_id
+                ),
 
-                defect_text=ranking.defect_text,
+                defect_text=(
+                    ranking.defect_text
+                ),
 
-                change_id=ranking.change_id,
+                change_id=(
+                    ranking.change_id
+                ),
 
                 relevance_score=(
                     ranking.relevance_score
@@ -321,7 +350,9 @@ def _to_detail(
                     ranking.rank_position
                 ),
 
-                reason=ranking.reason,
+                reason=(
+                    ranking.reason
+                ),
             )
             for ranking
             in analysis.defect_rankings
@@ -344,7 +375,8 @@ def _load_analysis(
             ),
         )
         .where(
-            AnalysisRun.id == analysis_id
+            AnalysisRun.id
+            == analysis_id
         )
     )
 
@@ -357,8 +389,12 @@ def _load_analysis(
 
     if analysis is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Analysis not found.",
+            status_code=(
+                status.HTTP_404_NOT_FOUND
+            ),
+            detail=(
+                "Analysis not found."
+            ),
         )
 
     return analysis
@@ -384,11 +420,14 @@ def _optional_string(
     ):
         pass
 
-    text = str(value).strip()
+    text = str(
+        value
+    ).strip()
 
     if (
         not text
-        or text.lower() == "nan"
+        or text.lower()
+        == "nan"
     ):
         return None
 
@@ -410,7 +449,9 @@ def _optional_float(
     ):
         return None
 
-    return float(value)
+    return float(
+        value
+    )
 
 
 def _string_list(
@@ -429,7 +470,8 @@ def _string_list(
     ):
         return [
             str(item).strip()
-            for item in value
+            for item
+            in value
             if str(item).strip()
         ]
 
@@ -442,12 +484,16 @@ def _string_list(
     ):
         pass
 
-    text = str(value).strip()
+    text = str(
+        value
+    ).strip()
 
     if not text:
         return []
 
-    return [text]
+    return [
+        text
+    ]
 
 
 # =========================================================
@@ -471,10 +517,13 @@ def _validate_excel_upload(
 
     if extension != ".xlsx":
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=(
+                status.HTTP_400_BAD_REQUEST
+            ),
             detail=(
                 "Yalnızca .xlsx uzantılı "
-                "Excel dosyaları desteklenmektedir."
+                "Excel dosyaları "
+                "desteklenmektedir."
             ),
         )
 
@@ -490,7 +539,9 @@ def _save_upload_to_temp(
         suffix=".xlsx",
         delete=False,
     ) as temporary_file:
-        upload_file.file.seek(0)
+        upload_file.file.seek(
+            0
+        )
 
         shutil.copyfileobj(
             upload_file.file,
@@ -512,8 +563,13 @@ def _save_upload_to_temp(
         )
 
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Yüklenen Excel dosyası boş.",
+            status_code=(
+                status.HTTP_400_BAD_REQUEST
+            ),
+            detail=(
+                "Yüklenen Excel "
+                "dosyası boş."
+            ),
         )
 
     return temporary_path
@@ -534,11 +590,16 @@ def _extract_version(
     dataframe: pd.DataFrame,
     fallback: str,
 ) -> str:
-    if "version" not in dataframe.columns:
+    if (
+        "version"
+        not in dataframe.columns
+    ):
         return fallback
 
     values = (
-        dataframe["version"]
+        dataframe[
+            "version"
+        ]
         .astype(str)
         .str.strip()
     )
@@ -599,7 +660,9 @@ def _build_changes_dataframe(
         dict[str, object]
     ] = []
 
-    for change in analysis.requirement_changes:
+    for change in (
+        analysis.requirement_changes
+    ):
         rows.append(
             {
                 "change_id": str(
@@ -667,19 +730,32 @@ def _delete_temp_report(
 @router.post(
     "/analyses",
     response_model=AnalysisDetail,
-    status_code=status.HTTP_201_CREATED,
+    status_code=(
+        status.HTTP_201_CREATED
+    ),
 )
 def create_analysis(
     payload: AnalysisCreate,
-    database: Session = Depends(get_db),
+    database: Session = Depends(
+        get_db
+    ),
 ) -> AnalysisDetail:
+
     analysis = AnalysisRun(
-        analysis_name=payload.analysis_name,
-        source_version=payload.source_version,
-        target_version=payload.target_version,
+        analysis_name=(
+            payload.analysis_name
+        ),
+        source_version=(
+            payload.source_version
+        ),
+        target_version=(
+            payload.target_version
+        ),
     )
 
-    for change in payload.requirement_changes:
+    for change in (
+        payload.requirement_changes
+    ):
         analysis.requirement_changes.append(
             RequirementChange(
                 old_requirement_id=(
@@ -702,26 +778,44 @@ def create_analysis(
                     change.detailed_change_types
                 ),
 
-                change_type=change.change_type,
+                change_type=(
+                    change.change_type
+                ),
 
-                risk_score=change.risk_score,
+                risk_score=(
+                    change.risk_score
+                ),
 
-                risk_level=change.risk_level,
+                risk_level=(
+                    change.risk_level
+                ),
 
-                confidence=change.confidence,
+                confidence=(
+                    change.confidence
+                ),
 
-                explanation=change.explanation,
+                explanation=(
+                    change.explanation
+                ),
             )
         )
 
-    for ranking in payload.defect_rankings:
+    for ranking in (
+        payload.defect_rankings
+    ):
         analysis.defect_rankings.append(
             DefectRanking(
-                defect_id=ranking.defect_id,
+                defect_id=(
+                    ranking.defect_id
+                ),
 
-                defect_text=ranking.defect_text,
+                defect_text=(
+                    ranking.defect_text
+                ),
 
-                change_id=ranking.change_id,
+                change_id=(
+                    ranking.change_id
+                ),
 
                 relevance_score=(
                     ranking.relevance_score
@@ -731,7 +825,9 @@ def create_analysis(
                     ranking.rank_position
                 ),
 
-                reason=ranking.reason,
+                reason=(
+                    ranking.reason
+                ),
             )
         )
 
@@ -758,16 +854,25 @@ def create_analysis(
 @router.post(
     "/analyses/compare",
     response_model=AnalysisDetail,
-    status_code=status.HTTP_201_CREATED,
+    status_code=(
+        status.HTTP_201_CREATED
+    ),
 )
 def compare_uploaded_requirements(
-    source_file: UploadFile = File(...),
-    target_file: UploadFile = File(...),
+    source_file: UploadFile = File(
+        ...
+    ),
+    target_file: UploadFile = File(
+        ...
+    ),
     analysis_name: str = Form(
         default="",
     ),
-    database: Session = Depends(get_db),
+    database: Session = Depends(
+        get_db
+    ),
 ) -> AnalysisDetail:
+
     source_path: str | None = None
     target_path: str | None = None
 
@@ -846,9 +951,11 @@ def compare_uploaded_requirements(
             analysis_name=(
                 clean_analysis_name
             ),
+
             source_version=(
                 source_version
             ),
+
             target_version=(
                 target_version
             ),
@@ -860,7 +967,9 @@ def compare_uploaded_requirements(
         ) in result_dataframe.iterrows():
 
             change_type = str(
-                row["change_type"]
+                row[
+                    "change_type"
+                ]
             ).strip()
 
             if (
@@ -897,13 +1006,17 @@ def compare_uploaded_requirements(
 
                     old_requirement_text=(
                         _optional_string(
-                            row["old_text"]
+                            row[
+                                "old_text"
+                            ]
                         )
                     ),
 
                     new_requirement_text=(
                         _optional_string(
-                            row["new_text"]
+                            row[
+                                "new_text"
+                            ]
                         )
                     ),
 
@@ -916,16 +1029,22 @@ def compare_uploaded_requirements(
                     ),
 
                     risk_score=float(
-                        row["risk_score"]
+                        row[
+                            "risk_score"
+                        ]
                     ),
 
                     risk_level=str(
-                        row["risk_level"]
+                        row[
+                            "risk_level"
+                        ]
                     ).strip(),
 
                     confidence=(
                         _optional_float(
-                            row["confidence"]
+                            row[
+                                "confidence"
+                            ]
                         )
                     ),
 
@@ -964,7 +1083,9 @@ def compare_uploaded_requirements(
             status_code=(
                 status.HTTP_400_BAD_REQUEST
             ),
-            detail=str(error),
+            detail=str(
+                error
+            ),
         ) from error
 
     except ValueError as error:
@@ -974,7 +1095,9 @@ def compare_uploaded_requirements(
             status_code=(
                 status.HTTP_400_BAD_REQUEST
             ),
-            detail=str(error),
+            detail=str(
+                error
+            ),
         ) from error
 
     except Exception:
@@ -1000,24 +1123,35 @@ def compare_uploaded_requirements(
 
 @router.post(
     "/analyses/{analysis_id}/defect-rankings",
-    response_model=DefectAnalysisResponse,
+    response_model=(
+        DefectAnalysisResponse
+    ),
 )
 def analyze_defect(
     analysis_id: int,
     payload: DefectAnalysisRequest,
-    database: Session = Depends(get_db),
+    database: Session = Depends(
+        get_db
+    ),
 ) -> DefectAnalysisResponse:
+
     analysis = _load_analysis(
         analysis_id=analysis_id,
         database=database,
     )
 
-    if not analysis.requirement_changes:
+    if (
+        not analysis
+        .requirement_changes
+    ):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=(
+                status.HTTP_400_BAD_REQUEST
+            ),
             detail=(
                 "Bu analizde defect ile "
-                "karşılaştırılabilecek değişiklik bulunmuyor."
+                "karşılaştırılabilecek "
+                "değişiklik bulunmuyor."
             ),
         )
 
@@ -1027,8 +1161,10 @@ def analyze_defect(
 
     defect_id = (
         payload.defect_id.strip()
-        if payload.defect_id
-        and payload.defect_id.strip()
+        if (
+            payload.defect_id
+            and payload.defect_id.strip()
+        )
         else _next_defect_id(
             analysis
         )
@@ -1047,11 +1183,18 @@ def analyze_defect(
     try:
         ranking_dataframe = (
             ranker.rank(
-                defect_text=defect_text,
+                defect_text=(
+                    defect_text
+                ),
+
                 changes_dataframe=(
                     changes_dataframe
                 ),
-                top_k=payload.top_k,
+
+                top_k=(
+                    payload.top_k
+                ),
+
                 min_relevance=(
                     payload.min_relevance
                 ),
@@ -1060,12 +1203,14 @@ def analyze_defect(
 
     except ValueError as error:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(error),
+            status_code=(
+                status.HTTP_400_BAD_REQUEST
+            ),
+            detail=str(
+                error
+            ),
         ) from error
 
-    # Aynı defect ID tekrar analiz edilirse
-    # eski sıralama kayıtlarını yeniliyoruz.
     database.execute(
         delete(
             DefectRanking
@@ -1097,7 +1242,9 @@ def analyze_defect(
 
         change_id = (
             _optional_string(
-                row["change_id"]
+                row[
+                    "change_id"
+                ]
             )
         )
 
@@ -1115,20 +1262,27 @@ def analyze_defect(
 
         reason = (
             _optional_string(
-                row["reason"]
+                row[
+                    "reason"
+                ]
             )
             or (
                 "Bu değişiklik defect ile "
-                "ilişkili olabilecek adaylardan biridir."
+                "ilişkili olabilecek "
+                "adaylardan biridir."
             )
         )
 
         relevance_score = float(
-            row["relevance_score"]
+            row[
+                "relevance_score"
+            ]
         )
 
         rank_position = int(
-            row["rank"]
+            row[
+                "rank"
+            ]
         )
 
         database.add(
@@ -1268,13 +1422,20 @@ def analyze_defect(
 
 @router.get(
     "/analyses",
-    response_model=list[AnalysisSummary],
+    response_model=list[
+        AnalysisSummary
+    ],
 )
 def list_analyses(
-    database: Session = Depends(get_db),
+    database: Session = Depends(
+        get_db
+    ),
 ) -> list[AnalysisSummary]:
+
     statement = (
-        select(AnalysisRun)
+        select(
+            AnalysisRun
+        )
         .options(
             selectinload(
                 AnalysisRun.requirement_changes
@@ -1311,12 +1472,17 @@ def list_analyses(
 
 @router.get(
     "/analyses/{analysis_id}",
-    response_model=AnalysisDetail,
+    response_model=(
+        AnalysisDetail
+    ),
 )
 def get_analysis(
     analysis_id: int,
-    database: Session = Depends(get_db),
+    database: Session = Depends(
+        get_db
+    ),
 ) -> AnalysisDetail:
+
     analysis = _load_analysis(
         analysis_id=analysis_id,
         database=database,
@@ -1338,8 +1504,11 @@ def get_analysis(
 )
 def download_analysis_report(
     analysis_id: int,
-    database: Session = Depends(get_db),
+    database: Session = Depends(
+        get_db
+    ),
 ) -> FileResponse:
+
     analysis = _load_analysis(
         analysis_id=analysis_id,
         database=database,
@@ -1360,28 +1529,37 @@ def download_analysis_report(
 
         generator.generate(
             analysis=analysis,
-            output_path=output_path,
+            output_path=(
+                output_path
+            ),
         )
 
     except Exception:
         _delete_temp_report(
             output_path
         )
+
         raise
 
     download_filename = (
-        f"ScopeDiff_Analysis_"
+        "ScopeDiff_Analysis_"
         f"{analysis.id}.xlsx"
     )
 
     return FileResponse(
         path=output_path,
+
         media_type=(
             "application/"
-            "vnd.openxmlformats-officedocument."
+            "vnd.openxmlformats-"
+            "officedocument."
             "spreadsheetml.sheet"
         ),
-        filename=download_filename,
+
+        filename=(
+            download_filename
+        ),
+
         background=BackgroundTask(
             _delete_temp_report,
             output_path,

@@ -107,3 +107,77 @@ export interface DefectAnalysisResult {
 
   candidates: DefectCandidate[]
 }
+
+
+/* =====================================================
+   HISTORY
+   ===================================================== */
+
+
+export interface HistoryCatalogItem {
+  requirement_id: string
+  module: string
+
+  version_count: number
+
+  first_version: string
+  latest_version: string
+
+  highest_risk: string | null
+
+  current_text: string
+}
+
+
+export interface HistoryCatalog {
+  modules: string[]
+
+  requirements: HistoryCatalogItem[]
+}
+
+
+export interface HistorySummary {
+  requirement_id: string
+  module: string
+
+  first_version: string
+  latest_version: string
+
+  version_count: number
+  transition_count: number
+
+  highest_risk: string | null
+
+  change_types: string[]
+
+  current_text: string
+}
+
+
+export interface HistoryTimelineItem {
+  requirement_id: string
+  module: string
+
+  version: string
+  version_label: string
+
+  requirement_text: string
+
+  previous_version: string | null
+  transition_id: string | null
+
+  change_type: string
+  risk_level: string
+
+  change_explanation: string
+
+  is_initial_version: boolean
+  is_current_version: boolean
+}
+
+
+export interface RequirementHistory {
+  summary: HistorySummary
+
+  timeline: HistoryTimelineItem[]
+}

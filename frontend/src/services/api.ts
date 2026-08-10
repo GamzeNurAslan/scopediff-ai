@@ -3,6 +3,8 @@ import type {
   AnalysisSummary,
   DefectAnalysisResult,
   HealthResponse,
+  HistoryCatalog,
+  RequirementHistory,
 } from '../types/api'
 
 
@@ -18,8 +20,26 @@ async function request<T>(
   )
 
   if (!response.ok) {
+    let message =
+      `API request failed: ${response.status}`
+
+    try {
+      const errorBody =
+        await response.json()
+
+      if (
+        typeof errorBody.detail
+        === 'string'
+      ) {
+        message =
+          errorBody.detail
+      }
+    } catch {
+      // Varsayılan mesaj.
+    }
+
     throw new Error(
-      `API request failed: ${response.status}`,
+      message,
     )
   }
 
@@ -70,20 +90,23 @@ export async function compareRequirementFiles(
     targetFile,
   )
 
-  if (analysisName.trim()) {
+  if (
+    analysisName.trim()
+  ) {
     formData.append(
       'analysis_name',
       analysisName.trim(),
     )
   }
 
-  const response = await fetch(
-    `${API_BASE_URL}/analyses/compare`,
-    {
-      method: 'POST',
-      body: formData,
-    },
-  )
+  const response =
+    await fetch(
+      `${API_BASE_URL}/analyses/compare`,
+      {
+        method: 'POST',
+        body: formData,
+      },
+    )
 
   if (!response.ok) {
     let message =
@@ -100,6 +123,7 @@ export async function compareRequirementFiles(
         message =
           errorBody.detail
       }
+
     } catch {
       // Varsayılan mesaj.
     }
@@ -118,28 +142,30 @@ export async function analyzeDefect(
   defectText: string,
   topK: number = 5,
 ): Promise<DefectAnalysisResult> {
-  const response = await fetch(
-    `${API_BASE_URL}/analyses/${analysisId}/defect-rankings`,
-    {
-      method: 'POST',
 
-      headers: {
-        'Content-Type':
-          'application/json',
+  const response =
+    await fetch(
+      `${API_BASE_URL}/analyses/${analysisId}/defect-rankings`,
+      {
+        method: 'POST',
+
+        headers: {
+          'Content-Type':
+            'application/json',
+        },
+
+        body: JSON.stringify({
+          defect_text:
+            defectText.trim(),
+
+          top_k:
+            topK,
+
+          min_relevance:
+            0.0,
+        }),
       },
-
-      body: JSON.stringify({
-        defect_text:
-          defectText.trim(),
-
-        top_k:
-          topK,
-
-        min_relevance:
-          0.0,
-      }),
-    },
-  )
+    )
 
   if (!response.ok) {
     let message =
@@ -156,6 +182,7 @@ export async function analyzeDefect(
         message =
           errorBody.detail
       }
+
     } catch {
       // Varsayılan mesaj.
     }
@@ -169,12 +196,41 @@ export async function analyzeDefect(
 }
 
 
+/* =====================================================
+   HISTORY
+   ===================================================== */
+
+
+export function getHistoryCatalog():
+Promise<HistoryCatalog> {
+  return request<HistoryCatalog>(
+    '/history/requirements',
+  )
+}
+
+
+export function getRequirementHistory(
+  requirementId: string,
+): Promise<RequirementHistory> {
+
+  return request<RequirementHistory>(
+    `/history/requirements/${
+      encodeURIComponent(
+        requirementId,
+      )
+    }`,
+  )
+}
+
+
 export async function downloadAnalysisReport(
   analysisId: number,
 ): Promise<void> {
-  const response = await fetch(
-    `${API_BASE_URL}/analyses/${analysisId}/report`,
-  )
+
+  const response =
+    await fetch(
+      `${API_BASE_URL}/analyses/${analysisId}/report`,
+    )
 
   if (!response.ok) {
     throw new Error(
@@ -191,7 +247,9 @@ export async function downloadAnalysisReport(
     )
 
   const link =
-    document.createElement('a')
+    document.createElement(
+      'a',
+    )
 
   link.href =
     downloadUrl
