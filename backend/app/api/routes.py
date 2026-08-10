@@ -49,12 +49,21 @@ from backend.app.reports.excel_report import (
 router = APIRouter()
 
 
+# =========================================================
+# REQUEST / RESPONSE MODELS
+# =========================================================
+
+
 class RequirementChangeCreate(BaseModel):
     old_requirement_id: str | None = None
     new_requirement_id: str | None = None
 
     old_requirement_text: str | None = None
     new_requirement_text: str | None = None
+
+    detailed_change_types: list[str] = Field(
+        default_factory=list,
+    )
 
     change_type: str
 
@@ -76,7 +85,9 @@ class RequirementChangeCreate(BaseModel):
 
 class DefectRankingCreate(BaseModel):
     defect_id: str | None = None
+
     defect_text: str
+
     change_id: str | None = None
 
     relevance_score: float = Field(
@@ -127,9 +138,12 @@ class DefectRankingResponse(
 
 class AnalysisSummary(BaseModel):
     id: int
+
     analysis_name: str
+
     source_version: str | None
     target_version: str | None
+
     created_at: datetime
 
     requirement_change_count: int
@@ -138,9 +152,12 @@ class AnalysisSummary(BaseModel):
 
 class AnalysisDetail(BaseModel):
     id: int
+
     analysis_name: str
+
     source_version: str | None
     target_version: str | None
+
     created_at: datetime
 
     requirement_changes: list[
@@ -150,6 +167,11 @@ class AnalysisDetail(BaseModel):
     defect_rankings: list[
         DefectRankingResponse
     ]
+
+
+# =========================================================
+# RESPONSE HELPERS
+# =========================================================
 
 
 def _to_summary(
@@ -182,41 +204,63 @@ def _to_detail(
         requirement_changes=[
             RequirementChangeResponse(
                 id=change.id,
+
                 old_requirement_id=(
                     change.old_requirement_id
                 ),
+
                 new_requirement_id=(
                     change.new_requirement_id
                 ),
+
                 old_requirement_text=(
                     change.old_requirement_text
                 ),
+
                 new_requirement_text=(
                     change.new_requirement_text
                 ),
+
+                detailed_change_types=list(
+                    change.detailed_change_types
+                    or []
+                ),
+
                 change_type=change.change_type,
+
                 risk_score=change.risk_score,
+
                 risk_level=change.risk_level,
+
                 confidence=change.confidence,
+
                 explanation=change.explanation,
             )
-            for change in analysis.requirement_changes
+            for change
+            in analysis.requirement_changes
         ],
         defect_rankings=[
             DefectRankingResponse(
                 id=ranking.id,
+
                 defect_id=ranking.defect_id,
+
                 defect_text=ranking.defect_text,
+
                 change_id=ranking.change_id,
+
                 relevance_score=(
                     ranking.relevance_score
                 ),
+
                 rank_position=(
                     ranking.rank_position
                 ),
+
                 reason=ranking.reason,
             )
-            for ranking in analysis.defect_rankings
+            for ranking
+            in analysis.defect_rankings
         ],
     )
 
@@ -241,7 +285,9 @@ def _load_analysis(
     )
 
     analysis = (
-        database.scalars(statement)
+        database.scalars(
+            statement
+        )
         .first()
     )
 
@@ -254,10 +300,18 @@ def _load_analysis(
     return analysis
 
 
+# =========================================================
+# FILE HELPERS
+# =========================================================
+
+
 def _validate_excel_upload(
     upload_file: UploadFile,
 ) -> None:
-    filename = upload_file.filename or ""
+    filename = (
+        upload_file.filename
+        or ""
+    )
 
     extension = (
         Path(filename)
@@ -293,9 +347,13 @@ def _save_upload_to_temp(
             temporary_file,
         )
 
-        temporary_path = temporary_file.name
+        temporary_path = (
+            temporary_file.name
+        )
 
-    if os.path.getsize(temporary_path) == 0:
+    if os.path.getsize(
+        temporary_path
+    ) == 0:
         _delete_temp_file(
             temporary_path
         )
@@ -312,7 +370,9 @@ def _delete_temp_file(
     file_path: str,
 ) -> None:
     try:
-        os.remove(file_path)
+        os.remove(
+            file_path
+        )
     except FileNotFoundError:
         pass
 
@@ -359,7 +419,10 @@ def _optional_string(
     try:
         if pd.isna(value):
             return None
-    except (TypeError, ValueError):
+    except (
+        TypeError,
+        ValueError,
+    ):
         pass
 
     text = str(value).strip()
@@ -382,10 +445,55 @@ def _optional_float(
     try:
         if pd.isna(value):
             return None
-    except (TypeError, ValueError):
+    except (
+        TypeError,
+        ValueError,
+    ):
         return None
 
     return float(value)
+
+
+def _string_list(
+    value: object,
+) -> list[str]:
+    if value is None:
+        return []
+
+    if isinstance(
+        value,
+        (
+            list,
+            tuple,
+            set,
+        ),
+    ):
+        return [
+            str(item).strip()
+            for item in value
+            if str(item).strip()
+        ]
+
+    try:
+        if pd.isna(value):
+            return []
+    except (
+        TypeError,
+        ValueError,
+    ):
+        pass
+
+    text = str(value).strip()
+
+    if not text:
+        return []
+
+    return [text]
+
+
+# =========================================================
+# REPORT HELPERS
+# =========================================================
 
 
 def _delete_temp_report(
@@ -394,6 +502,11 @@ def _delete_temp_report(
     _delete_temp_file(
         file_path
     )
+
+
+# =========================================================
+# MANUAL ANALYSIS CREATE
+# =========================================================
 
 
 @router.post(
@@ -417,19 +530,31 @@ def create_analysis(
                 old_requirement_id=(
                     change.old_requirement_id
                 ),
+
                 new_requirement_id=(
                     change.new_requirement_id
                 ),
+
                 old_requirement_text=(
                     change.old_requirement_text
                 ),
+
                 new_requirement_text=(
                     change.new_requirement_text
                 ),
+
+                detailed_change_types=list(
+                    change.detailed_change_types
+                ),
+
                 change_type=change.change_type,
+
                 risk_score=change.risk_score,
+
                 risk_level=change.risk_level,
+
                 confidence=change.confidence,
+
                 explanation=change.explanation,
             )
         )
@@ -438,25 +563,41 @@ def create_analysis(
         analysis.defect_rankings.append(
             DefectRanking(
                 defect_id=ranking.defect_id,
+
                 defect_text=ranking.defect_text,
+
                 change_id=ranking.change_id,
+
                 relevance_score=(
                     ranking.relevance_score
                 ),
+
                 rank_position=(
                     ranking.rank_position
                 ),
+
                 reason=ranking.reason,
             )
         )
 
-    database.add(analysis)
+    database.add(
+        analysis
+    )
+
     database.commit()
-    database.refresh(analysis)
+
+    database.refresh(
+        analysis
+    )
 
     return _to_detail(
         analysis
     )
+
+
+# =========================================================
+# REAL EXCEL COMPARISON
+# =========================================================
 
 
 @router.post(
@@ -467,20 +608,34 @@ def create_analysis(
 def compare_uploaded_requirements(
     source_file: UploadFile = File(...),
     target_file: UploadFile = File(...),
-    analysis_name: str = Form(default=""),
+    analysis_name: str = Form(
+        default="",
+    ),
     database: Session = Depends(get_db),
 ) -> AnalysisDetail:
     source_path: str | None = None
     target_path: str | None = None
 
     try:
-        source_path = _save_upload_to_temp(
-            source_file
+        # -------------------------------------------------
+        # 1. FILES
+        # -------------------------------------------------
+
+        source_path = (
+            _save_upload_to_temp(
+                source_file
+            )
         )
 
-        target_path = _save_upload_to_temp(
-            target_file
+        target_path = (
+            _save_upload_to_temp(
+                target_file
+            )
         )
+
+        # -------------------------------------------------
+        # 2. LOAD EXCEL
+        # -------------------------------------------------
 
         old_dataframe = (
             load_requirements_excel(
@@ -494,27 +649,57 @@ def compare_uploaded_requirements(
             )
         )
 
-        matcher = SemanticRequirementMatcher()
+        # -------------------------------------------------
+        # 3. SEMANTIC MATCHER
+        # -------------------------------------------------
 
-        pipeline = ScopeDiffAnalysisPipeline(
-            matcher=matcher,
+        matcher = (
+            SemanticRequirementMatcher()
         )
 
-        result_dataframe = pipeline.analyze(
-            old_dataframe=old_dataframe,
-            new_dataframe=new_dataframe,
-            top_k=5,
+        # -------------------------------------------------
+        # 4. ANALYSIS PIPELINE
+        # -------------------------------------------------
+
+        pipeline = (
+            ScopeDiffAnalysisPipeline(
+                matcher=matcher,
+            )
         )
 
-        source_version = _extract_version(
-            old_dataframe,
-            fallback="source",
+        result_dataframe = (
+            pipeline.analyze(
+                old_dataframe=(
+                    old_dataframe
+                ),
+                new_dataframe=(
+                    new_dataframe
+                ),
+                top_k=5,
+            )
         )
 
-        target_version = _extract_version(
-            new_dataframe,
-            fallback="target",
+        # -------------------------------------------------
+        # 5. VERSIONS
+        # -------------------------------------------------
+
+        source_version = (
+            _extract_version(
+                old_dataframe,
+                fallback="source",
+            )
         )
+
+        target_version = (
+            _extract_version(
+                new_dataframe,
+                fallback="target",
+            )
+        )
+
+        # -------------------------------------------------
+        # 6. ANALYSIS NAME
+        # -------------------------------------------------
 
         clean_analysis_name = (
             analysis_name.strip()
@@ -526,22 +711,53 @@ def compare_uploaded_requirements(
                 f"{target_version} Analizi"
             )
 
+        # -------------------------------------------------
+        # 7. ANALYSIS RUN
+        # -------------------------------------------------
+
         analysis = AnalysisRun(
-            analysis_name=clean_analysis_name,
-            source_version=source_version,
-            target_version=target_version,
+            analysis_name=(
+                clean_analysis_name
+            ),
+            source_version=(
+                source_version
+            ),
+            target_version=(
+                target_version
+            ),
         )
 
-        for _, row in result_dataframe.iterrows():
+        # -------------------------------------------------
+        # 8. SAVE PIPELINE RESULTS
+        # -------------------------------------------------
+
+        for (
+            _,
+            row,
+        ) in result_dataframe.iterrows():
+
             change_type = str(
                 row["change_type"]
             ).strip()
 
-            if change_type.lower() == "unchanged":
+            if (
+                change_type.lower()
+                == "unchanged"
+            ):
                 continue
 
-            confidence = _optional_float(
-                row["confidence"]
+            confidence = (
+                _optional_float(
+                    row["confidence"]
+                )
+            )
+
+            detailed_change_types = (
+                _string_list(
+                    row[
+                        "detailed_change_types"
+                    ]
+                )
             )
 
             analysis.requirement_changes.append(
@@ -553,6 +769,7 @@ def compare_uploaded_requirements(
                             ]
                         )
                     ),
+
                     new_requirement_id=(
                         _optional_string(
                             row[
@@ -561,20 +778,25 @@ def compare_uploaded_requirements(
                         )
                     ),
 
-                    # Pipeline çıktısındaki
-                    # gerçek gereksinim metinleri.
                     old_requirement_text=(
                         _optional_string(
                             row["old_text"]
                         )
                     ),
+
                     new_requirement_text=(
                         _optional_string(
                             row["new_text"]
                         )
                     ),
 
-                    change_type=change_type,
+                    detailed_change_types=(
+                        detailed_change_types
+                    ),
+
+                    change_type=(
+                        change_type
+                    ),
 
                     risk_score=float(
                         row["risk_score"]
@@ -584,7 +806,9 @@ def compare_uploaded_requirements(
                         row["risk_level"]
                     ).strip(),
 
-                    confidence=confidence,
+                    confidence=(
+                        confidence
+                    ),
 
                     explanation=(
                         _optional_string(
@@ -596,9 +820,15 @@ def compare_uploaded_requirements(
                 )
             )
 
-        database.add(analysis)
+        database.add(
+            analysis
+        )
+
         database.commit()
-        database.refresh(analysis)
+
+        database.refresh(
+            analysis
+        )
 
         return _to_detail(
             analysis
@@ -612,7 +842,9 @@ def compare_uploaded_requirements(
         database.rollback()
 
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=(
+                status.HTTP_400_BAD_REQUEST
+            ),
             detail=str(error),
         ) from error
 
@@ -620,7 +852,9 @@ def compare_uploaded_requirements(
         database.rollback()
 
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=(
+                status.HTTP_400_BAD_REQUEST
+            ),
             detail=str(error),
         ) from error
 
@@ -638,6 +872,11 @@ def compare_uploaded_requirements(
             _delete_temp_file(
                 target_path
             )
+
+
+# =========================================================
+# ANALYSIS LIST
+# =========================================================
 
 
 @router.get(
@@ -670,9 +909,17 @@ def list_analyses(
     )
 
     return [
-        _to_summary(analysis)
-        for analysis in analyses
+        _to_summary(
+            analysis
+        )
+        for analysis
+        in analyses
     ]
+
+
+# =========================================================
+# ANALYSIS DETAIL
+# =========================================================
 
 
 @router.get(
@@ -693,6 +940,11 @@ def get_analysis(
     )
 
 
+# =========================================================
+# EXCEL REPORT
+# =========================================================
+
+
 @router.get(
     "/analyses/{analysis_id}/report",
     response_class=FileResponse,
@@ -710,10 +962,14 @@ def download_analysis_report(
         suffix=".xlsx",
         delete=False,
     ) as temporary_file:
-        output_path = temporary_file.name
+        output_path = (
+            temporary_file.name
+        )
 
     try:
-        generator = ExcelReportGenerator()
+        generator = (
+            ExcelReportGenerator()
+        )
 
         generator.generate(
             analysis=analysis,
@@ -724,6 +980,7 @@ def download_analysis_report(
         _delete_temp_report(
             output_path
         )
+
         raise
 
     download_filename = (

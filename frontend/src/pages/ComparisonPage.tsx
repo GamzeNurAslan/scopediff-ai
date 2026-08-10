@@ -60,6 +60,22 @@ function formatRiskLevel(
 }
 
 
+function getVisibleChangeTypes(
+  change: RequirementChange,
+): string[] {
+  if (
+    change.detailed_change_types
+    && change.detailed_change_types.length > 0
+  ) {
+    return change.detailed_change_types
+  }
+
+  return [
+    change.change_type,
+  ]
+}
+
+
 function ComparisonPage() {
   const [
     analyses,
@@ -110,10 +126,6 @@ function ComparisonPage() {
   ] = useState('all')
 
 
-  // =====================================================
-  // ANALİZ LİSTESİNİ GETİR
-  // =====================================================
-
   useEffect(() => {
     async function loadAnalyses() {
       try {
@@ -146,10 +158,6 @@ function ComparisonPage() {
     void loadAnalyses()
   }, [])
 
-
-  // =====================================================
-  // SEÇİLEN ANALİZİN DETAYINI GETİR
-  // =====================================================
 
   useEffect(() => {
     if (
@@ -189,10 +197,6 @@ function ComparisonPage() {
   }, [selectedAnalysisId])
 
 
-  // =====================================================
-  // DEĞİŞİM TÜRLERİ
-  // =====================================================
-
   const changeTypes =
     useMemo(() => {
       const types =
@@ -204,9 +208,16 @@ function ComparisonPage() {
           ?.requirement_changes
         ?? []
       ) {
-        types.add(
-          change.change_type,
-        )
+        for (
+          const type
+          of getVisibleChangeTypes(
+            change,
+          )
+        ) {
+          types.add(
+            type,
+          )
+        }
       }
 
       return Array.from(
@@ -214,10 +225,6 @@ function ComparisonPage() {
       ).sort()
     }, [analysis])
 
-
-  // =====================================================
-  // KPI
-  // =====================================================
 
   const metrics =
     useMemo(() => {
@@ -269,10 +276,6 @@ function ComparisonPage() {
     }, [analysis])
 
 
-  // =====================================================
-  // FİLTRELENMİŞ SONUÇLAR
-  // =====================================================
-
   const filteredChanges =
     useMemo(() => {
       const changes =
@@ -290,6 +293,11 @@ function ComparisonPage() {
           change:
             RequirementChange,
         ) => {
+          const visibleTypes =
+            getVisibleChangeTypes(
+              change,
+            )
+
           const matchesRisk =
             riskFilter
               === 'all'
@@ -301,20 +309,34 @@ function ComparisonPage() {
           const matchesType =
             changeTypeFilter
               === 'all'
-            || change
-              .change_type
-              === changeTypeFilter
+            || visibleTypes.includes(
+              changeTypeFilter,
+            )
 
           const searchableText =
             [
               change
                 .old_requirement_id
               ?? '',
+
               change
                 .new_requirement_id
               ?? '',
+
+              change
+                .old_requirement_text
+              ?? '',
+
+              change
+                .new_requirement_text
+              ?? '',
+
               change.change_type,
+
+              ...visibleTypes,
+
               change.risk_level,
+
               change.explanation
               ?? '',
             ]
@@ -343,10 +365,6 @@ function ComparisonPage() {
     ])
 
 
-  // =====================================================
-  // LOADING
-  // =====================================================
-
   if (
     loading
     && analyses.length === 0
@@ -360,10 +378,6 @@ function ComparisonPage() {
   }
 
 
-  // =====================================================
-  // ERROR
-  // =====================================================
-
   if (error) {
     return (
       <div className="dashboard-message error">
@@ -373,15 +387,12 @@ function ComparisonPage() {
   }
 
 
-  // =====================================================
-  // EMPTY
-  // =====================================================
-
   if (
     analyses.length === 0
   ) {
     return (
       <div className="empty-dashboard">
+
         <GitCompare
           size={38}
         />
@@ -391,11 +402,11 @@ function ComparisonPage() {
         </h2>
 
         <p>
-          Önce Yükleme
-          ekranından iki
-          gereksinim versiyonunu
+          Önce Yükleme ekranından
+          iki gereksinim versiyonunu
           karşılaştır.
         </p>
+
       </div>
     )
   }
@@ -403,10 +414,6 @@ function ComparisonPage() {
 
   return (
     <div className="comparison-page">
-
-      {/* =========================================
-          ÜST ALAN
-      ========================================= */}
 
       <section className="comparison-header">
 
@@ -478,10 +485,6 @@ function ComparisonPage() {
       </section>
 
 
-      {/* =========================================
-          VERSİYON BİLGİSİ
-      ========================================= */}
-
       {analysis && (
         <section className="comparison-version-card">
 
@@ -539,13 +542,10 @@ function ComparisonPage() {
       )}
 
 
-      {/* =========================================
-          KPI
-      ========================================= */}
-
       <section className="comparison-kpi-grid">
 
         <article className="comparison-kpi-card">
+
           <div className="comparison-kpi-icon blue">
             <GitCompare
               size={17}
@@ -561,10 +561,12 @@ function ComparisonPage() {
               {metrics.total}
             </strong>
           </div>
+
         </article>
 
 
         <article className="comparison-kpi-card">
+
           <div className="comparison-kpi-icon green">
             <ShieldAlert
               size={17}
@@ -580,10 +582,12 @@ function ComparisonPage() {
               {metrics.low}
             </strong>
           </div>
+
         </article>
 
 
         <article className="comparison-kpi-card">
+
           <div className="comparison-kpi-icon yellow">
             <AlertTriangle
               size={17}
@@ -599,10 +603,12 @@ function ComparisonPage() {
               {metrics.medium}
             </strong>
           </div>
+
         </article>
 
 
         <article className="comparison-kpi-card">
+
           <div className="comparison-kpi-icon orange">
             <AlertTriangle
               size={17}
@@ -618,10 +624,12 @@ function ComparisonPage() {
               {metrics.high}
             </strong>
           </div>
+
         </article>
 
 
         <article className="comparison-kpi-card">
+
           <div className="comparison-kpi-icon red">
             <ShieldAlert
               size={17}
@@ -637,14 +645,11 @@ function ComparisonPage() {
               {metrics.critical}
             </strong>
           </div>
+
         </article>
 
       </section>
 
-
-      {/* =========================================
-          FİLTRELER
-      ========================================= */}
 
       <section className="comparison-filter-card">
 
@@ -660,7 +665,7 @@ function ComparisonPage() {
               searchTerm
             }
             placeholder={
-              'Requirement ID, değişim türü veya açıklama ara...'
+              'Requirement ID, metin, değişim türü veya açıklama ara...'
             }
             onChange={
               (event) =>
@@ -746,10 +751,6 @@ function ComparisonPage() {
       </section>
 
 
-      {/* =========================================
-          SONUÇ BAŞLIĞI
-      ========================================= */}
-
       <section className="comparison-results-heading">
 
         <div>
@@ -773,17 +774,15 @@ function ComparisonPage() {
       </section>
 
 
-      {/* =========================================
-          DEĞİŞİKLİK KARTLARI
-      ========================================= */}
-
       <section className="comparison-change-list">
 
         {loading ? (
+
           <div className="comparison-empty-result">
             Analiz detayları
             yükleniyor...
           </div>
+
         ) : filteredChanges.length
           === 0 ? (
 
@@ -802,6 +801,11 @@ function ComparisonPage() {
                 change
                   .risk_level
                   .toLowerCase()
+
+              const visibleTypes =
+                getVisibleChangeTypes(
+                  change,
+                )
 
               return (
                 <article
@@ -838,14 +842,22 @@ function ComparisonPage() {
 
                     <div className="change-card-badges">
 
-                      <span className="change-type-badge">
-                        {
-                          formatChangeType(
-                            change
-                              .change_type,
-                          )
-                        }
-                      </span>
+                      {visibleTypes.map(
+                        (type) => (
+                          <span
+                            key={
+                              `${change.id}-${type}`
+                            }
+                            className="change-type-badge"
+                          >
+                            {
+                              formatChangeType(
+                                type,
+                              )
+                            }
+                          </span>
+                        ),
+                      )}
 
                       <span
                         className={
@@ -864,57 +876,61 @@ function ComparisonPage() {
 
                   </div>
 
+
                   <div className="requirement-text-diff">
 
-  <div className="requirement-text-panel old">
+                    <div className="requirement-text-panel old">
 
-    <span className="requirement-text-label">
-      ÖNCEKİ GEREKSİNİM
-    </span>
+                      <span className="requirement-text-label">
+                        ÖNCEKİ GEREKSİNİM
+                      </span>
 
-    <p>
-      {
-        change.old_requirement_text
-        ?? (
-          change.old_requirement_id === null
-            ? 'Bu gereksinim önceki versiyonda bulunmuyordu.'
-            : 'Önceki gereksinim metni bulunamadı.'
-        )
-      }
-    </p>
+                      <p>
+                        {
+                          change.old_requirement_text
+                          ?? (
+                            change.old_requirement_id
+                              === null
+                              ? 'Bu gereksinim önceki versiyonda bulunmuyordu.'
+                              : 'Önceki gereksinim metni bulunamadı.'
+                          )
+                        }
+                      </p>
 
-  </div>
-
-
-  <div className="requirement-text-arrow">
-
-    <ArrowRight
-      size={17}
-    />
-
-  </div>
+                    </div>
 
 
-  <div className="requirement-text-panel new">
+                    <div className="requirement-text-arrow">
 
-    <span className="requirement-text-label">
-      YENİ GEREKSİNİM
-    </span>
+                      <ArrowRight
+                        size={17}
+                      />
 
-    <p>
-      {
-        change.new_requirement_text
-        ?? (
-          change.new_requirement_id === null
-            ? 'Bu gereksinim yeni versiyondan kaldırıldı.'
-            : 'Yeni gereksinim metni bulunamadı.'
-        )
-      }
-    </p>
+                    </div>
 
-  </div>
 
-</div>
+                    <div className="requirement-text-panel new">
+
+                      <span className="requirement-text-label">
+                        YENİ GEREKSİNİM
+                      </span>
+
+                      <p>
+                        {
+                          change.new_requirement_text
+                          ?? (
+                            change.new_requirement_id
+                              === null
+                              ? 'Bu gereksinim yeni versiyondan kaldırıldı.'
+                              : 'Yeni gereksinim metni bulunamadı.'
+                          )
+                        }
+                      </p>
+
+                    </div>
+
+                  </div>
+
 
                   <div className="change-card-metrics">
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 
 from sqlalchemy import (
+    JSON,
     DateTime,
     Float,
     ForeignKey,
@@ -111,6 +112,14 @@ class RequirementChange(Base):
     ] = mapped_column(
         Text,
         nullable=True,
+    )
+
+    detailed_change_types: Mapped[
+        list[str]
+    ] = mapped_column(
+        JSON,
+        nullable=False,
+        default=list,
     )
 
     change_type: Mapped[str] = mapped_column(

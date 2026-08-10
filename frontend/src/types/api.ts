@@ -13,6 +13,8 @@ export interface RequirementChange {
   old_requirement_text: string | null
   new_requirement_text: string | null
 
+  detailed_change_types: string[]
+
   change_type: string
 
   risk_score: number
