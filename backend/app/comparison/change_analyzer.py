@@ -37,6 +37,10 @@ class RequirementChangeAnalyzer:
     değişikliklerini kural tabanlı olarak tespit eder.
     """
 
+    # =========================================================
+    # SÜRE / SAYI PATTERNLARI
+    # =========================================================
+
     DURATION_PATTERN = re.compile(
         r"(?P<value>\d+(?:[.,]\d+)?)\s*"
         r"(?P<unit>"
@@ -47,6 +51,52 @@ class RequirementChangeAnalyzer:
     NUMBER_PATTERN = re.compile(
         r"(?<!\w)%?\d+(?:[.,]\d+)?(?!\w)"
     )
+
+    # =========================================================
+    # TÜRKÇE YAZIYLA SAYILAR
+    # =========================================================
+
+    TURKISH_NUMBER_UNITS = {
+        "sıfır": 0,
+        "bir": 1,
+        "iki": 2,
+        "üç": 3,
+        "dört": 4,
+        "beş": 5,
+        "altı": 6,
+        "yedi": 7,
+        "sekiz": 8,
+        "dokuz": 9,
+    }
+
+    TURKISH_NUMBER_TENS = {
+        "on": 10,
+        "yirmi": 20,
+        "otuz": 30,
+        "kırk": 40,
+        "elli": 50,
+        "altmış": 60,
+        "yetmiş": 70,
+        "seksen": 80,
+        "doksan": 90,
+    }
+
+    TURKISH_NUMBER_WORD_PATTERN = re.compile(
+        r"\b(?P<tens>"
+        r"on|yirmi|otuz|kırk|elli|altmış|yetmiş|seksen|doksan"
+        r")"
+        r"(?:\s+(?P<unit>"
+        r"bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz"
+        r"))?\b"
+        r"|"
+        r"\b(?P<single>"
+        r"sıfır|bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz"
+        r")\b"
+    )
+
+    # =========================================================
+    # KOŞUL
+    # =========================================================
 
     CONDITION_TERMS = (
         "eğer",
@@ -62,6 +112,10 @@ class RequirementChangeAnalyzer:
         "unless",
     )
 
+    # =========================================================
+    # KAPSAM
+    # =========================================================
+
     SCOPE_TERMS = (
         "tüm",
         "bütün",
@@ -74,6 +128,10 @@ class RequirementChangeAnalyzer:
         "bazı",
         "tek",
     )
+
+    # =========================================================
+    # AKTÖR
+    # =========================================================
 
     ACTOR_TERMS = (
         "kurumsal müşteri",
@@ -89,6 +147,10 @@ class RequirementChangeAnalyzer:
         "sistem",
     )
 
+    # =========================================================
+    # DURUM
+    # =========================================================
+
     STATE_TERMS = (
         "aktif",
         "pasif",
@@ -103,6 +165,10 @@ class RequirementChangeAnalyzer:
         "açık",
         "kapalı",
     )
+
+    # =========================================================
+    # MODALITY
+    # =========================================================
 
     MANDATORY_PATTERN = re.compile(
         r"\b(?:"
@@ -135,6 +201,10 @@ class RequirementChangeAnalyzer:
         r")\b"
     )
 
+    # =========================================================
+    # NEGATION
+    # =========================================================
+
     NEGATION_PATTERN = re.compile(
         r"\b(?:"
         r"değil|"
@@ -147,8 +217,14 @@ class RequirementChangeAnalyzer:
         r")\b"
     )
 
+    # =========================================================
+    # HELPERS
+    # =========================================================
+
     @staticmethod
-    def _format_values(values: list[str]) -> str | None:
+    def _format_values(
+        values: list[str],
+    ) -> str | None:
         if not values:
             return None
 
@@ -166,6 +242,7 @@ class RequirementChangeAnalyzer:
         'kurumsal müşteri' bulunduğunda ayrıca 'müşteri'
         sonucu üretmemeye çalışırız.
         """
+
         found: list[str] = []
 
         for term in sorted(
@@ -174,7 +251,7 @@ class RequirementChangeAnalyzer:
             reverse=True,
         ):
             pattern = re.compile(
-                rf"(?<!\w){re.escape(term)}\w*",
+                rf"(?<!\w){re.escape(term)}\w*"
             )
 
             if pattern.search(text):
@@ -188,6 +265,88 @@ class RequirementChangeAnalyzer:
 
         return sorted(found)
 
+    # =========================================================
+    # TÜRKÇE SAYI NORMALİZASYONU
+    # =========================================================
+
+    @classmethod
+    def _normalize_turkish_number_words(
+        cls,
+        text: str,
+    ) -> str:
+        """
+        Türkçe yazıyla ifade edilen sayıları rakamsal
+        biçime dönüştürür.
+
+        Örnekler:
+
+        'üç kez'
+            -> '3 kez'
+
+        'beş dakika'
+            -> '5 dakika'
+
+        'yirmi dört saat'
+            -> '24 saat'
+
+        Bu işlem sayesinde mevcut numeric ve duration
+        detector'ları Türkçe yazıyla ifade edilen
+        sayıları da yakalayabilir.
+        """
+
+        def replace_match(
+            match: re.Match[str],
+        ) -> str:
+            single = match.group(
+                "single"
+            )
+
+            if single is not None:
+                return str(
+                    cls.TURKISH_NUMBER_UNITS[
+                        single
+                    ]
+                )
+
+            tens = match.group(
+                "tens"
+            )
+
+            unit = match.group(
+                "unit"
+            )
+
+            if tens is None:
+                return match.group(0)
+
+            value = (
+                cls.TURKISH_NUMBER_TENS[
+                    tens
+                ]
+            )
+
+            if unit is not None:
+                value += (
+                    cls.TURKISH_NUMBER_UNITS[
+                        unit
+                    ]
+                )
+
+            return str(value)
+
+        return (
+            cls
+            .TURKISH_NUMBER_WORD_PATTERN
+            .sub(
+                replace_match,
+                text,
+            )
+        )
+
+    # =========================================================
+    # DURATION
+    # =========================================================
+
     @classmethod
     def _extract_durations(
         cls,
@@ -195,15 +354,28 @@ class RequirementChangeAnalyzer:
     ) -> list[str]:
         durations: list[str] = []
 
-        for match in cls.DURATION_PATTERN.finditer(text):
-            value = match.group("value").replace(",", ".")
-            unit = match.group("unit")
+        for match in cls.DURATION_PATTERN.finditer(
+            text
+        ):
+            value = (
+                match
+                .group("value")
+                .replace(",", ".")
+            )
+
+            unit = match.group(
+                "unit"
+            )
 
             durations.append(
                 f"{value} {unit}"
             )
 
         return durations
+
+    # =========================================================
+    # NUMERIC
+    # =========================================================
 
     @classmethod
     def _extract_numbers(
@@ -213,7 +385,18 @@ class RequirementChangeAnalyzer:
         """
         Süre ifadelerinin içindeki sayıları hariç tutarak
         diğer sayısal değerleri çıkarır.
+
+        Böylece:
+
+        '5 dakika'
+            -> duration_change
+
+        fakat:
+
+        'en fazla 5 kez'
+            -> numeric_change
         """
+
         text_without_durations = (
             cls.DURATION_PATTERN.sub(
                 " ",
@@ -225,6 +408,10 @@ class RequirementChangeAnalyzer:
             text_without_durations
         )
 
+    # =========================================================
+    # MODALITY
+    # =========================================================
+
     @classmethod
     def _detect_modality(
         cls,
@@ -232,16 +419,32 @@ class RequirementChangeAnalyzer:
     ) -> list[str]:
         modalities: list[str] = []
 
-        if cls.PROHIBITED_PATTERN.search(text):
-            modalities.append("prohibited")
+        if cls.PROHIBITED_PATTERN.search(
+            text
+        ):
+            modalities.append(
+                "prohibited"
+            )
 
-        if cls.MANDATORY_PATTERN.search(text):
-            modalities.append("mandatory")
+        if cls.MANDATORY_PATTERN.search(
+            text
+        ):
+            modalities.append(
+                "mandatory"
+            )
 
-        if cls.OPTIONAL_PATTERN.search(text):
-            modalities.append("optional")
+        if cls.OPTIONAL_PATTERN.search(
+            text
+        ):
+            modalities.append(
+                "optional"
+            )
 
         return modalities
+
+    # =========================================================
+    # NEGATION
+    # =========================================================
 
     @classmethod
     def _has_negation(
@@ -249,8 +452,14 @@ class RequirementChangeAnalyzer:
         text: str,
     ) -> bool:
         return bool(
-            cls.NEGATION_PATTERN.search(text)
+            cls.NEGATION_PATTERN.search(
+                text
+            )
         )
+
+    # =========================================================
+    # CHANGE BUILDER
+    # =========================================================
 
     @staticmethod
     def _create_change(
@@ -282,37 +491,100 @@ class RequirementChangeAnalyzer:
             ),
         )
 
+    # =========================================================
+    # MAIN ANALYSIS
+    # =========================================================
+
     def analyze(
         self,
         old_text: object,
         new_text: object,
     ) -> list[DetectedChange]:
         """
-        İki gereksinim arasındaki özel değişiklikleri tespit eder.
+        İki gereksinim arasındaki özel değişiklikleri
+        tespit eder.
         """
 
-        old_normalized = normalize_text(old_text)
-        new_normalized = normalize_text(new_text)
+        # -----------------------------------------------------
+        # 1. NORMAL TEXT PROCESSING
+        # -----------------------------------------------------
 
-        if not old_normalized or not new_normalized:
+        old_normalized = normalize_text(
+            old_text
+        )
+
+        new_normalized = normalize_text(
+            new_text
+        )
+
+        if (
+            not old_normalized
+            or not new_normalized
+        ):
             return []
 
-        if old_normalized == new_normalized:
-            return []
+        # -----------------------------------------------------
+        # 2. TÜRKÇE SAYILARI RAKAMA ÇEVİR
+        #
+        # üç -> 3
+        # beş -> 5
+        # yirmi dört -> 24
+        # -----------------------------------------------------
 
-        changes: list[DetectedChange] = []
+        old_normalized = (
+            self
+            ._normalize_turkish_number_words(
+                old_normalized
+            )
+        )
 
-        # 1. Süre değişiklikleri
-        old_durations = self._extract_durations(
+        new_normalized = (
+            self
+            ._normalize_turkish_number_words(
+                new_normalized
+            )
+        )
+
+        # Böylece:
+        #
+        # "üç kez" ve "3 kez"
+        #
+        # aynı anlamda değerlendirilir.
+
+        if (
             old_normalized
+            == new_normalized
+        ):
+            return []
+
+        changes: list[
+            DetectedChange
+        ] = []
+
+        # =====================================================
+        # 1. SÜRE DEĞİŞİKLİKLERİ
+        # =====================================================
+
+        old_durations = (
+            self._extract_durations(
+                old_normalized
+            )
         )
 
-        new_durations = self._extract_durations(
-            new_normalized
+        new_durations = (
+            self._extract_durations(
+                new_normalized
+            )
         )
 
-        if old_durations != new_durations:
-            if old_durations or new_durations:
+        if (
+            old_durations
+            != new_durations
+        ):
+            if (
+                old_durations
+                or new_durations
+            ):
                 changes.append(
                     self._create_change(
                         DetailedChangeType.DURATION,
@@ -322,17 +594,30 @@ class RequirementChangeAnalyzer:
                     )
                 )
 
-        # 2. Sayısal değişiklikler
-        old_numbers = self._extract_numbers(
-            old_normalized
+        # =====================================================
+        # 2. SAYISAL DEĞİŞİKLİKLER
+        # =====================================================
+
+        old_numbers = (
+            self._extract_numbers(
+                old_normalized
+            )
         )
 
-        new_numbers = self._extract_numbers(
-            new_normalized
+        new_numbers = (
+            self._extract_numbers(
+                new_normalized
+            )
         )
 
-        if old_numbers != new_numbers:
-            if old_numbers or new_numbers:
+        if (
+            old_numbers
+            != new_numbers
+        ):
+            if (
+                old_numbers
+                or new_numbers
+            ):
                 changes.append(
                     self._create_change(
                         DetailedChangeType.NUMERIC,
@@ -342,17 +627,30 @@ class RequirementChangeAnalyzer:
                     )
                 )
 
-        # 3. Modality / zorunluluk
-        old_modality = self._detect_modality(
-            old_normalized
+        # =====================================================
+        # 3. MODALITY / ZORUNLULUK
+        # =====================================================
+
+        old_modality = (
+            self._detect_modality(
+                old_normalized
+            )
         )
 
-        new_modality = self._detect_modality(
-            new_normalized
+        new_modality = (
+            self._detect_modality(
+                new_normalized
+            )
         )
 
-        if old_modality != new_modality:
-            if old_modality or new_modality:
+        if (
+            old_modality
+            != new_modality
+        ):
+            if (
+                old_modality
+                or new_modality
+            ):
                 changes.append(
                     self._create_change(
                         DetailedChangeType.MODALITY,
@@ -362,19 +660,31 @@ class RequirementChangeAnalyzer:
                     )
                 )
 
-        # 4. Olumsuzluk
-        old_negation = self._has_negation(
-            old_normalized
+        # =====================================================
+        # 4. OLUMSUZLUK
+        # =====================================================
+
+        old_negation = (
+            self._has_negation(
+                old_normalized
+            )
         )
 
-        new_negation = self._has_negation(
-            new_normalized
+        new_negation = (
+            self._has_negation(
+                new_normalized
+            )
         )
 
-        if old_negation != new_negation:
+        if (
+            old_negation
+            != new_negation
+        ):
             changes.append(
                 DetectedChange(
-                    change_type=DetailedChangeType.NEGATION,
+                    change_type=(
+                        DetailedChangeType.NEGATION
+                    ),
                     old_value=(
                         "present"
                         if old_negation
@@ -387,24 +697,35 @@ class RequirementChangeAnalyzer:
                     ),
                     explanation=(
                         "Olumsuzluk yapısı değişti: "
-                        f"{'var' if old_negation else 'yok'} → "
+                        f"{'var' if old_negation else 'yok'}"
+                        " → "
                         f"{'var' if new_negation else 'yok'}"
                     ),
                 )
             )
 
-        # 5. Koşul değişiklikleri
-        old_conditions = self._extract_terms(
-            old_normalized,
-            self.CONDITION_TERMS,
+        # =====================================================
+        # 5. KOŞUL DEĞİŞİKLİKLERİ
+        # =====================================================
+
+        old_conditions = (
+            self._extract_terms(
+                old_normalized,
+                self.CONDITION_TERMS,
+            )
         )
 
-        new_conditions = self._extract_terms(
-            new_normalized,
-            self.CONDITION_TERMS,
+        new_conditions = (
+            self._extract_terms(
+                new_normalized,
+                self.CONDITION_TERMS,
+            )
         )
 
-        if old_conditions != new_conditions:
+        if (
+            old_conditions
+            != new_conditions
+        ):
             changes.append(
                 self._create_change(
                     DetailedChangeType.CONDITION,
@@ -414,18 +735,28 @@ class RequirementChangeAnalyzer:
                 )
             )
 
-        # 6. Kapsam değişiklikleri
-        old_scope = self._extract_terms(
-            old_normalized,
-            self.SCOPE_TERMS,
+        # =====================================================
+        # 6. KAPSAM DEĞİŞİKLİKLERİ
+        # =====================================================
+
+        old_scope = (
+            self._extract_terms(
+                old_normalized,
+                self.SCOPE_TERMS,
+            )
         )
 
-        new_scope = self._extract_terms(
-            new_normalized,
-            self.SCOPE_TERMS,
+        new_scope = (
+            self._extract_terms(
+                new_normalized,
+                self.SCOPE_TERMS,
+            )
         )
 
-        if old_scope != new_scope:
+        if (
+            old_scope
+            != new_scope
+        ):
             changes.append(
                 self._create_change(
                     DetailedChangeType.SCOPE,
@@ -435,19 +766,32 @@ class RequirementChangeAnalyzer:
                 )
             )
 
-        # 7. Aktör değişiklikleri
-        old_actors = self._extract_terms(
-            old_normalized,
-            self.ACTOR_TERMS,
+        # =====================================================
+        # 7. AKTÖR DEĞİŞİKLİKLERİ
+        # =====================================================
+
+        old_actors = (
+            self._extract_terms(
+                old_normalized,
+                self.ACTOR_TERMS,
+            )
         )
 
-        new_actors = self._extract_terms(
-            new_normalized,
-            self.ACTOR_TERMS,
+        new_actors = (
+            self._extract_terms(
+                new_normalized,
+                self.ACTOR_TERMS,
+            )
         )
 
-        if old_actors != new_actors:
-            if old_actors or new_actors:
+        if (
+            old_actors
+            != new_actors
+        ):
+            if (
+                old_actors
+                or new_actors
+            ):
                 changes.append(
                     self._create_change(
                         DetailedChangeType.ACTOR,
@@ -457,19 +801,32 @@ class RequirementChangeAnalyzer:
                     )
                 )
 
-        # 8. Durum / state değişiklikleri
-        old_states = self._extract_terms(
-            old_normalized,
-            self.STATE_TERMS,
+        # =====================================================
+        # 8. DURUM / STATE DEĞİŞİKLİKLERİ
+        # =====================================================
+
+        old_states = (
+            self._extract_terms(
+                old_normalized,
+                self.STATE_TERMS,
+            )
         )
 
-        new_states = self._extract_terms(
-            new_normalized,
-            self.STATE_TERMS,
+        new_states = (
+            self._extract_terms(
+                new_normalized,
+                self.STATE_TERMS,
+            )
         )
 
-        if old_states != new_states:
-            if old_states or new_states:
+        if (
+            old_states
+            != new_states
+        ):
+            if (
+                old_states
+                or new_states
+            ):
                 changes.append(
                     self._create_change(
                         DetailedChangeType.STATE,
