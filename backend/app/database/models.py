@@ -34,26 +34,20 @@ class AnalysisRun(Base):
         nullable=False,
     )
 
-    source_version: Mapped[str | None] = (
-        mapped_column(
-            String(100),
-            nullable=True,
-        )
+    source_version: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
     )
 
-    target_version: Mapped[str | None] = (
-        mapped_column(
-            String(100),
-            nullable=True,
-        )
+    target_version: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
     )
 
-    created_at: Mapped[datetime] = (
-        mapped_column(
-            DateTime,
-            nullable=False,
-            server_default=func.now(),
-        )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        server_default=func.now(),
     )
 
     requirement_changes: Mapped[
@@ -82,15 +76,13 @@ class RequirementChange(Base):
         autoincrement=True,
     )
 
-    analysis_run_id: Mapped[int] = (
-        mapped_column(
-            ForeignKey(
-                "analysis_runs.id",
-                ondelete="CASCADE",
-            ),
-            nullable=False,
-            index=True,
-        )
+    analysis_run_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "analysis_runs.id",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+        index=True,
     )
 
     old_requirement_id: Mapped[
@@ -107,25 +99,33 @@ class RequirementChange(Base):
         nullable=True,
     )
 
-    change_type: Mapped[str] = (
-        mapped_column(
-            String(100),
-            nullable=False,
-        )
+    old_requirement_text: Mapped[
+        str | None
+    ] = mapped_column(
+        Text,
+        nullable=True,
     )
 
-    risk_score: Mapped[float] = (
-        mapped_column(
-            Float,
-            nullable=False,
-        )
+    new_requirement_text: Mapped[
+        str | None
+    ] = mapped_column(
+        Text,
+        nullable=True,
     )
 
-    risk_level: Mapped[str] = (
-        mapped_column(
-            String(50),
-            nullable=False,
-        )
+    change_type: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+    )
+
+    risk_score: Mapped[float] = mapped_column(
+        Float,
+        nullable=False,
+    )
+
+    risk_level: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False,
     )
 
     confidence: Mapped[
@@ -142,20 +142,16 @@ class RequirementChange(Base):
         nullable=True,
     )
 
-    created_at: Mapped[datetime] = (
-        mapped_column(
-            DateTime,
-            nullable=False,
-            server_default=func.now(),
-        )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        server_default=func.now(),
     )
 
     analysis_run: Mapped[
         AnalysisRun
     ] = relationship(
-        back_populates=(
-            "requirement_changes"
-        )
+        back_populates="requirement_changes"
     )
 
 
@@ -168,15 +164,13 @@ class DefectRanking(Base):
         autoincrement=True,
     )
 
-    analysis_run_id: Mapped[int] = (
-        mapped_column(
-            ForeignKey(
-                "analysis_runs.id",
-                ondelete="CASCADE",
-            ),
-            nullable=False,
-            index=True,
-        )
+    analysis_run_id: Mapped[int] = mapped_column(
+        ForeignKey(
+            "analysis_runs.id",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+        index=True,
     )
 
     defect_id: Mapped[
@@ -186,11 +180,9 @@ class DefectRanking(Base):
         nullable=True,
     )
 
-    defect_text: Mapped[str] = (
-        mapped_column(
-            Text,
-            nullable=False,
-        )
+    defect_text: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
     )
 
     change_id: Mapped[
@@ -200,18 +192,14 @@ class DefectRanking(Base):
         nullable=True,
     )
 
-    relevance_score: Mapped[float] = (
-        mapped_column(
-            Float,
-            nullable=False,
-        )
+    relevance_score: Mapped[float] = mapped_column(
+        Float,
+        nullable=False,
     )
 
-    rank_position: Mapped[int] = (
-        mapped_column(
-            Integer,
-            nullable=False,
-        )
+    rank_position: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
     )
 
     reason: Mapped[
@@ -221,12 +209,10 @@ class DefectRanking(Base):
         nullable=True,
     )
 
-    created_at: Mapped[datetime] = (
-        mapped_column(
-            DateTime,
-            nullable=False,
-            server_default=func.now(),
-        )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        server_default=func.now(),
     )
 
     analysis_run: Mapped[

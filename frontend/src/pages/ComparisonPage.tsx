@@ -864,6 +864,57 @@ function ComparisonPage() {
 
                   </div>
 
+                  <div className="requirement-text-diff">
+
+  <div className="requirement-text-panel old">
+
+    <span className="requirement-text-label">
+      ÖNCEKİ GEREKSİNİM
+    </span>
+
+    <p>
+      {
+        change.old_requirement_text
+        ?? (
+          change.old_requirement_id === null
+            ? 'Bu gereksinim önceki versiyonda bulunmuyordu.'
+            : 'Önceki gereksinim metni bulunamadı.'
+        )
+      }
+    </p>
+
+  </div>
+
+
+  <div className="requirement-text-arrow">
+
+    <ArrowRight
+      size={17}
+    />
+
+  </div>
+
+
+  <div className="requirement-text-panel new">
+
+    <span className="requirement-text-label">
+      YENİ GEREKSİNİM
+    </span>
+
+    <p>
+      {
+        change.new_requirement_text
+        ?? (
+          change.new_requirement_id === null
+            ? 'Bu gereksinim yeni versiyondan kaldırıldı.'
+            : 'Yeni gereksinim metni bulunamadı.'
+        )
+      }
+    </p>
+
+  </div>
+
+</div>
 
                   <div className="change-card-metrics">
 
