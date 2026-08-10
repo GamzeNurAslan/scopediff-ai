@@ -1,0 +1,609 @@
+/* =====================================================
+   SCOPEDIFF AI - COMPARISON PAGE
+   ===================================================== */
+
+.comparison-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.comparison-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.comparison-header > div:first-child {
+  min-width: 0;
+}
+
+.comparison-header h2 {
+  margin: 8px 0 6px;
+  color: #101828;
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.comparison-header p {
+  max-width: 650px;
+  margin: 0;
+  color: #667085;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.comparison-analysis-select {
+  width: 320px;
+  flex: 0 0 auto;
+}
+
+.comparison-analysis-select label {
+  display: block;
+  margin-bottom: 7px;
+  color: #667085;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.comparison-analysis-select select {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 9px;
+  outline: none;
+  background: #ffffff;
+  color: #344054;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.comparison-analysis-select select:focus {
+  border-color: #f59e0b;
+  box-shadow:
+    0 0 0 3px
+    rgba(245, 158, 11, 0.12);
+}
+
+
+/* =====================================================
+   VERSION SUMMARY
+   ===================================================== */
+
+.comparison-version-card {
+  display: grid;
+  grid-template-columns:
+    135px
+    34px
+    135px
+    minmax(220px, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px
+    rgba(16, 24, 40, 0.03);
+}
+
+.version-box {
+  padding: 11px 13px;
+  border: 1px solid #eaecf0;
+  border-radius: 9px;
+  background: #f9fafb;
+}
+
+.version-box span,
+.comparison-name span {
+  display: block;
+  color: #98a2b3;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.version-box strong {
+  display: block;
+  margin-top: 5px;
+  color: #101828;
+  font-size: 14px;
+}
+
+.version-arrow {
+  display: grid;
+  place-items: center;
+  color: #f59e0b;
+}
+
+.comparison-name {
+  min-width: 0;
+  padding: 5px 8px;
+}
+
+.comparison-name strong {
+  display: block;
+  margin-top: 5px;
+  overflow: hidden;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =====================================================
+   KPI CARDS
+   ===================================================== */
+
+.comparison-kpi-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.comparison-kpi-card {
+  min-width: 0;
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 15px;
+  border: 1px solid #e4e7ec;
+  border-radius: 11px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px
+    rgba(16, 24, 40, 0.03);
+}
+
+.comparison-kpi-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 9px;
+}
+
+.comparison-kpi-icon.blue {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.comparison-kpi-icon.green {
+  background: #ecfdf3;
+  color: #16a34a;
+}
+
+.comparison-kpi-icon.yellow {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.comparison-kpi-icon.orange {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.comparison-kpi-icon.red {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.comparison-kpi-card span {
+  display: block;
+  color: #98a2b3;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.comparison-kpi-card strong {
+  display: block;
+  margin-top: 3px;
+  color: #101828;
+  font-size: 21px;
+  line-height: 1;
+}
+
+
+/* =====================================================
+   FILTER AREA
+   ===================================================== */
+
+.comparison-filter-card {
+  display: grid;
+  grid-template-columns:
+    minmax(300px, 1fr)
+    165px
+    220px;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid #e4e7ec;
+  border-radius: 11px;
+  background: #ffffff;
+}
+
+.comparison-search {
+  min-width: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #98a2b3;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.comparison-search:focus-within {
+  border-color: #f59e0b;
+  box-shadow:
+    0 0 0 3px
+    rgba(245, 158, 11, 0.1);
+}
+
+.comparison-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #344054;
+  font-size: 11px;
+}
+
+.comparison-search input::placeholder {
+  color: #98a2b3;
+}
+
+.comparison-filter-card select {
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  outline: none;
+  background: #ffffff;
+  color: #475467;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+/* =====================================================
+   RESULT HEADER
+   ===================================================== */
+
+.comparison-results-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 3px;
+}
+
+.comparison-results-heading h3 {
+  margin: 0;
+  color: #101828;
+  font-size: 15px;
+}
+
+.comparison-results-heading p {
+  margin: 4px 0 0;
+  color: #98a2b3;
+  font-size: 10px;
+}
+
+.comparison-results-heading > span {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: 7px;
+  background: #f2f4f7;
+  color: #475467;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   CHANGE LIST
+   ===================================================== */
+
+.comparison-change-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comparison-change-card {
+  position: relative;
+  overflow: hidden;
+  padding: 16px 18px;
+  border: 1px solid #e4e7ec;
+  border-radius: 11px;
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px
+    rgba(16, 24, 40, 0.03);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.comparison-change-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: #f59e0b;
+}
+
+.comparison-change-card:hover {
+  transform: translateY(-1px);
+  border-color: #f6c67a;
+  box-shadow:
+    0 8px 20px
+    rgba(16, 24, 40, 0.06);
+}
+
+.change-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.change-requirement-route {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #98a2b3;
+}
+
+.requirement-id {
+  display: inline-flex;
+  align-items: center;
+  min-height: 27px;
+  padding: 5px 9px;
+  border-radius: 7px;
+  background: #f2f4f7;
+  color: #475467;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.requirement-id.target {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.change-card-badges {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.change-type-badge {
+  padding: 6px 9px;
+  border-radius: 7px;
+  background: #eef4ff;
+  color: #3538cd;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.comparison-risk-badge {
+  padding: 6px 9px;
+  border-radius: 7px;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.comparison-risk-badge.low {
+  background: #ecfdf3;
+  color: #15803d;
+}
+
+.comparison-risk-badge.medium {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.comparison-risk-badge.high {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.comparison-risk-badge.critical {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+
+/* =====================================================
+   CHANGE METRICS
+   ===================================================== */
+
+.change-card-metrics {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid #f0f2f5;
+}
+
+.change-card-metrics div {
+  min-width: 100px;
+}
+
+.change-card-metrics span {
+  display: block;
+  color: #98a2b3;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+}
+
+.change-card-metrics strong {
+  display: block;
+  margin-top: 5px;
+  color: #101828;
+  font-size: 15px;
+}
+
+
+/* =====================================================
+   EXPLANATION
+   ===================================================== */
+
+.change-explanation {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #f0f2f5;
+  border-radius: 9px;
+  background: #f9fafb;
+}
+
+.change-explanation span {
+  display: block;
+  color: #98a2b3;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+}
+
+.change-explanation p {
+  margin: 6px 0 0;
+  color: #475467;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+
+/* =====================================================
+   EMPTY / LOADING
+   ===================================================== */
+
+.comparison-empty-result {
+  padding: 38px 20px;
+  border: 1px dashed #d0d5dd;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #98a2b3;
+  font-size: 11px;
+  text-align: center;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 1100px) {
+  .comparison-kpi-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+  .comparison-filter-card {
+    grid-template-columns:
+      1fr 160px;
+  }
+
+  .comparison-filter-card select:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 850px) {
+  .comparison-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .comparison-analysis-select {
+    width: 100%;
+  }
+
+  .comparison-version-card {
+    grid-template-columns:
+      1fr 34px 1fr;
+  }
+
+  .comparison-name {
+    grid-column: 1 / -1;
+  }
+
+  .comparison-kpi-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .comparison-filter-card {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-filter-card select:last-child {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .comparison-version-card {
+    grid-template-columns: 1fr;
+  }
+
+  .version-arrow {
+    transform: rotate(90deg);
+  }
+
+  .comparison-name {
+    grid-column: auto;
+  }
+
+  .comparison-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .change-card-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .change-card-badges {
+    justify-content: flex-start;
+  }
+
+  .change-card-metrics {
+    gap: 20px;
+  }
+}

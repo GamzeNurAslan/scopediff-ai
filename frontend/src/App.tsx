@@ -4,8 +4,9 @@ import {
   Routes,
 } from 'react-router'
 
-import AppLayout from './layouts/AppLayout'
+import './App.css'
 
+import AppLayout from './layouts/AppLayout'
 import ComparisonPage from './pages/ComparisonPage'
 import DashboardPage from './pages/DashboardPage'
 import DefectAnalysisPage from './pages/DefectAnalysisPage'
@@ -17,7 +18,6 @@ import UploadPage from './pages/UploadPage'
 function App() {
   return (
     <Routes>
-
       <Route element={<AppLayout />}>
 
         <Route
@@ -71,7 +71,6 @@ function App() {
         />
 
       </Route>
-
     </Routes>
   )
 }
