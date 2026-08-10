@@ -1,6 +1,7 @@
 import type {
   AnalysisDetail,
   AnalysisSummary,
+  DefectAnalysisResult,
   HealthResponse,
 } from '../types/api'
 
@@ -51,10 +52,6 @@ export function getAnalysis(
 }
 
 
-/*
- * İKİ EXCEL DOSYASINI
- * SCOPEDIFF BACKEND'E GÖNDERİR.
- */
 export async function compareRequirementFiles(
   sourceFile: File,
   targetFile: File,
@@ -104,8 +101,7 @@ export async function compareRequirementFiles(
           errorBody.detail
       }
     } catch {
-      // JSON hata gövdesi yoksa
-      // varsayılan mesaj kullanılır.
+      // Varsayılan mesaj.
     }
 
     throw new Error(
@@ -117,9 +113,62 @@ export async function compareRequirementFiles(
 }
 
 
-/*
- * EXCEL RAPORU İNDİR
- */
+export async function analyzeDefect(
+  analysisId: number,
+  defectText: string,
+  topK: number = 5,
+): Promise<DefectAnalysisResult> {
+  const response = await fetch(
+    `${API_BASE_URL}/analyses/${analysisId}/defect-rankings`,
+    {
+      method: 'POST',
+
+      headers: {
+        'Content-Type':
+          'application/json',
+      },
+
+      body: JSON.stringify({
+        defect_text:
+          defectText.trim(),
+
+        top_k:
+          topK,
+
+        min_relevance:
+          0.0,
+      }),
+    },
+  )
+
+  if (!response.ok) {
+    let message =
+      'Defect analizi tamamlanamadı.'
+
+    try {
+      const errorBody =
+        await response.json()
+
+      if (
+        typeof errorBody.detail
+        === 'string'
+      ) {
+        message =
+          errorBody.detail
+      }
+    } catch {
+      // Varsayılan mesaj.
+    }
+
+    throw new Error(
+      message,
+    )
+  }
+
+  return response.json()
+}
+
+
 export async function downloadAnalysisReport(
   analysisId: number,
 ): Promise<void> {
