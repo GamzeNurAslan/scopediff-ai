@@ -573,3 +573,40 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ========================================
+   DASHBOARD - 5 KPI MOCKUP
+   ======================================== */
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.kpi-card {
+  min-height: 125px;
+  padding: 15px;
+}
+
+.kpi-icon.green {
+  background: #ecfdf3;
+  color: #16a34a;
+}
+
+.kpi-icon.yellow {
+  background: #fffaeb;
+  color: #d97706;
+}
+
+@media (max-width: 1200px) {
+  .kpi-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
