@@ -1,0 +1,21 @@
+﻿defect_id,defect_text,expected_requirement_id,expected_transition_id,expected_change_type,difficulty,relation_level,predicted_rank_1,predicted_rank_2,predicted_rank_3,predicted_rank_4,predicted_rank_5,gold_rank
+DEF-001,Port kontrolü sürekli tekrar ediyor ve işlem sonlanmıyor.,REQ-001,TR-001-2,numeric_constraint_removed,easy,high,TR-001-2,TR-017-2,TR-001-1,TR-008-1,TR-017-1,1
+DEF-002,Başarısız sipariş beşinci denemeden sonra da tekrar çalıştırılıyor.,REQ-002,TR-002-2,numeric_constraint_removed,easy,high,TR-002-2,TR-002-1,TR-009-2,TR-010-2,TR-012-1,1
+DEF-003,Aktivasyon işlemi saatlerce tamamlanmadan açık kalıyor.,REQ-003,TR-003-2,duration_constraint_removed,easy,high,TR-003-2,TR-009-2,TR-003-1,TR-011-1,TR-017-2,1
+DEF-004,Yeni servis henüz aktif değilken müşterinin eski servisi kapatılıyor.,REQ-004,TR-004-2,state_change,easy,high,TR-004-2,TR-004-1,TR-017-2,TR-006-1,TR-012-1,1
+DEF-005,Kurumsal müşterilere bazı işlemlerde SMS gönderilmiyor.,REQ-005,TR-005-2,modality_change,medium,high,TR-005-2,TR-005-1,TR-010-2,TR-006-1,TR-012-1,1
+DEF-006,Aynı müşteri adına sınırsız sayıda aktif geçiş siparişi açılabiliyor.,REQ-006,TR-006-2,numeric_constraint_removed,easy,high,TR-006-1,TR-006-2,TR-001-2,TR-004-2,TR-019-2,2
+DEF-007,Port sorgusu cevap vermediğinde işlem zaman aşımına uğramıyor.,REQ-007,TR-007-2,duration_constraint_removed,easy,high,TR-007-2,TR-017-2,TR-012-1,TR-008-1,TR-001-2,1
+DEF-008,Port uygunluğu doğrulanmadan kaynak başka bir sipariş için rezerve ediliyor.,REQ-008,TR-008-2,condition_removed,medium,high,TR-008-1,TR-017-2,TR-008-2,TR-001-2,TR-006-1,3
+DEF-009,Aktivasyon hatasında sistem sürekli yeniden deneme yapıyor.,REQ-009,TR-009-2,numeric_constraint_removed,easy,high,TR-009-2,TR-002-2,TR-012-1,TR-012-2,TR-010-2,1
+DEF-010,SMS gönderimi başarısız olduğunda sistem yeniden denemiyor.,REQ-010,TR-010-2,modality_change,easy,high,TR-010-2,TR-010-1,TR-005-2,TR-012-1,TR-005-1,1
+DEF-011,Aktivasyon tamamlanmadan müşterinin faturası oluşuyor.,REQ-011,TR-011-2,condition_change,easy,high,TR-011-1,TR-012-1,TR-012-2,TR-011-2,TR-006-1,4
+DEF-012,Başarısız aktivasyon için müşteriye tam aktivasyon ücreti yansıtılıyor.,REQ-012,TR-012-2,negation_change,easy,high,TR-012-2,TR-012-1,TR-009-2,TR-011-1,TR-010-2,1
+DEF-013,Hesap beş başarısız girişten sonra yalnızca beş dakika kilitli kalıyor.,REQ-013,TR-013-2,duration_change,medium,high,TR-013-2,TR-013-1,TR-002-2,TR-012-1,TR-017-2,1
+DEF-014,Kritik destek kaydı uzun süre atanmadan bekliyor.,REQ-014,TR-014-2,duration_constraint_removed,easy,high,TR-014-2,TR-014-1,TR-016-2,TR-007-2,TR-008-1,1
+DEF-015,Yetkisiz müşteri kullanıcısı siparişi iptal edebiliyor.,REQ-015,TR-015-2,scope_change,easy,high,TR-015-1,TR-015-2,TR-006-1,TR-017-2,TR-012-1,2
+DEF-016,Aynı sorun için açılan destek kayıtları ayrı ayrı çoğalıyor.,REQ-016,TR-016-2,state_change,easy,high,TR-016-2,TR-016-1,TR-014-2,TR-006-1,TR-014-1,1
+DEF-017,İptal edilmeyen siparişin port rezervasyonu günlerce serbest bırakılmıyor.,REQ-017,TR-017-2,condition_change,medium,high,TR-017-2,TR-008-1,TR-017-1,TR-004-2,TR-001-2,1
+DEF-018,Altyapı uygun olmadığı hâlde kaynak rezervasyonu tamamlanıyor.,REQ-018,TR-018-2,sequence_change,medium,high,TR-008-1,TR-018-2,TR-018-1,TR-008-2,TR-012-1,2
+DEF-019,Loglarda müşteri telefon ve adres bilgileri açık biçimde görünüyor.,REQ-019,TR-019-2,modality_change,medium,high,TR-019-2,TR-019-1,TR-005-2,TR-005-1,TR-006-1,1
+DEF-020,Sipariş doğrulaması uzun sürdüğü için işlem başlamadan bekliyor.,REQ-020,TR-020-1,duration_change,hard,medium,TR-017-2,TR-020-2,TR-002-2,TR-007-2,TR-004-2,6

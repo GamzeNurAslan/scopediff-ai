@@ -20,6 +20,7 @@ import {
 } from 'recharts'
 
 import {
+  downloadAnalysisReport,
   getAnalyses,
   getAnalysis,
 } from '../services/api'
@@ -55,8 +56,9 @@ function formatChangeType(
 ) {
   return value
     .replaceAll('_', ' ')
-    .replace(/\b\w/g, (letter) =>
-      letter.toUpperCase(),
+    .replace(
+      /\b\w/g,
+      (letter) => letter.toUpperCase(),
     )
 }
 
@@ -79,11 +81,21 @@ function DashboardPage() {
   const [error, setError] =
     useState<string | null>(null)
 
+  const [
+    reportDownloading,
+    setReportDownloading,
+  ] = useState(false)
+
+
+  // =====================================================
+  // ANALİZ LİSTESİNİ YÜKLE
+  // =====================================================
 
   useEffect(() => {
     async function loadAnalyses() {
       try {
         setLoading(true)
+        setError(null)
 
         const result =
           await getAnalyses()
@@ -104,23 +116,32 @@ function DashboardPage() {
       }
     }
 
-    loadAnalyses()
+    void loadAnalyses()
   }, [])
 
 
+  // =====================================================
+  // SEÇİLEN ANALİZİN DETAYINI YÜKLE
+  // =====================================================
+
   useEffect(() => {
-    if (selectedAnalysisId === null) {
+    if (
+      typeof selectedAnalysisId
+      !== 'number'
+    ) {
       return
     }
 
-    async function loadDetail() {
+    async function loadDetail(
+      analysisId: number,
+    ) {
       try {
         setLoading(true)
         setError(null)
 
         const result =
           await getAnalysis(
-            selectedAnalysisId!,
+            analysisId,
           )
 
         setAnalysis(result)
@@ -133,9 +154,15 @@ function DashboardPage() {
       }
     }
 
-    loadDetail()
+    void loadDetail(
+      selectedAnalysisId,
+    )
   }, [selectedAnalysisId])
 
+
+  // =====================================================
+  // KPI METRİKLERİ
+  // =====================================================
 
   const metrics = useMemo(() => {
     const changes =
@@ -143,26 +170,26 @@ function DashboardPage() {
 
     const lowRisk = changes.filter(
       (change) =>
-        change.risk_level.toLowerCase()
-        === 'low',
+        change.risk_level
+          .toLowerCase() === 'low',
     ).length
 
     const mediumRisk = changes.filter(
       (change) =>
-        change.risk_level.toLowerCase()
-        === 'medium',
+        change.risk_level
+          .toLowerCase() === 'medium',
     ).length
 
     const highRisk = changes.filter(
       (change) =>
-        change.risk_level.toLowerCase()
-        === 'high',
+        change.risk_level
+          .toLowerCase() === 'high',
     ).length
 
     const criticalRisk = changes.filter(
       (change) =>
-        change.risk_level.toLowerCase()
-        === 'critical',
+        change.risk_level
+          .toLowerCase() === 'critical',
     ).length
 
     return {
@@ -175,16 +202,20 @@ function DashboardPage() {
   }, [analysis])
 
 
+  // =====================================================
+  // DEĞİŞİM TÜRÜ DAĞILIMI
+  // =====================================================
+
   const changeDistribution =
     useMemo(() => {
       const counts =
         new Map<string, number>()
 
-      for (
-        const change
-        of analysis?.requirement_changes
+      const changes =
+        analysis?.requirement_changes
         ?? []
-      ) {
+
+      for (const change of changes) {
         counts.set(
           change.change_type,
           (
@@ -197,25 +228,34 @@ function DashboardPage() {
 
       return Array.from(
         counts.entries(),
-      ).map(([name, value]) => ({
-        name: formatChangeType(name),
-        value,
-      }))
+      ).map(
+        ([name, value]) => ({
+          name: formatChangeType(
+            name,
+          ),
+          value,
+        }),
+      )
     }, [analysis])
 
+
+  // =====================================================
+  // RİSK DAĞILIMI
+  // =====================================================
 
   const riskDistribution =
     useMemo(() => {
       const counts =
         new Map<string, number>()
 
-      for (
-        const change
-        of analysis?.requirement_changes
+      const changes =
+        analysis?.requirement_changes
         ?? []
-      ) {
+
+      for (const change of changes) {
         const risk =
-          change.risk_level.toLowerCase()
+          change.risk_level
+            .toLowerCase()
 
         counts.set(
           risk,
@@ -229,12 +269,15 @@ function DashboardPage() {
         'medium',
         'low',
       ]
-        .filter((risk) =>
-          counts.has(risk),
+        .filter(
+          (risk) =>
+            counts.has(risk),
         )
         .map((risk) => ({
           name:
-            risk.charAt(0).toUpperCase()
+            risk
+              .charAt(0)
+              .toUpperCase()
             + risk.slice(1),
 
           key: risk,
@@ -244,6 +287,39 @@ function DashboardPage() {
         }))
     }, [analysis])
 
+
+  // =====================================================
+  // EXCEL RAPORU İNDİR
+  // =====================================================
+
+  async function handleDownloadReport() {
+    if (
+      typeof selectedAnalysisId
+      !== 'number'
+    ) {
+      return
+    }
+
+    try {
+      setReportDownloading(true)
+      setError(null)
+
+      await downloadAnalysisReport(
+        selectedAnalysisId,
+      )
+    } catch {
+      setError(
+        'Excel raporu indirilemedi.',
+      )
+    } finally {
+      setReportDownloading(false)
+    }
+  }
+
+
+  // =====================================================
+  // LOADING
+  // =====================================================
 
   if (
     loading
@@ -257,6 +333,10 @@ function DashboardPage() {
   }
 
 
+  // =====================================================
+  // ERROR
+  // =====================================================
+
   if (error) {
     return (
       <div className="dashboard-message error">
@@ -265,6 +345,10 @@ function DashboardPage() {
     )
   }
 
+
+  // =====================================================
+  // EMPTY STATE
+  // =====================================================
 
   if (analyses.length === 0) {
     return (
@@ -288,42 +372,67 @@ function DashboardPage() {
   return (
     <div className="dashboard-page">
 
+      {/* ==============================================
+          KARŞILAŞTIRMA TOOLBAR
+      ============================================== */}
+
       <section className="dashboard-toolbar">
-  <div className="comparison-selector">
-    <span className="section-label">
-      KARŞILAŞTIRMA
-    </span>
 
-    <select
-      value={selectedAnalysisId ?? ''}
-      onChange={(event) =>
-        setSelectedAnalysisId(
-          Number(event.target.value),
-        )
-      }
-    >
-      {analyses.map((item) => (
-        <option
-          key={item.id}
-          value={item.id}
+        <div className="comparison-selector">
+          <span className="section-label">
+            KARŞILAŞTIRMA
+          </span>
+
+          <select
+            value={
+              selectedAnalysisId ?? ''
+            }
+            onChange={(event) => {
+              setSelectedAnalysisId(
+                Number(
+                  event.target.value,
+                ),
+              )
+            }}
+          >
+            {analyses.map(
+              (item) => (
+                <option
+                  key={item.id}
+                  value={item.id}
+                >
+                  {item.analysis_name}
+                </option>
+              ),
+            )}
+          </select>
+        </div>
+
+
+        <button
+          type="button"
+          className="excel-report-button"
+          onClick={
+            handleDownloadReport
+          }
+          disabled={
+            selectedAnalysisId === null
+            || reportDownloading
+          }
         >
-          {item.analysis_name}
-        </option>
-      ))}
-    </select>
-  </div>
+          <Download size={16} />
 
-  <button
-    type="button"
-    className="excel-report-button"
-    disabled
-    title="Excel raporu indirme bağlantısı henüz eklenmedi."
-  >
-    <Download size={16} />
-    Excel Raporu İndir
-  </button>
-</section>
+          {reportDownloading
+            ? 'Rapor hazırlanıyor...'
+            : 'Excel Raporu İndir'}
+        </button>
 
+      </section>
+
+
+      {/* ==============================================
+          KPI KARTLARI
+      ============================================== */}
 
       <section className="kpi-grid">
 
@@ -424,9 +533,16 @@ function DashboardPage() {
       </section>
 
 
+      {/* ==============================================
+          GRAFİKLER
+      ============================================== */}
+
       <section className="chart-grid">
 
+        {/* DEĞİŞİM DAĞILIMI */}
+
         <article className="dashboard-card">
+
           <div className="card-heading">
             <div>
               <h2>
@@ -440,7 +556,9 @@ function DashboardPage() {
             </div>
           </div>
 
+
           <div className="chart-content">
+
             <div className="donut-wrapper">
 
               <ResponsiveContainer
@@ -448,6 +566,7 @@ function DashboardPage() {
                 height={230}
               >
                 <PieChart>
+
                   <Pie
                     data={
                       changeDistribution
@@ -459,25 +578,28 @@ function DashboardPage() {
                     paddingAngle={3}
                   >
                     {
-                      changeDistribution.map(
-                        (_, index) => (
-                          <Cell
-                            key={index}
-                            fill={
-                              CHANGE_COLORS[
-                                index
-                                % CHANGE_COLORS.length
-                              ]
-                            }
-                          />
-                        ),
-                      )
+                      changeDistribution
+                        .map(
+                          (_, index) => (
+                            <Cell
+                              key={index}
+                              fill={
+                                CHANGE_COLORS[
+                                  index
+                                  % CHANGE_COLORS.length
+                                ]
+                              }
+                            />
+                          ),
+                        )
                     }
                   </Pie>
 
                   <Tooltip />
+
                 </PieChart>
               </ResponsiveContainer>
+
 
               <div className="donut-center">
                 <strong>
@@ -488,13 +610,18 @@ function DashboardPage() {
                   değişiklik
                 </span>
               </div>
+
             </div>
 
 
             <div className="chart-legend">
+
               {
                 changeDistribution.map(
-                  (item, index) => (
+                  (
+                    item,
+                    index,
+                  ) => (
                     <div
                       className="legend-row"
                       key={item.name}
@@ -521,12 +648,18 @@ function DashboardPage() {
                   ),
                 )
               }
+
             </div>
+
           </div>
+
         </article>
 
 
+        {/* RİSK DAĞILIMI */}
+
         <article className="dashboard-card">
+
           <div className="card-heading">
             <div>
               <h2>
@@ -542,6 +675,7 @@ function DashboardPage() {
 
 
           <div className="chart-content">
+
             <div className="donut-wrapper">
 
               <ResponsiveContainer
@@ -549,6 +683,7 @@ function DashboardPage() {
                 height={230}
               >
                 <PieChart>
+
                   <Pie
                     data={
                       riskDistribution
@@ -576,6 +711,7 @@ function DashboardPage() {
                   </Pie>
 
                   <Tooltip />
+
                 </PieChart>
               </ResponsiveContainer>
 
@@ -589,10 +725,12 @@ function DashboardPage() {
                   analiz
                 </span>
               </div>
+
             </div>
 
 
             <div className="chart-legend">
+
               {
                 riskDistribution.map(
                   (item) => (
@@ -621,12 +759,19 @@ function DashboardPage() {
                   ),
                 )
               }
+
             </div>
+
           </div>
+
         </article>
 
       </section>
 
+
+      {/* ==============================================
+          GEREKSİNİM TABLOSU
+      ============================================== */}
 
       <section
         className="
@@ -634,7 +779,9 @@ function DashboardPage() {
           table-card
         "
       >
+
         <div className="card-heading">
+
           <div>
             <h2>
               Gereksinim Değişiklikleri
@@ -647,38 +794,62 @@ function DashboardPage() {
             </p>
           </div>
 
+
           <span className="result-count">
             {
               analysis
                 ?.requirement_changes
                 .length
+              ?? 0
             } sonuç
           </span>
+
         </div>
 
 
         <div className="table-wrapper">
+
           <table className="changes-table">
 
             <thead>
               <tr>
-                <th>Eski ID</th>
-                <th>Yeni ID</th>
-                <th>Değişim Türü</th>
-                <th>Risk</th>
-                <th>Risk Skoru</th>
-                <th>Confidence</th>
+                <th>
+                  Eski ID
+                </th>
+
+                <th>
+                  Yeni ID
+                </th>
+
+                <th>
+                  Değişim Türü
+                </th>
+
+                <th>
+                  Risk
+                </th>
+
+                <th>
+                  Risk Skoru
+                </th>
+
+                <th>
+                  Confidence
+                </th>
               </tr>
             </thead>
 
 
             <tbody>
+
               {
                 analysis
                   ?.requirement_changes
                   .slice(0, 10)
                   .map((change) => (
+
                     <tr key={change.id}>
+
                       <td>
                         {
                           change
@@ -687,6 +858,7 @@ function DashboardPage() {
                         }
                       </td>
 
+
                       <td>
                         {
                           change
@@ -694,6 +866,7 @@ function DashboardPage() {
                           ?? '—'
                         }
                       </td>
+
 
                       <td>
                         <span
@@ -707,6 +880,7 @@ function DashboardPage() {
                           }
                         </span>
                       </td>
+
 
                       <td>
                         <span
@@ -725,6 +899,7 @@ function DashboardPage() {
                         </span>
                       </td>
 
+
                       <td>
                         {
                           change
@@ -732,6 +907,7 @@ function DashboardPage() {
                             .toFixed(1)
                         }
                       </td>
+
 
                       <td>
                         {
@@ -745,13 +921,18 @@ function DashboardPage() {
                             : '—'
                         }
                       </td>
+
                     </tr>
+
                   ))
               }
+
             </tbody>
 
           </table>
+
         </div>
+
       </section>
 
     </div>

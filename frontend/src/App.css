@@ -610,3 +610,367 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ========================================
+   UPLOAD PAGE
+   ======================================== */
+
+.upload-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.upload-intro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.upload-intro h2 {
+  margin: 4px 0 7px;
+  color: #101828;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.upload-intro p {
+  max-width: 680px;
+  margin: 0;
+  color: #7b8495;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.upload-step-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid #fde6c7;
+  border-radius: 8px;
+  background: #fffaf5;
+  color: #b45309;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.upload-step-badge span {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f97316;
+  color: #ffffff;
+  font-size: 10px;
+}
+
+
+.upload-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.upload-card {
+  padding: 20px;
+  border: 1px solid #e4e8ef;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow:
+    0 4px 16px rgba(15, 23, 42, 0.03);
+}
+
+.upload-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 17px;
+}
+
+.upload-number {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 8px;
+  background: #fff4e8;
+  color: #f97316;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.upload-card-heading h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 14px;
+}
+
+.upload-card-heading p {
+  margin: 4px 0 0;
+  color: #98a2b3;
+  font-size: 10px;
+}
+
+
+.file-drop-zone {
+  min-height: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 25px;
+  border: 1.5px dashed #d3d9e4;
+  border-radius: 10px;
+  background: #fafbfc;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.file-drop-zone:hover {
+  border-color: #f59e0b;
+  background: #fffaf3;
+}
+
+.drop-icon {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 13px;
+  border-radius: 12px;
+  background: #fff1df;
+  color: #f97316;
+}
+
+.file-drop-zone strong {
+  color: #344054;
+  font-size: 12px;
+}
+
+.file-drop-zone span {
+  margin-top: 5px;
+  color: #98a2b3;
+  font-size: 10px;
+}
+
+.file-drop-zone small {
+  margin-top: 12px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: #f0f2f5;
+  color: #667085;
+  font-size: 9px;
+}
+
+
+.selected-file {
+  min-height: 210px;
+  display: flex;
+  align-items: center;
+  padding: 18px;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  background: #f7fef9;
+}
+
+.file-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 9px;
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.file-info {
+  min-width: 0;
+  flex: 1;
+  margin-left: 12px;
+}
+
+.file-info strong {
+  display: block;
+  overflow: hidden;
+  color: #344054;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-info span {
+  display: block;
+  margin-top: 4px;
+  color: #98a2b3;
+  font-size: 9px;
+}
+
+.file-success {
+  flex: 0 0 auto;
+  margin-left: 10px;
+  color: #16a34a;
+}
+
+.remove-file-button {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  margin-left: 7px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #98a2b3;
+  cursor: pointer;
+}
+
+.remove-file-button:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+
+.upload-settings-card {
+  padding: 20px;
+  border: 1px solid #e4e8ef;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow:
+    0 4px 16px rgba(15, 23, 42, 0.03);
+}
+
+.upload-settings-heading h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 14px;
+}
+
+.upload-settings-heading p {
+  margin: 5px 0 0;
+  color: #98a2b3;
+  font-size: 10px;
+}
+
+
+.analysis-name-field {
+  margin-top: 18px;
+}
+
+.analysis-name-field label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: #667085;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.analysis-name-field label span {
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: #f2f4f7;
+  color: #98a2b3;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.analysis-name-field input {
+  width: 100%;
+  height: 42px;
+  padding: 0 13px;
+  border: 1px solid #d9dee8;
+  border-radius: 8px;
+  outline: none;
+  background: #ffffff;
+  color: #172033;
+  font-size: 11px;
+}
+
+.analysis-name-field input:focus {
+  border-color: #f59e0b;
+  box-shadow:
+    0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.analysis-name-field input::placeholder {
+  color: #b1b8c5;
+}
+
+
+.upload-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #edf0f4;
+}
+
+.upload-ready-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #667085;
+  font-size: 10px;
+}
+
+.start-comparison-button {
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 7px;
+  background: #f97316;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.start-comparison-button:hover:not(:disabled) {
+  background: #ea580c;
+}
+
+.start-comparison-button:disabled {
+  background: #d0d5dd;
+  color: #ffffff;
+  cursor: not-allowed;
+}
+
+
+@media (max-width: 900px) {
+  .upload-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .upload-intro {
+    flex-direction: column;
+  }
+
+  .upload-action-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .start-comparison-button {
+    width: 100%;
+  }
+}
