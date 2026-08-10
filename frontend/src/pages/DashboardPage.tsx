@@ -1,5 +1,6 @@
 import {
   AlertTriangle,
+  Download,
   GitCompare,
   ShieldAlert,
 } from 'lucide-react'
@@ -288,52 +289,40 @@ function DashboardPage() {
     <div className="dashboard-page">
 
       <section className="dashboard-toolbar">
-        <div>
-          <span className="section-label">
-            AKTİF KARŞILAŞTIRMA
-          </span>
+  <div className="comparison-selector">
+    <span className="section-label">
+      KARŞILAŞTIRMA
+    </span>
 
-          <select
-            value={
-              selectedAnalysisId ?? ''
-            }
-            onChange={(event) =>
-              setSelectedAnalysisId(
-                Number(
-                  event.target.value,
-                ),
-              )
-            }
-          >
-            {analyses.map(
-              (item) => (
-                <option
-                  key={item.id}
-                  value={item.id}
-                >
-                  {item.analysis_name}
-                </option>
-              ),
-            )}
-          </select>
-        </div>
+    <select
+      value={selectedAnalysisId ?? ''}
+      onChange={(event) =>
+        setSelectedAnalysisId(
+          Number(event.target.value),
+        )
+      }
+    >
+      {analyses.map((item) => (
+        <option
+          key={item.id}
+          value={item.id}
+        >
+          {item.analysis_name}
+        </option>
+      ))}
+    </select>
+  </div>
 
-        {analysis && (
-          <div className="version-badge">
-            {
-              analysis.source_version
-              ?? '—'
-            }
-
-            <span>→</span>
-
-            {
-              analysis.target_version
-              ?? '—'
-            }
-          </div>
-        )}
-      </section>
+  <button
+    type="button"
+    className="excel-report-button"
+    disabled
+    title="Excel raporu indirme bağlantısı henüz eklenmedi."
+  >
+    <Download size={16} />
+    Excel Raporu İndir
+  </button>
+</section>
 
 
       <section className="kpi-grid">
