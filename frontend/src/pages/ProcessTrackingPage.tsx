@@ -70,9 +70,9 @@ const STAGE_LABELS: Record<ProcessStage, { tr: string; en: string }> = {
 
 const COPY = {
   tr: {
-    kicker: 'TAKIM LİDERİ VERİ GİRİŞİ',
+    kicker: 'SÜREÇ TAKİBİ',
     title: 'Süreç Takibi',
-    description: 'Takım liderleri süreç kayıtlarını buradan ekler, ekip durumunu tek tabloda takip eder.',
+    description: 'Takım liderleri kayıt ve atamaları yönetir; ekip üyeleri mevcut kayıtları günceller.',
     export: 'Excel İndir',
     exportPreparing: 'Excel hazırlanıyor...',
     newRecord: 'Yeni süreç kaydı',
@@ -99,7 +99,7 @@ const COPY = {
     cancelEdit: 'Düzenlemeyi iptal et',
     updated: 'Süreç kaydı güncellendi.',
     duplicate: 'Aynı süreç/iş adı ve tarihle kayıt zaten mevcut.',
-    teamLeadOnly: 'Kayıt ekleme, düzenleme ve silme yetkisi yalnızca takım liderlerindedir.',
+    teamLeadOnly: 'Yeni kayıt ve atama işlemlerini takım lideri yapar. Mevcut kayıtları ekip üyeleri de düzenleyebilir.',
     summary: 'Genel görünüm',
     active: 'Aktif',
     testSummary: 'Testte',
@@ -110,7 +110,7 @@ const COPY = {
     historyTitle: 'Aşama geçmişi',
     historyEmpty: 'Bu kayıt için henüz aşama değişikliği yok.',
     historyBy: 'değiştiren',
-    readOnlyActions: 'Düzenleme ve silme yalnızca takım liderlerine açıktır.',
+    readOnlyActions: 'Yeni kayıt, atama ve silme işlemleri yalnızca takım liderlerine açıktır.',
     records: 'Kayıt',
     tableTitle: 'Süreç kayıtları',
     search: 'Süreç, yazılımcı, analist veya modül ara...',
@@ -130,9 +130,9 @@ const COPY = {
     blockedShort: 'Blokeli',
   },
   en: {
-    kicker: 'TEAM LEAD DATA ENTRY',
+    kicker: 'PROCESS TRACKING',
     title: 'Process Tracking',
-    description: 'Team leads add process records here and track the team status in one table.',
+    description: 'Team leads manage records and assignments; team members can update existing records.',
     export: 'Download Excel',
     exportPreparing: 'Preparing Excel...',
     newRecord: 'New process record',
@@ -159,7 +159,7 @@ const COPY = {
     cancelEdit: 'Cancel editing',
     updated: 'Process record updated.',
     duplicate: 'A record with the same process/work name and date already exists.',
-    teamLeadOnly: 'Only team leads can add, edit or delete records.',
+    teamLeadOnly: 'Team leads create records and manage assignments. Team members can edit existing records.',
     summary: 'Overview',
     active: 'Active',
     testSummary: 'In test',
@@ -170,7 +170,7 @@ const COPY = {
     historyTitle: 'Stage history',
     historyEmpty: 'No stage changes have been recorded for this item yet.',
     historyBy: 'changed by',
-    readOnlyActions: 'Editing and deleting are available to team leads only.',
+    readOnlyActions: 'Creating, assigning and deleting records are available to team leads only.',
     records: 'Records',
     tableTitle: 'Process records',
     search: 'Search process, developer, analyst or module...',
@@ -300,8 +300,6 @@ function ProcessTrackingPage() {
 
   const actor = profile
     ? {
-        // Turkish characters in HTTP headers can be folded differently by
-        // local browsers/proxies; backend receives a stable canonical role.
         role: isTeamLead ? 'teamlead' : profile.role,
         userId: profile.userId,
         name: profile.fullName,
@@ -358,11 +356,6 @@ function ProcessTrackingPage() {
   }
 
   function startEditing(item: WorkItem) {
-    if (!isTeamLead) {
-      setError(copy.readOnlyActions)
-      return
-    }
-
     setEditingItem(item)
     setForm({
       title: item.title,
@@ -387,6 +380,11 @@ function ProcessTrackingPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+
+    if (!editingItem && !isTeamLead) {
+      setError(copy.readOnlyActions)
+      return
+    }
 
     if (!form.title.trim()) {
       setError(copy.required)
@@ -625,7 +623,7 @@ function ProcessTrackingPage() {
         </>
       )}
 
-      {!isTeamLead ? (
+      {!isTeamLead && !editingItem ? (
         <section className="pt-permission-card">
           <AlertTriangle size={17} />
           <span>{copy.teamLeadOnly}</span>
@@ -680,7 +678,7 @@ function ProcessTrackingPage() {
               value={form.developer}
               placeholder={copy.ownerPlaceholder}
               onChange={(event) => setTextField('developer', event.target.value)}
-              disabled={saving}
+              disabled={saving || !isTeamLead}
             />
           </label>
 
@@ -691,7 +689,7 @@ function ProcessTrackingPage() {
               value={form.analyst}
               placeholder={copy.analystPlaceholder}
               onChange={(event) => setTextField('analyst', event.target.value)}
-              disabled={saving}
+              disabled={saving || !isTeamLead}
             />
           </label>
 
@@ -861,17 +859,17 @@ function ProcessTrackingPage() {
                       >
                         <History size={15} />
                       </button>
+                      <button
+                        type="button"
+                        className="pt-action-button"
+                        aria-label={copy.editRecord}
+                        title={copy.editRecord}
+                        onClick={() => startEditing(item)}
+                      >
+                        <Pencil size={15} />
+                      </button>
                       {isTeamLead && (
                         <>
-                          <button
-                            type="button"
-                            className="pt-action-button"
-                            aria-label={copy.editRecord}
-                            title={copy.editRecord}
-                            onClick={() => startEditing(item)}
-                          >
-                            <Pencil size={15} />
-                          </button>
                           <button
                             type="button"
                             className="pt-delete-button"

@@ -59,9 +59,6 @@ Record<
   TranslationDictionary
 > = {
 
-  /* =====================================================
-     TÜRKÇE
-     ===================================================== */
 
   tr: {
     'common.systemReady':
@@ -210,7 +207,6 @@ Record<
       'Analiz çıktılarını ve raporlarını yönet.',
 
 
-    /* UPLOAD */
 
     'upload.kicker':
       'YENİ ANALİZ',
@@ -292,9 +288,6 @@ Record<
   },
 
 
-  /* =====================================================
-     ENGLISH
-     ===================================================== */
 
   en: {
     'common.systemReady':
@@ -443,7 +436,6 @@ Record<
       'Manage analysis outputs and reports.',
 
 
-    /* UPLOAD */
 
     'upload.kicker':
       'NEW ANALYSIS',
@@ -525,9 +517,6 @@ Record<
   },
 
 
-  /* =====================================================
-     DEUTSCH
-     ===================================================== */
 
   de: {
     'common.systemReady':
@@ -676,7 +665,6 @@ Record<
       'Analyseergebnisse und Berichte verwalten.',
 
 
-    /* UPLOAD */
 
     'upload.kicker':
       'NEUE ANALYSE',
@@ -758,9 +746,6 @@ Record<
   },
 
 
-  /* =====================================================
-     FRANÇAIS
-     ===================================================== */
 
   fr: {
     'common.systemReady':
@@ -909,7 +894,6 @@ Record<
       'Gérer les résultats d’analyse et les rapports.',
 
 
-    /* UPLOAD */
 
     'upload.kicker':
       'NOUVELLE ANALYSE',
@@ -991,9 +975,6 @@ Record<
   },
 
 
-  /* =====================================================
-     ESPAÑOL
-     ===================================================== */
 
   es: {
     'common.systemReady':
@@ -1142,7 +1123,6 @@ Record<
       'Gestionar resultados de análisis e informes.',
 
 
-    /* UPLOAD */
 
     'upload.kicker':
       'NUEVO ANÁLISIS',

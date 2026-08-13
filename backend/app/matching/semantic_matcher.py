@@ -65,7 +65,6 @@ class SemanticRequirementMatcher:
         self.batch_size = batch_size
         self.device = device
 
-        # Testlerde sahte model verebilmek için bağımlılık enjeksiyonu.
         self._model = model
 
         self._candidate_dataframe: pd.DataFrame | None = None
@@ -317,8 +316,6 @@ class SemanticRequirementMatcher:
         matches: list[SemanticRequirementMatch] = []
 
         for candidate_index in sorted_indexes:
-            # Kosinüs benzerliği teorik olarak negatif olabilir.
-            # ScopeDiff çıktısında skorları 0-1 aralığında tutuyoruz.
             score = float(
                 np.clip(
                     raw_scores[candidate_index],

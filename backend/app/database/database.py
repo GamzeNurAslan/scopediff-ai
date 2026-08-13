@@ -103,9 +103,7 @@ def init_db(
     ScopeDiff tablolarını oluşturur.
     """
 
-    # Modellerin Base metadata'ya
-    # kaydedilmesini garanti eder.
-    from backend.app.database import models  # noqa: F401
+    from backend.app.database import models
 
     target_engine = (
         database_engine

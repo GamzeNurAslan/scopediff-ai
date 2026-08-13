@@ -16,7 +16,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* ScopeDiff design tokens */
 
   --sd-navy-950: #061126;
   --sd-navy-900: #07162f;
@@ -97,9 +96,6 @@ a {
 }
 
 
-/* =====================================================
-   SCROLLBAR
-   ===================================================== */
 
 * {
   scrollbar-width: thin;

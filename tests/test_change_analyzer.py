@@ -32,9 +32,6 @@ def test_duration_change_is_detected() -> None:
     )
 
     assert "duration_change" in result
-
-    # Sürenin içindeki sayı ayrıca numeric_change
-    # olarak raporlanmamalıdır.
     assert "numeric_change" not in result
 
 

@@ -261,7 +261,6 @@ class RequirementContradictionDetector:
                 match["candidate_requirement_id"]
             ).strip()
 
-            # Gereksinimi kendisiyle karşılaştırmayız.
             if (
                 requirement_id_a
                 == requirement_id_b
@@ -277,7 +276,6 @@ class RequirementContradictionDetector:
                 )
             )
 
-            # A-B ve B-A'yı iki kez raporlamayız.
             if pair_key in seen_pairs:
                 continue
 

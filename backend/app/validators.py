@@ -46,7 +46,6 @@ def validate_requirements_dataframe(dataframe: pd.DataFrame) -> None:
         columns = ", ".join(sorted(missing_columns))
         errors.append(f"Eksik zorunlu sütunlar: {columns}")
 
-        # Gerekli sütunlar yoksa aşağıdaki kontroller güvenli çalışamaz.
         raise DataValidationError(errors)
 
     blank_requirement_texts = _get_blank_mask(dataframe["requirement_text"])

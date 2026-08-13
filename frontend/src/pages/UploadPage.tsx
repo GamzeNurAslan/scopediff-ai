@@ -671,9 +671,7 @@ function UploadPage() {
   return (
     <div className="upload-page">
 
-      {/* =================================================
-          HEADER
-          ================================================= */}
+
 
       <section className="upload-intro">
 
@@ -725,13 +723,11 @@ function UploadPage() {
       </section>
 
 
-      {/* =================================================
-          EXCEL FILES
-          ================================================= */}
+
 
       <section className="upload-grid">
 
-        {/* SOURCE */}
+
 
         <article className="upload-card">
 
@@ -929,7 +925,7 @@ function UploadPage() {
         </article>
 
 
-        {/* TARGET */}
+
 
         <article className="upload-card">
 
@@ -1129,9 +1125,7 @@ function UploadPage() {
       </section>
 
 
-      {/* =================================================
-          ERROR
-          ================================================= */}
+
 
       {
         analysisError
@@ -1143,9 +1137,7 @@ function UploadPage() {
       }
 
 
-      {/* =================================================
-          SETTINGS
-          ================================================= */}
+
 
       <section className="upload-settings-card">
 
@@ -1220,9 +1212,7 @@ function UploadPage() {
         </div>
 
 
-        {/* =================================================
-            CREATOR
-            ================================================= */}
+
 
         {
           profile
@@ -1269,9 +1259,7 @@ function UploadPage() {
         }
 
 
-        {/* =================================================
-            ACTION
-            ================================================= */}
+
 
         <div className="upload-action-row">
 

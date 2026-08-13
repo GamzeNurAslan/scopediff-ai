@@ -1256,11 +1256,6 @@ function ComparisonPage() {
   } = useLanguage()
 
 
-  /*
-   * Mevcut LanguageContext yapısına dokunmamak için
-   * halihazırda çalışan route çevirisini dil göstergesi
-   * olarak kullanıyoruz.
-   */
   const language =
     detectLanguage(
       t(
@@ -1355,9 +1350,6 @@ function ComparisonPage() {
   )
 
 
-  /* =====================================================
-     ANALYSIS LIST
-     ===================================================== */
 
   useEffect(
     () => {
@@ -1409,9 +1401,6 @@ function ComparisonPage() {
   )
 
 
-  /* =====================================================
-     ANALYSIS DETAIL
-     ===================================================== */
 
   useEffect(
     () => {
@@ -1469,9 +1458,6 @@ function ComparisonPage() {
   )
 
 
-  /* =====================================================
-     CHANGE TYPES
-     ===================================================== */
 
   const changeTypes =
     useMemo(
@@ -1511,9 +1497,6 @@ function ComparisonPage() {
     )
 
 
-  /* =====================================================
-     METRICS
-     ===================================================== */
 
   const metrics =
     useMemo(
@@ -1571,9 +1554,6 @@ function ComparisonPage() {
     )
 
 
-  /* =====================================================
-     LABEL HELPERS
-     ===================================================== */
 
   function formatRiskLevel(
     value: string,
@@ -1700,9 +1680,6 @@ function ComparisonPage() {
   }
 
 
-  /* =====================================================
-     FILTER
-     ===================================================== */
 
   const filteredChanges =
     useMemo(
@@ -1823,9 +1800,6 @@ function ComparisonPage() {
     )
 
 
-  /* =====================================================
-     ERROR
-     ===================================================== */
 
   if (
     errorType
@@ -1852,9 +1826,6 @@ function ComparisonPage() {
   }
 
 
-  /* =====================================================
-     EMPTY
-     ===================================================== */
 
   if (
     analyses.length
@@ -1885,16 +1856,11 @@ function ComparisonPage() {
   }
 
 
-  /* =====================================================
-     RENDER
-     ===================================================== */
 
   return (
     <div className="comparison-page">
 
-      {/* =================================================
-          HEADER
-          ================================================= */}
+
 
       <section className="comparison-header">
 
@@ -1986,9 +1952,7 @@ function ComparisonPage() {
       </section>
 
 
-      {/* =================================================
-          ANALYSIS CONTEXT
-          ================================================= */}
+
 
       {
         analysis
@@ -2123,9 +2087,7 @@ function ComparisonPage() {
       }
 
 
-      {/* =================================================
-          KPI
-          ================================================= */}
+
 
       <section className="comparison-kpi-grid">
 
@@ -2299,9 +2261,7 @@ function ComparisonPage() {
       </section>
 
 
-      {/* =================================================
-          RESULTS WORKSPACE
-          ================================================= */}
+
 
       <section className="comparison-results-heading">
 
@@ -2401,9 +2361,7 @@ function ComparisonPage() {
       </section>
 
 
-      {/* =================================================
-          FILTERS
-          ================================================= */}
+
 
       <section className="comparison-filter-card">
 
@@ -2529,9 +2487,7 @@ function ComparisonPage() {
       </section>
 
 
-      {/* =================================================
-          DETAIL ERROR
-          ================================================= */}
+
 
       {
         errorType
@@ -2544,9 +2500,7 @@ function ComparisonPage() {
       }
 
 
-      {/* =================================================
-          LOADING / EMPTY
-          ================================================= */}
+
 
       {
         loading
@@ -2575,9 +2529,6 @@ function ComparisonPage() {
               === 'table'
             ? (
 
-              /* ===========================================
-                 TABLE VIEW
-                 =========================================== */
 
               <section className="comparison-table-shell">
 
@@ -2873,9 +2824,6 @@ function ComparisonPage() {
 
             : (
 
-              /* ===========================================
-                 DETAIL VIEW
-                 =========================================== */
 
               <section className="comparison-change-list">
 
@@ -2906,7 +2854,7 @@ function ComparisonPage() {
                           }
                         >
 
-                          {/* TOP */}
+
 
                           <div className="change-card-top">
 
@@ -2983,7 +2931,7 @@ function ComparisonPage() {
                           </div>
 
 
-                          {/* REQUIREMENT DIFF */}
+
 
                           <div className="requirement-text-diff">
 
@@ -3040,7 +2988,7 @@ function ComparisonPage() {
                           </div>
 
 
-                          {/* METRICS */}
+
 
                           <div className="change-card-metrics">
 

@@ -39,9 +39,6 @@ import type {
 } from '../types/api'
 
 
-// =====================================================
-// HELPERS
-// =====================================================
 
 function formatDate(
   value: string,
@@ -151,9 +148,6 @@ function clampPercentage(
 }
 
 
-// =====================================================
-// PAGE
-// =====================================================
 
 function ReportsPage() {
   const navigate =
@@ -222,9 +216,6 @@ function ReportsPage() {
   >(null)
 
 
-  // =====================================================
-  // LOAD ANALYSES
-  // =====================================================
 
   useEffect(() => {
     async function loadAnalyses() {
@@ -286,9 +277,6 @@ function ReportsPage() {
   }, [])
 
 
-  // =====================================================
-  // LATEST ANALYSIS
-  // =====================================================
 
   const latestAnalysis =
     useMemo(
@@ -355,9 +343,6 @@ function ReportsPage() {
   ])
 
 
-  // =====================================================
-  // GLOBAL METRICS
-  // =====================================================
 
   const totalChanges =
     useMemo(
@@ -397,9 +382,6 @@ function ReportsPage() {
     )
 
 
-  // =====================================================
-  // LATEST ANALYSIS METRICS
-  // =====================================================
 
   const latestMetrics =
     useMemo(
@@ -517,9 +499,6 @@ function ReportsPage() {
     )
 
 
-  // =====================================================
-  // CHANGE PROFILE
-  // =====================================================
 
   const changeProfile =
     useMemo(
@@ -626,9 +605,6 @@ function ReportsPage() {
     )
 
 
-  // =====================================================
-  // SEARCH
-  // =====================================================
 
   const filteredAnalyses =
     useMemo(
@@ -690,9 +666,6 @@ function ReportsPage() {
     )
 
 
-  // =====================================================
-  // DOWNLOAD
-  // =====================================================
 
   async function handleDownload(
     analysis:
@@ -737,9 +710,6 @@ function ReportsPage() {
   }
 
 
-  // =====================================================
-  // DELETE
-  // =====================================================
 
   function openDeleteModal(
     analysis:
@@ -836,16 +806,11 @@ function ReportsPage() {
   }
 
 
-  // =====================================================
-  // RENDER
-  // =====================================================
 
   return (
     <div className="rpt-page">
 
-      {/* =================================================
-          HEADER
-          ================================================= */}
+
 
       <header className="rpt-header">
 
@@ -894,9 +859,7 @@ function ReportsPage() {
       </header>
 
 
-      {/* =================================================
-          ERROR
-          ================================================= */}
+
 
       {
         error
@@ -938,9 +901,7 @@ function ReportsPage() {
       }
 
 
-      {/* =================================================
-          KPI
-          ================================================= */}
+
 
       <section className="rpt-kpis">
 
@@ -1066,9 +1027,7 @@ function ReportsPage() {
       </section>
 
 
-      {/* =================================================
-          LOADING
-          ================================================= */}
+
 
       {
         loading
@@ -1115,9 +1074,7 @@ function ReportsPage() {
           : (
             <>
 
-              {/* =========================================
-                  LATEST ANALYSIS
-                  ========================================= */}
+
 
               {
                 latestAnalysis
@@ -1345,7 +1302,7 @@ function ReportsPage() {
                     </div>
 
 
-                    {/* LATEST METRICS */}
+
 
                     <div className="rpt-latest-metrics">
 
@@ -1413,7 +1370,7 @@ function ReportsPage() {
                     </div>
 
 
-                    {/* SCORE */}
+
 
                     <div className="rpt-score-row">
 
@@ -1481,13 +1438,11 @@ function ReportsPage() {
               }
 
 
-              {/* =========================================
-                  INSIGHTS
-                  ========================================= */}
+
 
               <section className="rpt-insights">
 
-                {/* RISK PROFILE */}
+
 
                 <article className="rpt-panel">
 
@@ -1633,7 +1588,7 @@ function ReportsPage() {
                 </article>
 
 
-                {/* CHANGE PROFILE */}
+
 
                 <article className="rpt-panel">
 
@@ -1748,9 +1703,7 @@ function ReportsPage() {
               </section>
 
 
-              {/* =========================================
-                  ARCHIVE
-                  ========================================= */}
+
 
               <section className="rpt-archive">
 
@@ -2091,9 +2044,7 @@ function ReportsPage() {
       }
 
 
-      {/* =================================================
-          DELETE MODAL
-          ================================================= */}
+
 
       {
         analysisPendingDelete

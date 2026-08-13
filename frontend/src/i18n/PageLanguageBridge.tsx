@@ -43,9 +43,6 @@ function e(
 }
 
 
-/* =========================================================
-   COMMON
-   ========================================================= */
 
 const COMMON:
 TranslationEntry[] = [
@@ -251,9 +248,6 @@ TranslationEntry[] = [
 ]
 
 
-/* =========================================================
-   DEFECT ANALYSIS
-   ========================================================= */
 
 const DEFECT:
 TranslationEntry[] = [
@@ -435,9 +429,6 @@ TranslationEntry[] = [
 ]
 
 
-/* =========================================================
-   PROCESS TRACKING
-   ========================================================= */
 
 const PROCESS:
 TranslationEntry[] = [
@@ -835,9 +826,6 @@ TranslationEntry[] = [
 ]
 
 
-/* =========================================================
-   REPORTS
-   ========================================================= */
 
 const REPORTS:
 TranslationEntry[] = [
@@ -1187,9 +1175,92 @@ TranslationEntry[] = [
 ]
 
 
-/* =========================================================
-   DASHBOARD FALLBACK
-   ========================================================= */
+void REPORTS
+
+
+const REPORTS_UNICODE:
+TranslationEntry[] = [
+  e('RAPOR MERKEZİ', 'REPORT CENTER', 'BERICHTSZENTRUM', 'CENTRE DE RAPPORTS', 'CENTRO DE INFORMES'),
+  e('Analiz Raporları', 'Analysis Reports', 'Analyseberichte', 'Rapports d’analyse', 'Informes de análisis'),
+  e('Analiz sonuçlarını, risk profilini ve geçmiş rapor kayıtlarını tek ekrandan yönet.', 'Manage analysis results, risk profiles and historical report records from a single screen.', 'Verwalten Sie Analyseergebnisse, Risikoprofile und frühere Berichte auf einem Bildschirm.', 'Gérez les résultats d’analyse, les profils de risque et l’historique des rapports depuis un seul écran.', 'Gestiona los resultados del análisis, los perfiles de riesgo y el historial de informes desde una sola pantalla.'),
+  e('Analiz sonuçlarını,', 'Manage analysis results,', 'Verwalten Sie Analyseergebnisse,', 'Gérez les résultats d’analyse,', 'Gestiona los resultados del análisis,'),
+  e('risk profilini ve geçmiş', 'risk profiles and historical', 'Risikoprofile und frühere', 'les profils de risque et l’historique', 'los perfiles de riesgo y el historial'),
+  e('rapor kayıtlarını tek', 'report records from a single', 'Berichte auf einem', 'des rapports depuis un seul', 'de informes desde una sola'),
+  e('ekrandan yönet.', 'screen.', 'Bildschirm.', 'écran.', 'pantalla.'),
+  e('RAPOR FORMATI', 'REPORT FORMAT', 'BERICHTSFORMAT', 'FORMAT DU RAPPORT', 'FORMATO DEL INFORME'),
+  e('Toplam Analiz', 'Total Analyses', 'Analysen gesamt', 'Total des analyses', 'Análisis totales'),
+  e('kayıtlı karşılaştırma', 'saved comparisons', 'gespeicherte Vergleiche', 'comparaisons enregistrées', 'comparaciones guardadas'),
+  e('Toplam Değişiklik', 'Total Changes', 'Gesamtänderungen', 'Total des modifications', 'Cambios totales'),
+  e('tespit edilen değişiklik', 'detected changes', 'erkannte Änderungen', 'modifications détectées', 'cambios detectados'),
+  e('Defect Aday Kaydı', 'Defect Candidate Records', 'Defektkandidaten', 'Candidats de défaut', 'Registros de candidatos a defecto'),
+  e('önceliklendirilmiş aday', 'prioritized candidates', 'priorisierte Kandidaten', 'candidats priorisés', 'candidatos priorizados'),
+  e('Son Analiz Öncelikli Risk', 'Latest Analysis Priority Risk', 'Prioritätsrisiko der letzten Analyse', 'Risque prioritaire de la dernière analyse', 'Riesgo prioritario del último análisis'),
+  e('yüksek + kritik', 'high + critical', 'hoch + kritisch', 'élevé + critique', 'alto + crítico'),
+  e('Raporlar yükleniyor', 'Loading reports', 'Berichte werden geladen', 'Chargement des rapports', 'Cargando informes'),
+  e('Analiz kayıtları getiriliyor.', 'Loading analysis records.', 'Analysedatensätze werden geladen.', 'Chargement des enregistrements d’analyse.', 'Cargando registros de análisis.'),
+  e('Henüz rapor bulunmuyor', 'No reports yet', 'Noch keine Berichte', 'Aucun rapport pour le moment', 'Todavía no hay informes'),
+  e('Yeni bir karşılaştırma oluşturduğunda rapor burada görünecek.', 'When you create a new comparison from the Upload page, the report will appear here.', 'Wenn Sie auf der Upload-Seite einen neuen Vergleich erstellen, erscheint der Bericht hier.', 'Lorsque vous créez une nouvelle comparaison depuis la page de téléversement, le rapport apparaît ici.', 'Cuando crees una nueva comparación desde la página de carga, el informe aparecerá aquí.'),
+  e('Yeni bir karşılaştırma', 'When you create a new comparison', 'Wenn Sie einen neuen Vergleich', 'Lorsque vous créez une nouvelle comparaison', 'Cuando crees una nueva comparación'),
+  e('oluşturduğunda rapor', 'from the Upload page, the report', 'auf der Upload-Seite erstellen, erscheint der Bericht', 'depuis la page de téléversement, le rapport', 'desde la página de carga, el informe'),
+  e('burada görünecek.', 'will appear here.', 'hier.', 'apparaît ici.', 'aparecerá aquí.'),
+  e('SON ANALİZ', 'LATEST ANALYSIS', 'LETZTE ANALYSE', 'DERNIÈRE ANALYSE', 'ÚLTIMO ANÁLISIS'),
+  e('Analiz #', 'Analysis #', 'Analyse #', 'Analyse #', 'Análisis #'),
+  e('Karşılaştırmayı İncele', 'Review Comparison', 'Vergleich prüfen', 'Examiner la comparaison', 'Revisar comparación'),
+  e('Hazırlanıyor...', 'Preparing...', 'Wird vorbereitet ...', 'Préparation...', 'Preparando...'),
+  e('Excel Raporu', 'Excel Report', 'Excel-Bericht', 'Rapport Excel', 'Informe Excel'),
+  e('KAYNAK', 'SOURCE', 'QUELLE', 'SOURCE', 'ORIGEN'),
+  e('HEDEF', 'TARGET', 'ZIEL', 'CIBLE', 'DESTINO'),
+  e('ANALİZİ OLUŞTURAN', 'CREATED BY', 'ERSTELLT VON', 'CRÉÉ PAR', 'CREADO POR'),
+  e('Kullanıcı bilgisi yok', 'No user information', 'Keine Benutzerinformationen', 'Aucune information utilisateur', 'No hay información del usuario'),
+  e('OLUŞTURULMA', 'CREATED', 'ERSTELLT', 'CRÉÉ LE', 'CREADO'),
+  e('DEĞİŞİKLİK', 'CHANGES', 'ÄNDERUNGEN', 'MODIFICATIONS', 'CAMBIOS'),
+  e('YÜKSEK RİSK', 'HIGH RISK', 'HOHES RISIKO', 'RISQUE ÉLEVÉ', 'RIESGO ALTO'),
+  e('KRİTİK RİSK', 'CRITICAL RISK', 'KRITISCHES RISIKO', 'RISQUE CRITIQUE', 'RIESGO CRÍTICO'),
+  e('DEFECT ADAYI', 'DEFECT CANDIDATES', 'DEFEKTKANDIDATEN', 'CANDIDATS DE DÉFAUT', 'CANDIDATOS A DEFECTO'),
+  e('Ortalama Risk Skoru', 'Average Risk Score', 'Durchschnittlicher Risikowert', 'Score de risque moyen', 'Puntuación media de riesgo'),
+  e('Ortalama Confidence', 'Average Confidence', 'Durchschnittliche Konfidenz', 'Confiance moyenne', 'Confianza media'),
+  e('Risk Profili', 'Risk Profile', 'Risikoprofil', 'Profil de risque', 'Perfil de riesgo'),
+  e('Risk seviyelerinin dağılımı', 'Distribution of risk levels', 'Verteilung der Risikostufen', 'Répartition des niveaux de risque', 'Distribución de niveles de riesgo'),
+  e('Risk seviyelerinin', 'Distribution of risk', 'Verteilung der Risiko', 'Répartition des niveaux', 'Distribución de los niveles'),
+  e('dağılımı', 'levels', 'stufen', 'de risque', 'de riesgo'),
+  e('DEĞİŞİM PROFİLİ', 'CHANGE PROFILE', 'ÄNDERUNGSPROFIL', 'PROFIL DES MODIFICATIONS', 'PERFIL DE CAMBIOS'),
+  e('Öne Çıkan Değişimler', 'Highlighted Changes', 'Wesentliche Änderungen', 'Modifications principales', 'Cambios destacados'),
+  e('Son analizde tespit edilen değişim türleri', 'Change types detected in the latest analysis', 'In der letzten Analyse erkannte Änderungstypen', 'Types de modifications détectés dans la dernière analyse', 'Tipos de cambio detectados en el último análisis'),
+  e('Son analizde tespit', 'Change types detected', 'In der letzten Analyse erkannte', 'Types de modifications détectés', 'Tipos de cambio detectados'),
+  e('edilen değişim türleri', 'in the latest analysis', 'Änderungstypen', 'dans la dernière analyse', 'en el último análisis'),
+  e('Değişim profili', 'Change profile', 'Änderungsprofil', 'Profil des modifications', 'Perfil de cambios'),
+  e('bulunmuyor.', 'not available.', 'nicht verfügbar.', 'indisponible.', 'no disponible.'),
+  e('Düşük', 'Low', 'Niedrig', 'Faible', 'Bajo'),
+  e('Orta', 'Medium', 'Mittel', 'Moyen', 'Medio'),
+  e('Yüksek', 'High', 'Hoch', 'Élevé', 'Alto'),
+  e('Kritik', 'Critical', 'Kritisch', 'Critique', 'Crítico'),
+  e('RAPOR ARŞİVİ', 'REPORT ARCHIVE', 'BERICHTSARCHIV', 'ARCHIVES DES RAPPORTS', 'ARCHIVO DE INFORMES'),
+  e('Tüm Analizler', 'All Analyses', 'Alle Analysen', 'Toutes les analyses', 'Todos los análisis'),
+  e('Geçmiş analiz raporlarını', 'View and manage historical', 'Historische Analyseberichte', 'Consultez et gérez les rapports', 'Consulta y gestiona los informes'),
+  e('Geçmiş analiz raporlarını görüntüle ve yönet.', 'View and manage historical analysis reports.', 'Historische Analyseberichte anzeigen und verwalten.', 'Consultez et gérez les rapports d’analyse historiques.', 'Consulta y gestiona los informes de análisis históricos.'),
+  e('görüntüle ve yönet.', 'analysis reports.', 'anzeigen und verwalten.', 'd’analyse historiques.', 'de análisis históricos.'),
+  e('Eşleşen rapor bulunamadı', 'No matching reports found', 'Keine passenden Berichte gefunden', 'Aucun rapport correspondant', 'No se encontraron informes coincidentes'),
+  e('Arama ifadesini', 'Change your search term', 'Ändern Sie den Suchbegriff', 'Modifiez votre recherche', 'Cambia el término de búsqueda'),
+  e('değiştirerek tekrar dene.', 'and try again.', 'und versuchen Sie es erneut.', 'et réessayez.', 'e inténtalo de nuevo.'),
+  e('Analiz adı, versiyon veya ID ara...', 'Search analysis name, version or ID...', 'Analysename, Version oder ID suchen ...', 'Rechercher un nom d’analyse, une version ou un ID...', 'Buscar nombre de análisis, versión o ID...'),
+  e('OLUŞTURAN', 'CREATED BY', 'ERSTELLT VON', 'CRÉÉ PAR', 'CREADO POR'),
+  e('Bilgi yok', 'No information', 'Keine Angaben', 'Aucune information', 'Sin información'),
+  e('ANALİZİ SİL', 'DELETE ANALYSIS', 'ANALYSE LÖSCHEN', 'SUPPRIMER L’ANALYSE', 'ELIMINAR ANÁLISIS'),
+  e('Bu analizi silmek', 'Are you sure you want to', 'Möchten Sie diese Analyse', 'Voulez-vous vraiment', '¿Seguro que quieres'),
+  e('Bu analizi silmek istediğine emin misin?', 'Are you sure you want to delete this analysis?', 'Möchten Sie diese Analyse wirklich löschen?', 'Voulez-vous vraiment supprimer cette analyse ?', '¿Seguro que quieres eliminar este análisis?'),
+  e('istediğine emin misin?', 'delete this analysis?', 'löschen?', 'supprimer cette analyse ?', 'eliminar este análisis?'),
+  e('silinecek.', 'will be permanently deleted.', 'wird dauerhaft gelöscht.', 'sera définitivement supprimée.', 'se eliminará permanentemente.'),
+  e('ANALİZ', 'ANALYSIS', 'ANALYSE', 'ANALYSE', 'ANÁLISIS'),
+  e('Bu işlem geri alınamaz.', 'This action cannot be undone.', 'Diese Aktion kann nicht rückgängig gemacht werden.', 'Cette action est irréversible.', 'Esta acción no se puede deshacer.'),
+  e('Analize bağlı değişiklik', 'Changes and defect candidate records', 'Änderungen und Defektkandidaten', 'Les modifications et candidats de défaut', 'Los cambios y registros de candidatos a defecto'),
+  e('ve defect aday kayıtları', 'related to the analysis', 'dieser Analyse', 'liés à l’analyse', 'relacionados con el análisis'),
+  e('da silinir.', 'will also be deleted.', 'werden ebenfalls gelöscht.', 'seront également supprimés.', 'también se eliminarán.'),
+  e('Vazgeç', 'Cancel', 'Abbrechen', 'Annuler', 'Cancelar'),
+  e('Siliniyor...', 'Deleting...', 'Wird gelöscht ...', 'Suppression...', 'Eliminando...'),
+  e('Analizi Kalıcı Olarak Sil', 'Delete Analysis Permanently', 'Analyse dauerhaft löschen', 'Supprimer définitivement l’analyse', 'Eliminar análisis permanentemente'),
+]
+
+
 
 const DASHBOARD:
 TranslationEntry[] = [
@@ -1243,9 +1314,6 @@ TranslationEntry[] = [
 ]
 
 
-/* =========================================================
-   COUNT UNITS
-   ========================================================= */
 
 const COUNT_UNITS:
 TranslationEntry[] = [
@@ -1299,9 +1367,6 @@ TranslationEntry[] = [
 ]
 
 
-/* =========================================================
-   DATE MONTHS
-   ========================================================= */
 
 const FULL_MONTHS:
 TranslationEntry[] = [
@@ -1420,18 +1485,15 @@ TranslationEntry[] = [
 ]
 
 
-/* =========================================================
-   HELPERS
-   ========================================================= */
 
 function normalize(
   value: string,
 ): string {
   return value
-    .replaceAll(
-      '?',
-      "'",
-    )
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replaceAll('ı', 'i')
+    .replaceAll('İ', 'I')
     .replace(
       /\s+/g,
       ' ',
@@ -1509,7 +1571,7 @@ function getEntriesForPath(
   ) {
     return [
       ...COMMON,
-      ...REPORTS,
+      ...REPORTS_UNICODE,
     ]
   }
 
@@ -1637,13 +1699,6 @@ function translateDateLike(
   language:
     SupportedLanguage,
 ): string | null {
-  /*
-   * 11 Agustos 2026 13:16
-   * 30 Agu 2026
-   *
-   * Veri tarihi degistirilmez.
-   * Sadece ay adi yerellestirilir.
-   */
   const match =
     value.match(
       /^(\d{1,2})\s+([^\s]+)\s+(\d{4})(.*)$/,
@@ -1825,6 +1880,24 @@ function translateCore(
   }
 
 
+  for (const [candidate, entry] of lookup) {
+    if (!candidate.includes('?')) {
+      continue
+    }
+
+    const pattern = new RegExp(
+      `^${candidate
+        .replace(/[.*+^${}()|[\]\\]/g, '\\$&')
+        .replaceAll('?', '.')}$`,
+      'i',
+    )
+
+    if (pattern.test(normalized)) {
+      return entry[language]
+    }
+  }
+
+
   const count =
     translateCount(
       normalized,
@@ -1882,7 +1955,6 @@ function translateTextNode(
   if (!value) {
     return
   }
-
 
   const source =
     getTextSource(
@@ -1967,8 +2039,8 @@ function isLikelyDynamicTurkishContent(
   }
 
   return (
-    /[?gi?s?I]/i.test(normalized)
-    || /\b(?:gereksinim|degisiklik|a?iklama|s?re?|sistem|m?steri|kullanici|kontrol|g?nder|olmalidir|edilmelidir|yapilabilir|yapilmalidir|incelenmesi|kaynak|siparis|aktivasyon)\b/i.test(normalized)
+    /[çğıöşü]/i.test(normalized)
+    || /\b(?:gereksinim|değişiklik|açıklama|süreç|sistem|müşteri|kullanıcı|kontrol|gönder|olmalıdır|edilmelidir|yapılabilir|yapılmalıdır|incelenmesi|kaynak|sipariş|aktivasyon)\b/i.test(normalized)
   )
 }
 
@@ -1978,6 +2050,10 @@ async function translateDynamicContent(
   language: SupportedLanguage,
 ): Promise<void> {
   if (language === 'tr') {
+    return
+  }
+
+  if (dynamicTranslationInFlight) {
     return
   }
 
@@ -2031,28 +2107,79 @@ async function translateDynamicContent(
     return
   }
 
-  let translations: string[]
-
-  try {
-    translations = await translateContentBatch(
-      sources,
-      language,
+  const pendingSources =
+    sources.filter(
+      (source) =>
+        !dynamicTranslationCache.has(
+          `${language}:${source}`,
+        ),
     )
-  } catch {
+
+  if (!pendingSources.length) {
+    for (const source of sources) {
+      const translated =
+        dynamicTranslationCache.get(
+          `${language}:${source}`,
+        )
+
+      if (!translated) {
+        continue
+      }
+
+      const leading = source.match(/^\s*/)?.[0] ?? ''
+      const trailing = source.match(/\s*$/)?.[0] ?? ''
+      const rendered = `${leading}${translated}${trailing}`
+
+      for (const node of sourceNodes.get(source) ?? []) {
+        if (!node.isConnected) {
+          continue
+        }
+
+        node.nodeValue = rendered
+        const state = textTranslationStates.get(node)
+        if (state) {
+          state.rendered = rendered
+          state.dynamic = true
+          state.dynamicLanguage = language
+        }
+      }
+    }
+
     return
   }
 
+  let translations: string[]
+
+  dynamicTranslationInFlight = true
+
+  try {
+    translations = await translateContentBatch(
+      pendingSources,
+      language,
+    )
+  } catch {
+    dynamicTranslationInFlight = false
+    return
+  }
+
+  dynamicTranslationInFlight = false
+
   for (
     let index = 0;
-    index < sources.length;
+    index < pendingSources.length;
     index += 1
   ) {
-    const source = sources[index]
+    const source = pendingSources[index]
     const translated = translations[index]
 
     if (!source || !translated) {
       continue
     }
+
+    dynamicTranslationCache.set(
+      `${language}:${source}`,
+      translated,
+    )
 
     const leading = source.match(/^\s*/)?.[0] ?? ''
     const trailing = source.match(/\s*$/)?.[0] ?? ''
@@ -2099,12 +2226,6 @@ interface AttributeTranslationState {
 }
 
 
-/*
- * Bridge ile ?evrilen metinler React tarafindan yeniden render edilmedigi
- * i?in, bir sonraki dil degisiminde artik kaynak dilde g?r?nmeyebilir.
- * Orijinal degeri node ?zerinde saklayarak her ge?iste ayni kaynaktan
- * ?eviri yapiyoruz.
- */
 const textTranslationStates =
   new WeakMap<
     Text,
@@ -2122,6 +2243,17 @@ const attributeTranslationStates =
   >()
 
 
+const dynamicTranslationCache =
+  new Map<
+    string,
+    string
+  >()
+
+
+let dynamicTranslationInFlight =
+  false
+
+
 function getTextSource(
   node: Text,
   value: string,
@@ -2132,7 +2264,6 @@ function getTextSource(
     )
 
 
-  /* Kendi son ?evirimiz h?l? node'daysa kaynak degeri koru. */
   if (
     state
     && state.rendered === value
@@ -2141,7 +2272,6 @@ function getTextSource(
   }
 
 
-  /* React node'u yeni bir degerle g?ncellediyse yeni kaynak degeri kaydet. */
   textTranslationStates.set(
     node,
     {
@@ -2467,9 +2597,6 @@ while (current) {
 }
 
 
-/* =========================================================
-   COMPONENT
-   ========================================================= */
 
 function PageLanguageBridge() {
   const location =

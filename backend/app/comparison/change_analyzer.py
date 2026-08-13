@@ -37,9 +37,6 @@ class RequirementChangeAnalyzer:
     değişikliklerini kural tabanlı olarak tespit eder.
     """
 
-    # =========================================================
-    # SÜRE / SAYI PATTERNLARI
-    # =========================================================
 
     DURATION_PATTERN = re.compile(
         r"(?P<value>\d+(?:[.,]\d+)?)\s*"
@@ -52,9 +49,6 @@ class RequirementChangeAnalyzer:
         r"(?<!\w)%?\d+(?:[.,]\d+)?(?!\w)"
     )
 
-    # =========================================================
-    # TÜRKÇE YAZIYLA SAYILAR
-    # =========================================================
 
     TURKISH_NUMBER_UNITS = {
         "sıfır": 0,
@@ -94,9 +88,6 @@ class RequirementChangeAnalyzer:
         r")\b"
     )
 
-    # =========================================================
-    # KOŞUL
-    # =========================================================
 
     CONDITION_TERMS = (
         "eğer",
@@ -112,9 +103,6 @@ class RequirementChangeAnalyzer:
         "unless",
     )
 
-    # =========================================================
-    # KAPSAM
-    # =========================================================
 
     SCOPE_TERMS = (
         "tüm",
@@ -129,9 +117,6 @@ class RequirementChangeAnalyzer:
         "tek",
     )
 
-    # =========================================================
-    # AKTÖR
-    # =========================================================
 
     ACTOR_TERMS = (
         "kurumsal müşteri",
@@ -147,9 +132,6 @@ class RequirementChangeAnalyzer:
         "sistem",
     )
 
-    # =========================================================
-    # DURUM
-    # =========================================================
 
     STATE_TERMS = (
         "aktif",
@@ -166,9 +148,6 @@ class RequirementChangeAnalyzer:
         "kapalı",
     )
 
-    # =========================================================
-    # MODALITY
-    # =========================================================
 
     MANDATORY_PATTERN = re.compile(
         r"\b(?:"
@@ -201,9 +180,6 @@ class RequirementChangeAnalyzer:
         r")\b"
     )
 
-    # =========================================================
-    # NEGATION
-    # =========================================================
 
     NEGATION_PATTERN = re.compile(
         r"\b(?:"
@@ -217,9 +193,6 @@ class RequirementChangeAnalyzer:
         r")\b"
     )
 
-    # =========================================================
-    # HELPERS
-    # =========================================================
 
     @staticmethod
     def _format_values(
@@ -265,9 +238,6 @@ class RequirementChangeAnalyzer:
 
         return sorted(found)
 
-    # =========================================================
-    # TÜRKÇE SAYI NORMALİZASYONU
-    # =========================================================
 
     @classmethod
     def _normalize_turkish_number_words(
@@ -343,9 +313,6 @@ class RequirementChangeAnalyzer:
             )
         )
 
-    # =========================================================
-    # DURATION
-    # =========================================================
 
     @classmethod
     def _extract_durations(
@@ -373,9 +340,6 @@ class RequirementChangeAnalyzer:
 
         return durations
 
-    # =========================================================
-    # NUMERIC
-    # =========================================================
 
     @classmethod
     def _extract_numbers(
@@ -408,9 +372,6 @@ class RequirementChangeAnalyzer:
             text_without_durations
         )
 
-    # =========================================================
-    # MODALITY
-    # =========================================================
 
     @classmethod
     def _detect_modality(
@@ -442,9 +403,6 @@ class RequirementChangeAnalyzer:
 
         return modalities
 
-    # =========================================================
-    # NEGATION
-    # =========================================================
 
     @classmethod
     def _has_negation(
@@ -457,9 +415,6 @@ class RequirementChangeAnalyzer:
             )
         )
 
-    # =========================================================
-    # CHANGE BUILDER
-    # =========================================================
 
     @staticmethod
     def _create_change(
@@ -491,9 +446,6 @@ class RequirementChangeAnalyzer:
             ),
         )
 
-    # =========================================================
-    # MAIN ANALYSIS
-    # =========================================================
 
     def analyze(
         self,
@@ -505,9 +457,6 @@ class RequirementChangeAnalyzer:
         tespit eder.
         """
 
-        # -----------------------------------------------------
-        # 1. NORMAL TEXT PROCESSING
-        # -----------------------------------------------------
 
         old_normalized = normalize_text(
             old_text
@@ -523,13 +472,6 @@ class RequirementChangeAnalyzer:
         ):
             return []
 
-        # -----------------------------------------------------
-        # 2. TÜRKÇE SAYILARI RAKAMA ÇEVİR
-        #
-        # üç -> 3
-        # beş -> 5
-        # yirmi dört -> 24
-        # -----------------------------------------------------
 
         old_normalized = (
             self
@@ -545,11 +487,6 @@ class RequirementChangeAnalyzer:
             )
         )
 
-        # Böylece:
-        #
-        # "üç kez" ve "3 kez"
-        #
-        # aynı anlamda değerlendirilir.
 
         if (
             old_normalized
@@ -561,9 +498,6 @@ class RequirementChangeAnalyzer:
             DetectedChange
         ] = []
 
-        # =====================================================
-        # 1. SÜRE DEĞİŞİKLİKLERİ
-        # =====================================================
 
         old_durations = (
             self._extract_durations(
@@ -594,9 +528,6 @@ class RequirementChangeAnalyzer:
                     )
                 )
 
-        # =====================================================
-        # 2. SAYISAL DEĞİŞİKLİKLER
-        # =====================================================
 
         old_numbers = (
             self._extract_numbers(
@@ -627,9 +558,6 @@ class RequirementChangeAnalyzer:
                     )
                 )
 
-        # =====================================================
-        # 3. MODALITY / ZORUNLULUK
-        # =====================================================
 
         old_modality = (
             self._detect_modality(
@@ -660,9 +588,6 @@ class RequirementChangeAnalyzer:
                     )
                 )
 
-        # =====================================================
-        # 4. OLUMSUZLUK
-        # =====================================================
 
         old_negation = (
             self._has_negation(
@@ -704,9 +629,6 @@ class RequirementChangeAnalyzer:
                 )
             )
 
-        # =====================================================
-        # 5. KOŞUL DEĞİŞİKLİKLERİ
-        # =====================================================
 
         old_conditions = (
             self._extract_terms(
@@ -735,9 +657,6 @@ class RequirementChangeAnalyzer:
                 )
             )
 
-        # =====================================================
-        # 6. KAPSAM DEĞİŞİKLİKLERİ
-        # =====================================================
 
         old_scope = (
             self._extract_terms(
@@ -766,9 +685,6 @@ class RequirementChangeAnalyzer:
                 )
             )
 
-        # =====================================================
-        # 7. AKTÖR DEĞİŞİKLİKLERİ
-        # =====================================================
 
         old_actors = (
             self._extract_terms(
@@ -801,9 +717,6 @@ class RequirementChangeAnalyzer:
                     )
                 )
 
-        # =====================================================
-        # 8. DURUM / STATE DEĞİŞİKLİKLERİ
-        # =====================================================
 
         old_states = (
             self._extract_terms(

@@ -77,7 +77,6 @@ function readLanguage(
     }
 
   } catch {
-    // localStorage unavailable.
   }
 
   return fallback
@@ -105,14 +104,6 @@ export function LanguageProvider(
   )
 
 
-  /*
-   * Raporların varsayılan dilini
-   * English yapıyoruz.
-   *
-   * Kullanıcı arayüzü Türkçe
-   * kullanırken kurumsal raporu
-   * İngilizce üretebilir.
-   */
   const [
     reportLanguage,
     setReportLanguageState,
@@ -143,7 +134,6 @@ export function LanguageProvider(
         language,
       )
     } catch {
-      // localStorage unavailable.
     }
   }, [
     language,
@@ -157,7 +147,6 @@ export function LanguageProvider(
         reportLanguage,
       )
     } catch {
-      // localStorage unavailable.
     }
   }, [
     reportLanguage,

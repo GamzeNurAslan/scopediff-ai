@@ -154,9 +154,6 @@ def evaluate_ranker(
             f"[{index}/{len(defects)}] "
             f"{defect_id} değerlendiriliyor..."
         )
-
-        # Gerçek MRR hesaplayabilmek için yalnızca ilk 5 değil,
-        # bütün aday değişiklikleri sıralıyoruz.
         ranking = ranker.rank(
             defect_text=defect["defect_text"],
             changes_dataframe=changes,

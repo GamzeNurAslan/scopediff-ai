@@ -78,9 +78,6 @@ export interface DefectRanking {
 }
 
 
-/* =====================================================
-   ANALYSIS CREATOR
-   ===================================================== */
 
 
 export interface AnalysisCreatorMetadata {
@@ -200,9 +197,6 @@ export interface DefectAnalysisResult {
 }
 
 
-/* =====================================================
-   HISTORY
-   ===================================================== */
 
 
 export interface HistoryCatalogItem {

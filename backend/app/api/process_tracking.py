@@ -58,9 +58,6 @@ STAGES = {
 }
 
 
-# =========================================================
-# RESPONSE MODELS
-# =========================================================
 
 
 class WorkItemResponse(BaseModel):
@@ -216,9 +213,6 @@ class NotificationResponse(BaseModel):
     created_at: datetime
 
 
-# =========================================================
-# COLUMN ALIASES
-# =========================================================
 
 
 COLUMN_ALIASES = {
@@ -245,11 +239,6 @@ COLUMN_ALIASES = {
         "termintarihi",
     },
 
-    # developer ve analyst kasıtlı olarak
-    # Excel importunda kullanılmıyor.
-    #
-    # Atamalar uygulama içinden kullanıcı
-    # tarafından yapılacak.
 
     "test_given_status": {
         "testeverildimi",
@@ -327,9 +316,6 @@ DELIVERY_READY_MARKERS = {
 }
 
 
-# =========================================================
-# NORMALIZATION
-# =========================================================
 
 
 KNOWN_ACRONYMS = {
@@ -512,6 +498,16 @@ def _require_team_lead(role: str | None) -> None:
             status_code=status.HTTP_403_FORBIDDEN,
             detail=(
                 "Bu işlem yalnızca takım liderleri tarafından yapılabilir."
+            ),
+        )
+
+
+def _require_user_role(role: str | None) -> None:
+    if not role or not role.strip():
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                "Bu işlem için kullanıcı rolü gereklidir."
             ),
         )
 
@@ -732,9 +728,6 @@ def _row_value(
     )
 
 
-# =========================================================
-# AUTOMATIC STAGE ENGINE
-# =========================================================
 
 
 def _infer_stage(
@@ -851,9 +844,6 @@ def _refresh_automatic_stage(
     )
 
 
-# =========================================================
-# RESPONSE HELPERS
-# =========================================================
 
 
 def _is_overdue(
@@ -1102,9 +1092,6 @@ def _get_item(
     return item
 
 
-# =========================================================
-# GET ITEMS
-# =========================================================
 
 
 @router.post(
@@ -1217,8 +1204,9 @@ def update_item(
     x_user_name: str | None = Header(default=None, alias="X-User-Name"),
     database: Session = Depends(get_db),
 ):
-    _require_team_lead(x_user_role)
+    _require_user_role(x_user_role)
     item = _get_item(database, item_id)
+    is_team_lead = _is_team_lead_role(x_user_role)
 
     normalized_title = (
         _normalize_display_text(request.title)
@@ -1251,8 +1239,9 @@ def update_item(
     item.title = normalized_title
     item.portal_menu = _clean_assignment(request.portal_menu)
     item.module = _clean_assignment(request.module)
-    item.developer = _clean_assignment(request.developer)
-    item.analyst = _clean_assignment(request.analyst)
+    if is_team_lead:
+        item.developer = _clean_assignment(request.developer)
+        item.analyst = _clean_assignment(request.analyst)
     item.due_date = request.due_date
     item.current_stage = normalized_stage
     item.stage_override = normalized_stage
@@ -1506,9 +1495,6 @@ def get_items(
     ]
 
 
-# =========================================================
-# GET ITEM DETAIL
-# =========================================================
 
 
 @router.get(
@@ -1627,9 +1613,6 @@ def mark_notification_read(
     )
 
 
-# =========================================================
-# SUMMARY
-# =========================================================
 
 
 @router.get(
@@ -1747,9 +1730,6 @@ def get_summary(
     )
 
 
-# =========================================================
-# EXCEL IMPORT
-# =========================================================
 
 
 @router.post(
@@ -1983,8 +1963,6 @@ def import_excel(
 
                         module=module,
 
-                        # Kullanıcı ataması.
-                        # Excel'den isim alınmaz.
                         developer=None,
                         analyst=None,
 
@@ -2042,12 +2020,6 @@ def import_excel(
                     imported_count += 1
 
                 else:
-                    # Excel tekrar yüklendiğinde
-                    # developer / analyst alanlarına
-                    # dokunmuyoruz.
-                    #
-                    # Böylece uygulamada yapılan
-                    # kullanıcı atamaları korunur.
 
                     existing.external_id = (
                         external_id
@@ -2152,9 +2124,6 @@ def import_excel(
             )
 
 
-# =========================================================
-# USER ASSIGNMENT
-# =========================================================
 
 
 @router.patch(
@@ -2220,9 +2189,6 @@ def update_assignment(
     )
 
 
-# =========================================================
-# ANALYSIS LINK
-# =========================================================
 
 
 @router.patch(
@@ -2278,9 +2244,6 @@ def update_analysis_link(
     )
 
 
-# =========================================================
-# STAGE OVERRIDE
-# =========================================================
 
 
 @router.patch(
@@ -2362,9 +2325,6 @@ def update_stage(
     )
 
 
-# =========================================================
-# DELETE
-# =========================================================
 
 
 @router.delete(

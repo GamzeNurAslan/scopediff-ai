@@ -1,6 +1,3 @@
-/* =====================================================
-   SCOPEDIFF AI - DEFECT ANALYSIS
-   ===================================================== */
 
 .defect-page {
   width: 100%;
@@ -10,7 +7,6 @@
 }
 
 
-/* HEADER */
 
 .defect-header {
   display: flex;
@@ -61,7 +57,6 @@
 }
 
 
-/* CONTEXT */
 
 .defect-context-card {
   display: flex;
@@ -102,7 +97,6 @@
 }
 
 
-/* INPUT */
 
 .defect-input-card {
   padding: 17px;
@@ -226,7 +220,6 @@
 }
 
 
-/* RESULT HEADER */
 
 .defect-result-summary {
   display: flex;
@@ -266,7 +259,6 @@
 }
 
 
-/* CANDIDATES */
 
 .defect-candidate-list {
   display: flex;
@@ -330,7 +322,6 @@
 }
 
 
-/* SCORES */
 
 .defect-score-grid {
   display: grid;
@@ -362,7 +353,6 @@
 }
 
 
-/* REQUIREMENT DIFF */
 
 .defect-requirement-diff {
   display: grid;
@@ -420,7 +410,6 @@
 }
 
 
-/* REASON */
 
 .defect-reason {
   margin: 0 16px 16px;
@@ -451,7 +440,6 @@
 }
 
 
-/* EMPTY */
 
 .defect-empty-state {
   display: flex;
@@ -477,11 +465,7 @@
 }
 
 
-/* RESPONSIVE */
 
-/* =====================================================
-   PREMIUM DEFECT WORKBENCH
-   ===================================================== */
 
 .defect-page {
   position: relative;
@@ -562,7 +546,6 @@
 }
 
 
-/* Etiya calm decision-support theme */
 .defect-page {
   max-width: 1220px;
   margin: 0 auto;

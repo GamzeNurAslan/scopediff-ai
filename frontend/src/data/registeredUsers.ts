@@ -8,13 +8,6 @@ export interface RegisteredUser {
 }
 
 
-/*
- * DEMO KULLANICI KAYITLARI
- *
- * Bunlar ger?ek sirket ?alisan kayitlari degildir.
- * Ger?ek authentication altyapisina ge?ildiginde
- * bu liste backend veritabanindan gelecektir.
- */
 export const REGISTERED_USERS: RegisteredUser[] = [
   {
     id: 'USR-001',
@@ -52,21 +45,6 @@ export const REGISTERED_USERS: RegisteredUser[] = [
     isActive: true,
   },
 
-  /*
-   * ?RNEK:
-   *
-   * Buraya listelerde olmayan bir departman
-   * ve rol de eklenebilir.
-   *
-   * {
-   *   id: 'USR-005',
-   *   fullName: '...',
-   *   corporateEmail: '...@company.com',
-   *   department: 'xDSL MS Developer',
-   *   role: 'Stajyer',
-   *   isActive: true,
-   * },
-   */
 ]
 
 
@@ -94,12 +72,6 @@ export function findUserByEmail(
 }
 
 
-/*
- * Bunlar zorunlu se?enekler degil.
- *
- * Sadece kullanici yazarken
- * ?neri g?stermek i?in kullaniliyor.
- */
 export function getDepartmentSuggestions():
 string[] {
   return Array.from(

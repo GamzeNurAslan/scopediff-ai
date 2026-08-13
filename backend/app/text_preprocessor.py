@@ -28,10 +28,8 @@ def clean_original_text(value: object) -> str:
 
     text = str(value)
 
-    # Farklı biçimlerde yazılmış Unicode karakterlerini standartlaştırır.
     text = unicodedata.normalize("NFKC", text)
 
-    # Satır sonları, sekmeler ve art arda gelen boşluklar tek boşluk olur.
     text = re.sub(r"\s+", " ", text)
 
     return text.strip()
@@ -49,8 +47,6 @@ def normalize_text(value: object) -> str:
     if not cleaned_text:
         return ""
 
-    # Python'un varsayılan lower işlemi Türkçe I/İ harflerinde
-    # istediğimiz sonucu vermeyebileceği için önce dönüşüm yapıyoruz.
     turkish_translation = str.maketrans(
         {
             "I": "ı",

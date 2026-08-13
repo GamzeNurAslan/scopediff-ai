@@ -67,7 +67,6 @@
 @media (max-width: 900px) { .login-page { grid-template-columns: 1fr; }.login-brand-panel { min-height: 445px; padding: 27px 28px; }.login-brand-content { margin: 45px 0 0; padding: 0; }.login-brand-content h1 { max-width: 520px; font-size: 44px; }.login-feature-list { display: none; }.login-brand-footer { display: none; }.login-form-panel { min-height: calc(100vh - 445px); padding: 40px 24px; }.login-form-card { width: min(100%, 410px); }.login-mobile-mark { display: grid; } }
 @media (max-width: 530px) { .login-brand-top > i { display: none; }.login-live-preview { display: none; }.login-brand-panel { min-height: 300px; }.login-brand-content { margin-top: 60px; }.login-brand-content h1 { font-size: 39px; }.login-brand-content > p { display: none; }.login-form-panel { min-height: calc(100vh - 300px); padding: 24px 16px; }.login-form-card { padding: 25px 21px 22px; } }
 
-/* Etiya-inspired calm enterprise theme */
 .login-page {
   background: #f5f7fb;
 }
@@ -142,7 +141,6 @@
   .login-brand-panel { min-height: 300px; }
 }
 
-/* Premium, calm enterprise landing */
 .login-page {
   grid-template-columns: minmax(0, 1.08fr) minmax(470px, .92fr);
   background: #f6f8fc;
@@ -224,7 +222,6 @@
   .login-form-panel { min-height: calc(100vh - 430px); }
 }
 
-/* Focused enterprise sign-in: no demo shortcuts */
 .login-form-card {
   width: min(100%, 500px);
   padding: 43px 46px 45px;
@@ -286,7 +283,6 @@
   }
 }
 
-/* Brand preview: compact product signal instead of a generic chart card */
 .login-live-preview {
   width: min(100%, 560px);
   padding: 20px 21px 17px;
@@ -385,7 +381,6 @@
   }
 }
 
-/* Editorial product story: no fake metrics, only the ScopeDiff promise */
 .login-live-preview {
   padding: 22px 23px 24px;
 }
@@ -454,7 +449,6 @@
   }
 }
 
-/* Balanced premium composition */
 .login-live-preview {
   width: min(100%, 570px);
   min-height: 158px;
@@ -533,7 +527,6 @@
   }
 }
 
-/* Signature visual: playful, premium and product-specific */
 .login-brand-visual {
   position: relative;
   width: min(100%, 560px);
@@ -636,7 +629,6 @@
   .brand-visual-tag { font-size: 7px; }
 }
 
-/* Etiya partnership wordmark */
 .login-brand-top > span:nth-child(3) {
   display: inline-flex;
   align-items: center;
@@ -663,7 +655,6 @@
   display: none;
 }
 
-/* Etiya energy: warm signal + enterprise depth */
 .login-page {
   grid-template-columns: minmax(0, 1.16fr) minmax(460px, .84fr);
   background: #07162f;
@@ -701,6 +692,8 @@
   color: #07162f;
   font-size: clamp(44px, 5.2vw, 78px);
   letter-spacing: -.085em;
+  line-height: 1.08;
+  padding-bottom: .08em;
   background: linear-gradient(120deg, #07162f 8%, #173d70 54%, #f47724 105%);
   -webkit-background-clip: text;
   background-clip: text;

@@ -6,7 +6,6 @@
 }
 
 
-/* HEADER */
 
 .history-header h2 {
   margin: 7px 0 6px;
@@ -23,7 +22,6 @@
 }
 
 
-/* FILTERS */
 
 .history-filter-card {
   display: grid;
@@ -66,7 +64,6 @@
 }
 
 
-/* KPI */
 
 .history-kpi-grid {
   display: grid;
@@ -134,7 +131,6 @@
 }
 
 
-/* CURRENT REQUIREMENT */
 
 .history-current-card {
   padding: 16px;
@@ -210,7 +206,6 @@
 }
 
 
-/* SECTION */
 
 .history-section-title {
   display: flex;
@@ -241,7 +236,6 @@
 }
 
 
-/* TIMELINE */
 
 .history-timeline {
   display: flex;
@@ -341,7 +335,6 @@
 }
 
 
-/* TRANSITION */
 
 .history-transition {
   display: grid;
@@ -447,9 +440,6 @@
 }
 
 
-/* =====================================================
-   PREMIUM HISTORY TIMELINE
-   ===================================================== */
 
 .history-page {
   position: relative;
@@ -486,7 +476,6 @@
 }
 
 
-/* RESPONSIVE */
 
 @media (max-width: 900px) {
   .history-kpi-grid {

@@ -69,6 +69,12 @@ export function normalizeProfileField(
     && (
       key === 'takım lideri'
       || key === 'takim lideri'
+      || key === 'team lead'
+      || key === 'teamlead'
+      || (
+        key.includes('tak')
+        && key.includes('lider')
+      )
     )
   ) {
     return 'Takım Lideri'

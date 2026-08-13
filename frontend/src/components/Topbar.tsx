@@ -507,7 +507,6 @@ function Topbar() {
           setNotifications(nextNotifications)
         }
       } catch {
-        // Bildirimler yardımcı bir özellik; ana ekranı bu hata için durdurma.
       } finally {
         if (!cancelled) {
           setNotificationLoading(false)
@@ -538,7 +537,6 @@ function Topbar() {
         )))
       }
     } catch {
-      // Navigasyon yine de devam edebilir.
     }
 
     setNotificationOpen(false)

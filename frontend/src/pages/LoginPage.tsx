@@ -37,16 +37,16 @@ const COPY = {
     fullName: 'Ad Soyad',
     fullNamePlaceholder: 'Adını ve soyadını yaz',
     eyebrow: 'SCOPEDIFF ENTERPRISE',
-    title: 'Ekibin nabzini\ntek bakista g?r.',
-    description: 'Degisiklikleri yakala, isleri hizlandir, ekibin kontrol?n? elinde tut.',
+    title: 'Ekibin nabzını\ntek bakışta gör.',
+    description: 'Değişiklikleri yakala, işleri hızlandır, ekibin kontrolünü elinde tut.',
     signIn: 'Hesabina giris yap',
-    signInHint: 'Kurumsal hesabinla g?venli ?alisma alanina devam et.',
+    signInHint: 'Kurumsal hesabınla güvenli çalışma alanına devam et.',
     email: 'Kurumsal e-posta',
     emailPlaceholder: 'ad.soyad@company.com',
     password: 'Sifre',
-    passwordPlaceholder: '????????',
-    remember: 'Bu cihazda oturumu a?ik tut',
-    submit: '?alisma alanina gir',
+    passwordPlaceholder: 'Şifreni gir',
+    remember: 'Bu cihazda oturumu açık tut',
+    submit: 'Çalışma alanına gir',
     invalid: 'E-posta veya sifre hatali. Demo hesaplardan birini deneyebilirsin.',
     shortPassword: 'Sifre en az 6 karakter olmali.',
     demoTitle: 'Demo erisimleri',
@@ -55,22 +55,22 @@ const COPY = {
     intern: 'Demo Kullanici',
     internEmail: 'demo@company.com',
     demoPassword: 'Sifre: 123456',
-    secure: 'Canli ekip zek?si',
-    secureHint: 'Rol bazli erisim ve anlik s?re? g?r?n?rl?g?',
-    localNote: 'Gelistirme ortami ? Demo giris',
+    secure: 'Canlı ekip zekâsı',
+    secureHint: 'Rol bazlı erişim ve anlık süreç görünürlüğü',
+    localNote: 'Geliştirme ortamı · Demo giriş',
   },
   en: {
     fullName: 'Full name',
     fullNamePlaceholder: 'Enter your full name',
     eyebrow: 'SCOPEDIFF ENTERPRISE',
-    title: 'See your team?s pulse\nat a glance.',
+    title: "See your team's pulse\nat a glance.",
     description: 'Catch change, move work forward and keep your team in control.',
     signIn: 'Sign in to your account',
     signInHint: 'Continue to your secure workspace with your corporate account.',
     email: 'Corporate email',
     emailPlaceholder: 'name@company.com',
     password: 'Password',
-    passwordPlaceholder: '????????',
+    passwordPlaceholder: 'Enter your password',
     remember: 'Keep me signed in on this device',
     submit: 'Enter workspace',
     invalid: 'Email or password is incorrect. Try one of the demo accounts.',
@@ -83,7 +83,7 @@ const COPY = {
     demoPassword: 'Password: 123456',
     secure: 'Live team intelligence',
     secureHint: 'Role-based access and instant process visibility',
-    localNote: 'Development environment ? Demo access',
+    localNote: 'Development environment · Demo access',
   },
 } as const
 
@@ -123,7 +123,7 @@ function ScopeDiffLogo() {
 function LoginPage() {
   const { language } = useLanguage()
   const copy = language === 'tr'
-    ? { ...COPY.tr, fullNamePlaceholder: 'Adini ve soyadini yaz' }
+    ? { ...COPY.tr, fullNamePlaceholder: 'Adını ve soyadını yaz' }
     : COPY.en
   const navigate = useNavigate()
   const location = useLocation()
@@ -211,7 +211,7 @@ function LoginPage() {
             <span className="brand-visual-tag tag-three">ACTION</span>
           </div>
         </div>
-        <small className="login-brand-footer">? 2026 ScopeDiff ? {copy.localNote}</small>
+        <small className="login-brand-footer">© 2026 ScopeDiff · {copy.localNote}</small>
       </section>
 
       <section className="login-form-panel">

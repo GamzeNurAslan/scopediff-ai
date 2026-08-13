@@ -73,9 +73,6 @@ Record<string, string> = {
 }
 
 
-/* =========================================================
-   PAGE COPY
-   ========================================================= */
 
 const COPY = {
   tr: {
@@ -664,9 +661,6 @@ const COPY = {
 } as const
 
 
-/* =========================================================
-   CHANGE TYPE LABELS
-   ========================================================= */
 
 const CHANGE_TYPE_LABELS:
 Record<
@@ -895,9 +889,6 @@ Record<
 }
 
 
-/* =========================================================
-   LANGUAGE
-   ========================================================= */
 
 function detectLanguage(
   routeTitle: string,
@@ -934,9 +925,6 @@ function detectLanguage(
 }
 
 
-/* =========================================================
-   FORMATTERS
-   ========================================================= */
 
 function normalizeChangeType(
   value: string,
@@ -991,9 +979,6 @@ function formatChangeType(
 }
 
 
-/* =========================================================
-   COMPONENT
-   ========================================================= */
 
 function DashboardPage() {
   const {
@@ -1063,9 +1048,6 @@ function DashboardPage() {
   )
 
 
-  /* =====================================================
-     LOAD ANALYSES
-     ===================================================== */
 
   useEffect(
     () => {
@@ -1117,9 +1099,6 @@ function DashboardPage() {
   )
 
 
-  /* =====================================================
-     LOAD DETAIL
-     ===================================================== */
 
   useEffect(
     () => {
@@ -1177,9 +1156,6 @@ function DashboardPage() {
   )
 
 
-  /* =====================================================
-     METRICS
-     ===================================================== */
 
   const metrics =
     useMemo(
@@ -1249,9 +1225,6 @@ function DashboardPage() {
     )
 
 
-  /* =====================================================
-     CHANGE DISTRIBUTION
-     ===================================================== */
 
   const changeDistribution =
     useMemo(
@@ -1313,9 +1286,6 @@ function DashboardPage() {
     )
 
 
-  /* =====================================================
-     RISK DISTRIBUTION
-     ===================================================== */
 
   const riskDistribution =
     useMemo(
@@ -1478,9 +1448,6 @@ function DashboardPage() {
   }
 
 
-  /* =====================================================
-     DOWNLOAD
-     ===================================================== */
 
   async function handleDownloadReport() {
     if (
@@ -1518,9 +1485,6 @@ function DashboardPage() {
   }
 
 
-  /* =====================================================
-     ERROR COPY
-     ===================================================== */
 
   function getErrorMessage():
   string | null {
@@ -1565,9 +1529,6 @@ function DashboardPage() {
     getErrorMessage()
 
 
-  /* =====================================================
-     LOADING
-     ===================================================== */
 
   if (
     loading
@@ -1582,9 +1543,6 @@ function DashboardPage() {
   }
 
 
-  /* =====================================================
-     INITIAL ERROR
-     ===================================================== */
 
   if (
     errorType
@@ -1601,9 +1559,6 @@ function DashboardPage() {
   }
 
 
-  /* =====================================================
-     EMPTY
-     ===================================================== */
 
   if (
     analyses.length
@@ -1637,16 +1592,11 @@ function DashboardPage() {
   }
 
 
-  /* =====================================================
-     RENDER
-     ===================================================== */
 
   return (
     <div className="dashboard-page">
 
-      {/* =================================================
-          TOOLBAR
-          ================================================= */}
+
 
       <section className="dashboard-toolbar">
 
@@ -1739,9 +1689,7 @@ function DashboardPage() {
       </section>
 
 
-      {/* =================================================
-          ERROR
-          ================================================= */}
+
 
       {
   errorMessage
@@ -1753,9 +1701,7 @@ function DashboardPage() {
 }
 
 
-      {/* =================================================
-          KPI
-          ================================================= */}
+
 
       <section className="kpi-grid">
 
@@ -1940,13 +1886,11 @@ function DashboardPage() {
       </section>
 
 
-      {/* =================================================
-          CHARTS
-          ================================================= */}
+
 
       <section className="chart-grid">
 
-        {/* CHANGE DISTRIBUTION */}
+
 
         <article className="dashboard-card chart-card chart-card--changes">
 
@@ -2120,7 +2064,7 @@ function DashboardPage() {
         </article>
 
 
-        {/* RISK DISTRIBUTION */}
+
 
         <article className="dashboard-card chart-card chart-card--risk">
 
@@ -2288,9 +2232,7 @@ function DashboardPage() {
       </section>
 
 
-      {/* =================================================
-          REQUIREMENT TABLE
-          ================================================= */}
+
 
       <section
         className="

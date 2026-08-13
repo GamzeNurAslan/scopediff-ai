@@ -47,9 +47,6 @@ class AnalysisRun(Base):
         nullable=True,
     )
 
-    # -------------------------------------------------
-    # ANALİZİ OLUŞTURAN KULLANICI
-    # -------------------------------------------------
 
     created_by_user_id: Mapped[str | None] = mapped_column(
         String(200),
@@ -278,8 +275,6 @@ class WorkItem(Base):
         autoincrement=True,
     )
 
-    # ScopeDiff analizi ile opsiyonel bağlantı.
-    # Süreç analiz olmadan da yaşayabilir.
     analysis_run_id: Mapped[int | None] = mapped_column(
         ForeignKey(
             "analysis_runs.id",
@@ -289,8 +284,6 @@ class WorkItem(Base):
         index=True,
     )
 
-    # Jira / Planner vb. sistemler ileride bağlanırsa
-    # dış sistemdeki kimlik burada tutulabilir.
     external_id: Mapped[str | None] = mapped_column(
         String(120),
         nullable=True,
@@ -327,8 +320,6 @@ class WorkItem(Base):
         nullable=True,
     )
 
-    # "Devam ediyor", "Teslim edildi" gibi
-    # tarih olmayan hücre değerleri.
     due_status_text: Mapped[str | None] = mapped_column(
         String(300),
         nullable=True,
@@ -355,8 +346,6 @@ class WorkItem(Base):
         default="TASARIM",
     )
 
-    # Normalde current_stage otomatik hesaplanır.
-    # Gerektiğinde kullanıcı manuel override verebilir.
     stage_override: Mapped[str | None] = mapped_column(
         String(50),
         nullable=True,
@@ -368,7 +357,6 @@ class WorkItem(Base):
         default=False,
     )
 
-    # Excel traceability
     source_file: Mapped[str | None] = mapped_column(
         String(500),
         nullable=True,

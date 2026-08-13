@@ -251,7 +251,6 @@ class RequirementChangeDetector:
             "requirement_id"
         )
 
-        # Yeni sürüm aday kümesi olarak hazırlanır.
         self.matcher.fit(new_data)
 
         match_results = self.matcher.match_dataframe(
@@ -269,7 +268,6 @@ class RequirementChangeDetector:
 
         changes: list[RequirementChange] = []
 
-        # 1. Aynı ID'ye sahip gereksinimler
         common_ids = sorted(
             set(old_by_id.index)
             & set(new_by_id.index)
@@ -325,7 +323,6 @@ class RequirementChangeDetector:
                 requirement_id
             )
 
-        # 2. ID'si değişmiş olabilecek gereksinimler
         if not match_results.empty:
 
             sorted_matches = (
@@ -408,7 +405,6 @@ class RequirementChangeDetector:
                 used_old_ids.add(old_id)
                 used_new_ids.add(new_id)
 
-        # 3. Eski sürümde olup yenide olmayanlar
         for old_id, old_row in old_by_id.iterrows():
 
             if old_id in used_old_ids:
@@ -432,7 +428,6 @@ class RequirementChangeDetector:
                 )
             )
 
-        # 4. Yeni sürümde ortaya çıkanlar
         for new_id, new_row in new_by_id.iterrows():
 
             if new_id in used_new_ids:

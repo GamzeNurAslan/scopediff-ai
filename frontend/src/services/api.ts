@@ -50,9 +50,6 @@ export async function translateContentBatch(
 }
 
 
-// =========================================================
-// COMMON TYPES
-// =========================================================
 
 
 export interface HealthResponse {
@@ -153,9 +150,6 @@ export interface DefectAnalysisResponse {
 }
 
 
-// =========================================================
-// ERROR HANDLING
-// =========================================================
 
 
 async function getErrorMessage(
@@ -195,7 +189,6 @@ async function getErrorMessage(
     }
 
   } catch {
-    // JSON değilse fallback kullan.
   }
 
   return fallback
@@ -228,9 +221,6 @@ async function getJson<T>(
 }
 
 
-// =========================================================
-// HEALTH
-// =========================================================
 
 
 export async function getHealth():
@@ -242,9 +232,6 @@ Promise<HealthResponse> {
 }
 
 
-// =========================================================
-// ANALYSES
-// =========================================================
 
 
 export async function getAnalyses():
@@ -270,9 +257,6 @@ export async function getAnalysis(
 }
 
 
-// =========================================================
-// EXCEL REQUIREMENT COMPARISON
-// =========================================================
 
 
 export async function previewRequirementFile(
@@ -325,16 +309,6 @@ export async function compareRequirementFiles(
     creator
 
 
-  /*
-   * Kullanım:
-   *
-   * compareRequirementFiles({
-   *   sourceFile,
-   *   targetFile,
-   *   analysisName,
-   *   creator,
-   * })
-   */
   if (
     typeof sourceOrInput
       === 'object'
@@ -374,15 +348,6 @@ export async function compareRequirementFiles(
     creatorInput =
       sourceOrInput.creator
 
-  /*
-   * Eski kullanım:
-   *
-   * compareRequirementFiles(
-   *   sourceFile,
-   *   targetFile,
-   *   analysisName,
-   * )
-   */
   } else if (
     sourceOrInput
     instanceof File
@@ -410,15 +375,6 @@ export async function compareRequirementFiles(
         ? nameOrTarget
         : ''
 
-  /*
-   * Eski kullanım:
-   *
-   * compareRequirementFiles(
-   *   analysisName,
-   *   sourceFile,
-   *   targetFile,
-   * )
-   */
   } else {
     if (
       !(
@@ -494,9 +450,6 @@ export async function compareRequirementFiles(
   )
 
 
-  /*
-   * ANALİZİ OLUŞTURAN
-   */
   if (creatorInput) {
     formData.append(
       'created_by_user_id',
@@ -535,10 +488,6 @@ export async function compareRequirementFiles(
   }
 
 
-  /*
-   * FormData kullanırken
-   * Content-Type elle yazmıyoruz.
-   */
   return getJson<
     AnalysisDetail
   >(
@@ -552,9 +501,6 @@ export async function compareRequirementFiles(
 }
 
 
-// =========================================================
-// DEFECT ANALYSIS
-// =========================================================
 
 
 export async function analyzeDefect(
@@ -631,10 +577,6 @@ export async function analyzeDefect(
 }
 
 
-/*
- * Eski sayfalardaki isimlerle
- * uyumluluğu koruyoruz.
- */
 export const rankDefectChanges =
   analyzeDefect
 
@@ -645,9 +587,6 @@ export const createDefectRanking =
   analyzeDefect
 
 
-// =========================================================
-// HISTORY
-// =========================================================
 
 
 export async function getHistoryCatalog():
@@ -675,9 +614,6 @@ export async function getRequirementHistory(
 }
 
 
-// =========================================================
-// EXCEL REPORT DOWNLOAD
-// =========================================================
 
 
 function getDownloadFilename(
@@ -782,9 +718,6 @@ export async function downloadAnalysisReport(
 }
 
 
-// =========================================================
-// DELETE ANALYSIS
-// =========================================================
 
 
 export async function deleteAnalysis(

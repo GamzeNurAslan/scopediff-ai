@@ -171,9 +171,6 @@ function ProfileSetupPage() {
       role.trim()
 
 
-    /*
-     * AD SOYAD
-     */
     if (
       normalizedName.length < 3
     ) {
@@ -185,12 +182,6 @@ function ProfileSetupPage() {
     }
 
 
-    /*
-     * E-POSTA FORMAT KONTROLÜ
-     *
-     * Burada kullanıcının sistemde kayıtlı
-     * olup olmadığını kontrol ETMİYORUZ.
-     */
     const emailPattern =
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -208,12 +199,6 @@ function ProfileSetupPage() {
     }
 
 
-    /*
-     * DEPARTMAN
-     *
-     * Kullanıcı istediği departmanı
-     * serbest şekilde yazabilir.
-     */
     if (
       normalizedDepartment.length
       < 2
@@ -226,12 +211,6 @@ function ProfileSetupPage() {
     }
 
 
-    /*
-     * ROL
-     *
-     * Kullanıcı istediği rolü
-     * serbest şekilde yazabilir.
-     */
     if (
       normalizedRole.length < 2
     ) {
@@ -243,12 +222,6 @@ function ProfileSetupPage() {
     }
 
 
-    /*
-     * PROFİLİ KAYDET
-     *
-     * Şimdilik backend doğrulaması yok.
-     * Profil localStorage üzerinden tutuluyor.
-     */
     saveProfile({
       userId:
         profile?.userId
@@ -304,9 +277,7 @@ function ProfileSetupPage() {
 
       <div className="profile-setup-shell">
 
-        {/* =============================================
-            LEFT SIDE
-            ============================================= */}
+
 
         <section className="profile-intro">
 
@@ -466,9 +437,7 @@ function ProfileSetupPage() {
         </section>
 
 
-        {/* =============================================
-            FORM
-            ============================================= */}
+
 
         <section className="profile-form-panel">
 
@@ -547,9 +516,7 @@ function ProfileSetupPage() {
             onSubmit={handleSubmit}
           >
 
-            {/* =========================================
-                NAME
-                ========================================= */}
+
 
             <div className="profile-field">
 
@@ -589,9 +556,7 @@ function ProfileSetupPage() {
             </div>
 
 
-            {/* =========================================
-                EMAIL
-                ========================================= */}
+
 
             <div className="profile-field">
 
@@ -637,9 +602,7 @@ function ProfileSetupPage() {
             </div>
 
 
-            {/* =========================================
-                DEPARTMENT
-                ========================================= */}
+
 
             <div className="profile-field">
 
@@ -686,9 +649,7 @@ function ProfileSetupPage() {
             </div>
 
 
-            {/* =========================================
-                ROLE
-                ========================================= */}
+
 
             <div className="profile-field">
 
@@ -734,9 +695,7 @@ function ProfileSetupPage() {
             </div>
 
 
-            {/* =========================================
-                ERROR
-                ========================================= */}
+
 
             {
               error
@@ -752,9 +711,7 @@ function ProfileSetupPage() {
             }
 
 
-            {/* =========================================
-                SUCCESS
-                ========================================= */}
+
 
             {
               success
@@ -774,9 +731,7 @@ function ProfileSetupPage() {
             }
 
 
-            {/* =========================================
-                ACTIONS
-                ========================================= */}
+
 
             <div className="profile-form-actions">
 
