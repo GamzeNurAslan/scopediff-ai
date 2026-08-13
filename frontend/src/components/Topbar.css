@@ -1,0 +1,511 @@
+/* =====================================================
+   SCOPEDIFF AI - TOPBAR
+   ===================================================== */
+
+.topbar {
+  position: relative;
+
+  min-height: 86px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 25px;
+
+  padding:
+    0 32px;
+
+  border-bottom:
+    1px solid #e4e7ec;
+
+  background:
+    rgba(255, 255, 255, .90);
+
+  color: #101828;
+}
+
+
+/* =====================================================
+   CONTENT
+   ===================================================== */
+
+.topbar-content {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+
+.topbar-brand {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #f59e0b;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing: .13em;
+}
+
+
+.topbar-heading {
+  min-width: 0;
+}
+
+
+.topbar-heading h1 {
+  margin: 0;
+
+  color: #101828;
+
+  font-size: 20px;
+  font-weight: 760;
+
+  line-height: 1.2;
+
+  letter-spacing: -.015em;
+}
+
+
+.topbar-heading p {
+  margin:
+    4px 0 0;
+
+  color: #98a2b3;
+
+  font-size: 9px;
+  font-weight: 500;
+
+  line-height: 1.35;
+}
+
+
+/* =====================================================
+   PROFILE
+   ===================================================== */
+
+.topbar-profile {
+  position: relative;
+
+  flex: 0 0 auto;
+}
+
+
+.topbar-profile-trigger {
+  min-width: 215px;
+  min-height: 48px;
+
+  display: grid;
+
+  grid-template-columns:
+    34px
+    minmax(0, 1fr)
+    18px;
+
+  align-items: center;
+
+  gap: 9px;
+
+  padding:
+    6px 9px;
+
+  border:
+    1px solid #e4e7ec;
+
+  border-radius: 10px;
+
+  background:
+    rgba(255, 255, 255, .82);
+
+  color: #344054;
+
+  cursor: pointer;
+
+  text-align: left;
+
+  transition:
+    border-color .16s ease,
+    background .16s ease,
+    box-shadow .16s ease;
+}
+
+
+.topbar-profile-trigger:hover,
+.topbar-profile-trigger.open {
+  border-color:
+    #f4c06e;
+
+  background:
+    #ffffff;
+
+  box-shadow:
+    0 5px 18px
+    rgba(15, 23, 42, .055);
+}
+
+
+.topbar-avatar {
+  width: 34px;
+  height: 34px;
+
+  display: grid;
+  place-items: center;
+
+  border:
+    1px solid
+    rgba(249, 115, 22, .2);
+
+  border-radius: 9px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #fff5e9,
+      #fffaf5
+    );
+
+  color: #ea580c;
+
+  font-size: 10px;
+  font-weight: 900;
+}
+
+
+.topbar-profile-copy {
+  min-width: 0;
+
+  display: block;
+}
+
+
+.topbar-profile-copy
+strong {
+  display: block;
+
+  overflow: hidden;
+
+  color: #344054;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.topbar-profile-copy
+small {
+  display: block;
+
+  overflow: hidden;
+
+  margin-top: 3px;
+
+  color: #98a2b3;
+
+  font-size: 7px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.topbar-chevron {
+  color: #98a2b3;
+
+  transition:
+    transform .16s ease;
+}
+
+
+.topbar-profile-trigger.open
+.topbar-chevron {
+  transform:
+    rotate(180deg);
+}
+
+
+/* =====================================================
+   PROFILE MENU
+   ===================================================== */
+
+.topbar-profile-menu {
+  position: absolute;
+
+  z-index: 100;
+
+  top:
+    calc(100% + 9px);
+
+  right: 0;
+
+  width: 285px;
+
+  overflow: hidden;
+
+  border:
+    1px solid #e4e7ec;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 20px 45px
+    rgba(15, 23, 42, .14);
+
+  animation:
+    topbar-profile-in
+    .14s ease-out;
+}
+
+
+@keyframes topbar-profile-in {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-5px)
+      scale(.985);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+
+/* MENU HEADER */
+
+.topbar-profile-menu-head {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 15px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #fafbfc,
+      #ffffff
+    );
+}
+
+
+.topbar-profile-menu-avatar {
+  width: 41px;
+  height: 41px;
+
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 auto;
+
+  border-radius: 10px;
+
+  background:
+    #07162f;
+
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 900;
+
+  box-shadow:
+    inset 0 0 0 1px
+    rgba(255, 255, 255, .08);
+}
+
+
+.topbar-profile-menu-head
+strong {
+  display: block;
+
+  color: #101828;
+
+  font-size: 10px;
+}
+
+
+.topbar-profile-menu-head
+span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #f59e0b;
+
+  font-size: 7px;
+  font-weight: 800;
+
+  letter-spacing: .06em;
+}
+
+
+/* DETAILS */
+
+.topbar-profile-details {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+
+  padding:
+    8px 10px;
+
+  border-top:
+    1px solid #f0f2f5;
+
+  border-bottom:
+    1px solid #f0f2f5;
+}
+
+
+.topbar-profile-details
+> div {
+  display: grid;
+
+  grid-template-columns:
+    24px
+    minmax(0, 1fr);
+
+  align-items: center;
+
+  min-height: 34px;
+
+  padding:
+    0 7px;
+
+  border-radius: 7px;
+
+  color: #667085;
+}
+
+
+.topbar-profile-details
+svg {
+  color: #98a2b3;
+}
+
+
+.topbar-profile-details
+span {
+  overflow: hidden;
+
+  font-size: 8px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* EDIT */
+
+.topbar-edit-profile {
+  width:
+    calc(100% - 20px);
+
+  min-height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  margin: 10px;
+
+  border:
+    1px solid #fde3bd;
+
+  border-radius: 8px;
+
+  background: #fffaf3;
+
+  color: #b45309;
+
+  font-size: 8px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+.topbar-edit-profile:hover {
+  border-color:
+    #f5c16c;
+
+  background:
+    #fff5e7;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (
+  max-width: 850px
+) {
+  .topbar {
+    padding:
+      0 20px;
+  }
+
+  .topbar-profile-trigger {
+    min-width: 0;
+
+    grid-template-columns:
+      34px 18px;
+  }
+
+  .topbar-profile-copy {
+    display: none;
+  }
+}
+
+
+@media (
+  max-width: 560px
+) {
+  .topbar {
+    min-height: 72px;
+
+    padding:
+      0 14px;
+  }
+
+  .topbar-heading h1 {
+    font-size: 16px;
+  }
+
+  .topbar-heading p {
+    display: none;
+  }
+
+  .topbar-profile-trigger {
+    min-height: 42px;
+  }
+
+  .topbar-profile-menu {
+    position: fixed;
+
+    top: 78px;
+    right: 14px;
+    left: 14px;
+
+    width: auto;
+  }
+}

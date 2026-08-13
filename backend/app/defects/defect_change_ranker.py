@@ -7,6 +7,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from backend.app.matching.semantic_matcher import DEFAULT_MODEL_NAME
@@ -125,6 +126,8 @@ class DefectChangeRanker:
         self.device = device
 
         self._model = model
+        self._fallback_vectorizer: TfidfVectorizer | None = None
+        self._using_fallback = False
 
     def _get_model(self) -> Any:
         """Sentence Transformer modelini ihtiyaç olduğunda yükler."""
@@ -132,11 +135,12 @@ class DefectChangeRanker:
             self._model = SentenceTransformer(
                 self.model_name,
                 device=self.device,
+                local_files_only=True,
             )
 
         return self._model
 
-    def _encode(
+    def _encode_with_model(
         self,
         texts: list[str],
     ) -> np.ndarray:
@@ -167,6 +171,35 @@ class DefectChangeRanker:
             )
 
         return embedding_array
+
+    def _encode(
+        self,
+        texts: list[str],
+    ) -> np.ndarray:
+        """Model erişilemezse yerel TF-IDF ile defect eşleştirir."""
+        if self._using_fallback:
+            if self._fallback_vectorizer is None:
+                raise RuntimeError(
+                    "Offline defect vektörleştiricisi hazır değil."
+                )
+
+            return self._fallback_vectorizer.transform(
+                texts
+            ).toarray().astype(np.float32)
+
+        try:
+            return self._encode_with_model(texts)
+        except Exception:
+            self._using_fallback = True
+            self._fallback_vectorizer = TfidfVectorizer(
+                ngram_range=(1, 2),
+                lowercase=True,
+            )
+            self._fallback_vectorizer.fit(texts)
+
+            return self._fallback_vectorizer.transform(
+                texts
+            ).toarray().astype(np.float32)
 
     @classmethod
     def _validate_changes_dataframe(
@@ -394,12 +427,12 @@ class DefectChangeRanker:
             for _, row in prepared_data.iterrows()
         ]
 
-        defect_embedding = self._encode(
-            [normalized_defect]
-        )
-
         candidate_embeddings = self._encode(
             candidate_texts
+        )
+
+        defect_embedding = self._encode(
+            [normalized_defect]
         )
 
         semantic_scores = cosine_similarity(

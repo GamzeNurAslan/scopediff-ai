@@ -6,6 +6,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from backend.app.text_preprocessor import normalize_text
@@ -69,6 +70,8 @@ class SemanticRequirementMatcher:
 
         self._candidate_dataframe: pd.DataFrame | None = None
         self._candidate_embeddings: np.ndarray | None = None
+        self._fallback_vectorizer: TfidfVectorizer | None = None
+        self._using_fallback = False
 
     @property
     def is_fitted(self) -> bool:
@@ -88,6 +91,7 @@ class SemanticRequirementMatcher:
             self._model = SentenceTransformer(
                 self.model_name,
                 device=self.device,
+                local_files_only=True,
             )
 
         return self._model
@@ -172,6 +176,59 @@ class SemanticRequirementMatcher:
             )
 
         return embedding_array
+
+    def _encode(
+        self,
+        texts: list[str],
+    ) -> np.ndarray:
+        """Model erişilemezse yerel TF-IDF ile eşleştirme yapar."""
+        if self._using_fallback:
+            if self._fallback_vectorizer is None:
+                raise RuntimeError(
+                    "Offline eşleştirme vektörleştiricisi hazır değil."
+                )
+
+            return self._fallback_vectorizer.transform(
+                texts
+            ).toarray().astype(np.float32)
+
+        try:
+            model = self._get_model()
+            embeddings = model.encode(
+                texts,
+                batch_size=self.batch_size,
+                show_progress_bar=False,
+                convert_to_numpy=True,
+                normalize_embeddings=True,
+            )
+
+            embedding_array = np.asarray(
+                embeddings,
+                dtype=np.float32,
+            )
+
+            if embedding_array.ndim != 2:
+                raise ValueError(
+                    "Model embedding matrisi iki boyutlu olmalıdır."
+                )
+
+            if embedding_array.shape[0] != len(texts):
+                raise ValueError(
+                    "Embedding sayısı ile metin sayısı eşleşmiyor."
+                )
+
+            return embedding_array
+        except Exception:
+            self._using_fallback = True
+            self._fallback_vectorizer = TfidfVectorizer(
+                ngram_range=(1, 2),
+                lowercase=True,
+            )
+            self._fallback_vectorizer.fit(texts)
+
+            return self._fallback_vectorizer.transform(
+                texts
+            ).toarray().astype(np.float32)
 
     def fit(
         self,

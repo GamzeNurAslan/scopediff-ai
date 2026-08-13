@@ -1,224 +1,727 @@
 import type {
   AnalysisDetail,
   AnalysisSummary,
-  DefectAnalysisResult,
-  HealthResponse,
   HistoryCatalog,
   RequirementHistory,
+  RequirementField,
+  RequirementFilePreview,
 } from '../types/api'
 
 
-const API_BASE_URL =
-  'http://127.0.0.1:8000'
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL
+  ?? 'http://127.0.0.1:8000'
 
 
-async function request<T>(
-  path: string,
-): Promise<T> {
-  const response = await fetch(
-    `${API_BASE_URL}${path}`,
-  )
+export async function translateContentBatch(
+  texts: string[],
+  targetLanguage: string,
+): Promise<string[]> {
+  const response =
+    await fetch(
+      `${API_BASE_URL}/translate/content`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          texts,
+          target_language: targetLanguage,
+        }),
+      },
+    )
 
   if (!response.ok) {
-    let message =
-      `API request failed: ${response.status}`
-
-    try {
-      const errorBody =
-        await response.json()
-
-      if (
-        typeof errorBody.detail
-        === 'string'
-      ) {
-        message =
-          errorBody.detail
-      }
-    } catch {
-      // Varsayılan mesaj.
-    }
-
     throw new Error(
-      message,
+      await getErrorMessage(
+        response,
+        'İçerikler çevrilemedi.',
+      ),
     )
   }
 
-  return response.json()
+  const data =
+    await response.json() as {
+      translations?: string[]
+    }
+
+  return data.translations ?? texts
 }
 
 
-export function getHealth():
+// =========================================================
+// COMMON TYPES
+// =========================================================
+
+
+export interface HealthResponse {
+  status: string
+  service: string
+}
+
+
+export interface AnalysisCreatorInput {
+  userId: string
+  fullName: string
+  corporateEmail: string
+  department: string
+  role: string
+}
+
+
+export interface CompareRequirementFilesInput {
+  sourceFile: File
+  targetFile: File
+
+  analysisName?: string
+
+  sourceSheet?: string
+  targetSheet?: string
+
+  sourceMapping?: Partial<Record<RequirementField, string | null>>
+  targetMapping?: Partial<Record<RequirementField, string | null>>
+
+  creator?:
+    AnalysisCreatorInput
+}
+
+
+export interface DefectAnalysisRequest {
+  defect_id?:
+    string | null
+
+  defect_text: string
+
+  top_k?: number
+  min_relevance?: number
+}
+
+
+export interface DefectCandidate {
+  change_id: string
+
+  old_requirement_id:
+    string | null
+
+  new_requirement_id:
+    string | null
+
+  old_requirement_text:
+    string | null
+
+  new_requirement_text:
+    string | null
+
+  detailed_change_types:
+    string[]
+
+  change_type: string
+
+  risk_score: number
+  risk_level: string
+
+  confidence:
+    number | null
+
+  semantic_similarity:
+    number
+
+  keyword_overlap:
+    number
+
+  relevance_score:
+    number
+
+  rank: number
+
+  reason: string
+}
+
+
+export interface DefectAnalysisResponse {
+  analysis_id: number
+  analysis_name: string
+
+  defect_id: string
+  defect_text: string
+
+  candidate_count: number
+
+  candidates:
+    DefectCandidate[]
+}
+
+
+// =========================================================
+// ERROR HANDLING
+// =========================================================
+
+
+async function getErrorMessage(
+  response: Response,
+  fallback: string,
+): Promise<string> {
+  try {
+    const data =
+      await response.json()
+
+    if (
+      data
+      && typeof data.detail
+      === 'string'
+    ) {
+      return data.detail
+    }
+
+    if (
+      data
+      && Array.isArray(
+        data.detail,
+      )
+    ) {
+      return data.detail
+        .map(
+          (
+            item:
+              {
+                msg?: string
+              },
+          ) =>
+            item.msg
+            ?? 'Geçersiz istek.',
+        )
+        .join(' ')
+    }
+
+  } catch {
+    // JSON değilse fallback kullan.
+  }
+
+  return fallback
+}
+
+
+async function getJson<T>(
+  url: string,
+  fallbackError: string,
+  options?: RequestInit,
+): Promise<T> {
+  const response =
+    await fetch(
+      url,
+      options,
+    )
+
+  if (!response.ok) {
+    throw new Error(
+      await getErrorMessage(
+        response,
+        fallbackError,
+      ),
+    )
+  }
+
+  return (
+    await response.json()
+  ) as T
+}
+
+
+// =========================================================
+// HEALTH
+// =========================================================
+
+
+export async function getHealth():
 Promise<HealthResponse> {
-  return request<HealthResponse>(
-    '/health',
+  return getJson<HealthResponse>(
+    `${API_BASE_URL}/health`,
+    'Backend bağlantısı kurulamadı.',
   )
 }
 
 
-export function getAnalyses():
+// =========================================================
+// ANALYSES
+// =========================================================
+
+
+export async function getAnalyses():
 Promise<AnalysisSummary[]> {
-  return request<AnalysisSummary[]>(
-    '/analyses',
+  return getJson<
+    AnalysisSummary[]
+  >(
+    `${API_BASE_URL}/analyses`,
+    'Analiz listesi alınamadı.',
   )
 }
 
 
-export function getAnalysis(
+export async function getAnalysis(
   analysisId: number,
 ): Promise<AnalysisDetail> {
-  return request<AnalysisDetail>(
-    `/analyses/${analysisId}`,
+  return getJson<
+    AnalysisDetail
+  >(
+    `${API_BASE_URL}/analyses/${analysisId}`,
+    'Analiz detayları alınamadı.',
+  )
+}
+
+
+// =========================================================
+// EXCEL REQUIREMENT COMPARISON
+// =========================================================
+
+
+export async function previewRequirementFile(
+  file: File,
+): Promise<RequirementFilePreview> {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  return getJson<RequirementFilePreview>(
+    `${API_BASE_URL}/requirements/preview`,
+    'Excel dosyası önizlenemedi.',
+    {
+      method: 'POST',
+      body: formData,
+    },
   )
 }
 
 
 export async function compareRequirementFiles(
-  sourceFile: File,
-  targetFile: File,
-  analysisName: string,
+  sourceOrInput:
+    | File
+    | CompareRequirementFilesInput
+    | string,
+
+  targetOrSource?: File,
+
+  nameOrTarget?:
+    | string
+    | File,
+
+  creator?:
+    AnalysisCreatorInput,
 ): Promise<AnalysisDetail> {
+  let sourceFile: File
+  let targetFile: File
+
+  let analysisName = ''
+
+  let sourceSheet = ''
+  let targetSheet = ''
+
+  let sourceMapping:
+    Partial<Record<RequirementField, string | null>> = {}
+
+  let targetMapping:
+    Partial<Record<RequirementField, string | null>> = {}
+
+  let creatorInput =
+    creator
+
+
+  /*
+   * Kullanım:
+   *
+   * compareRequirementFiles({
+   *   sourceFile,
+   *   targetFile,
+   *   analysisName,
+   *   creator,
+   * })
+   */
+  if (
+    typeof sourceOrInput
+      === 'object'
+    && !(
+      sourceOrInput
+      instanceof File
+    )
+    && 'sourceFile'
+      in sourceOrInput
+  ) {
+    sourceFile =
+      sourceOrInput.sourceFile
+
+    targetFile =
+      sourceOrInput.targetFile
+
+    analysisName =
+      sourceOrInput.analysisName
+      ?? ''
+
+    sourceSheet =
+      sourceOrInput.sourceSheet
+      ?? ''
+
+    targetSheet =
+      sourceOrInput.targetSheet
+      ?? ''
+
+    sourceMapping =
+      sourceOrInput.sourceMapping
+      ?? {}
+
+    targetMapping =
+      sourceOrInput.targetMapping
+      ?? {}
+
+    creatorInput =
+      sourceOrInput.creator
+
+  /*
+   * Eski kullanım:
+   *
+   * compareRequirementFiles(
+   *   sourceFile,
+   *   targetFile,
+   *   analysisName,
+   * )
+   */
+  } else if (
+    sourceOrInput
+    instanceof File
+  ) {
+    if (
+      !(
+        targetOrSource
+        instanceof File
+      )
+    ) {
+      throw new Error(
+        'Hedef Excel dosyası eksik.',
+      )
+    }
+
+    sourceFile =
+      sourceOrInput
+
+    targetFile =
+      targetOrSource
+
+    analysisName =
+      typeof nameOrTarget
+        === 'string'
+        ? nameOrTarget
+        : ''
+
+  /*
+   * Eski kullanım:
+   *
+   * compareRequirementFiles(
+   *   analysisName,
+   *   sourceFile,
+   *   targetFile,
+   * )
+   */
+  } else {
+    if (
+      !(
+        targetOrSource
+        instanceof File
+      )
+      || !(
+        nameOrTarget
+        instanceof File
+      )
+    ) {
+      throw new Error(
+        'Kaynak veya hedef '
+        + 'Excel dosyası eksik.',
+      )
+    }
+
+    analysisName =
+      sourceOrInput
+
+    sourceFile =
+      targetOrSource
+
+    targetFile =
+      nameOrTarget
+  }
+
+
   const formData =
     new FormData()
+
 
   formData.append(
     'source_file',
     sourceFile,
   )
 
+
   formData.append(
     'target_file',
     targetFile,
   )
 
-  if (
-    analysisName.trim()
-  ) {
+
+  formData.append(
+    'analysis_name',
+    analysisName.trim(),
+  )
+
+
+  if (sourceSheet) {
     formData.append(
-      'analysis_name',
-      analysisName.trim(),
+      'source_sheet',
+      sourceSheet,
     )
   }
 
-  const response =
-    await fetch(
-      `${API_BASE_URL}/analyses/compare`,
-      {
-        method: 'POST',
-        body: formData,
-      },
-    )
-
-  if (!response.ok) {
-    let message =
-      'Karşılaştırma işlemi başarısız oldu.'
-
-    try {
-      const errorBody =
-        await response.json()
-
-      if (
-        typeof errorBody.detail
-        === 'string'
-      ) {
-        message =
-          errorBody.detail
-      }
-
-    } catch {
-      // Varsayılan mesaj.
-    }
-
-    throw new Error(
-      message,
+  if (targetSheet) {
+    formData.append(
+      'target_sheet',
+      targetSheet,
     )
   }
 
-  return response.json()
+  formData.append(
+    'source_mapping_json',
+    JSON.stringify(sourceMapping),
+  )
+
+  formData.append(
+    'target_mapping_json',
+    JSON.stringify(targetMapping),
+  )
+
+
+  /*
+   * ANALİZİ OLUŞTURAN
+   */
+  if (creatorInput) {
+    formData.append(
+      'created_by_user_id',
+      creatorInput
+        .userId
+        .trim(),
+    )
+
+    formData.append(
+      'created_by_name',
+      creatorInput
+        .fullName
+        .trim(),
+    )
+
+    formData.append(
+      'created_by_email',
+      creatorInput
+        .corporateEmail
+        .trim(),
+    )
+
+    formData.append(
+      'created_by_department',
+      creatorInput
+        .department
+        .trim(),
+    )
+
+    formData.append(
+      'created_by_role',
+      creatorInput
+        .role
+        .trim(),
+    )
+  }
+
+
+  /*
+   * FormData kullanırken
+   * Content-Type elle yazmıyoruz.
+   */
+  return getJson<
+    AnalysisDetail
+  >(
+    `${API_BASE_URL}/analyses/compare`,
+    'Dosyalar karşılaştırılamadı.',
+    {
+      method: 'POST',
+      body: formData,
+    },
+  )
 }
+
+
+// =========================================================
+// DEFECT ANALYSIS
+// =========================================================
 
 
 export async function analyzeDefect(
   analysisId: number,
-  defectText: string,
-  topK: number = 5,
-): Promise<DefectAnalysisResult> {
 
-  const response =
-    await fetch(
-      `${API_BASE_URL}/analyses/${analysisId}/defect-rankings`,
-      {
-        method: 'POST',
+  requestOrText:
+    | DefectAnalysisRequest
+    | string,
 
-        headers: {
-          'Content-Type':
-            'application/json',
-        },
+  topK = 5,
 
-        body: JSON.stringify({
+  minRelevance = 0,
+
+  defectId?: string,
+): Promise<DefectAnalysisResponse> {
+  const payload:
+    DefectAnalysisRequest =
+    typeof requestOrText
+      === 'string'
+      ? {
+          defect_id:
+            defectId
+            ?? null,
+
           defect_text:
-            defectText.trim(),
+            requestOrText,
 
           top_k:
             topK,
 
           min_relevance:
-            0.0,
-        }),
+            minRelevance,
+        }
+      : {
+          defect_id:
+            requestOrText
+              .defect_id
+            ?? null,
+
+          defect_text:
+            requestOrText
+              .defect_text,
+
+          top_k:
+            requestOrText
+              .top_k
+            ?? 5,
+
+          min_relevance:
+            requestOrText
+              .min_relevance
+            ?? 0,
+        }
+
+
+  return getJson<
+    DefectAnalysisResponse
+  >(
+    `${API_BASE_URL}/analyses/${analysisId}/defect-rankings`,
+    'Defect analizi gerçekleştirilemedi.',
+    {
+      method: 'POST',
+
+      headers: {
+        'Content-Type':
+          'application/json',
       },
-    )
 
-  if (!response.ok) {
-    let message =
-      'Defect analizi tamamlanamadı.'
-
-    try {
-      const errorBody =
-        await response.json()
-
-      if (
-        typeof errorBody.detail
-        === 'string'
-      ) {
-        message =
-          errorBody.detail
-      }
-
-    } catch {
-      // Varsayılan mesaj.
-    }
-
-    throw new Error(
-      message,
-    )
-  }
-
-  return response.json()
-}
-
-
-/* =====================================================
-   HISTORY
-   ===================================================== */
-
-
-export function getHistoryCatalog():
-Promise<HistoryCatalog> {
-  return request<HistoryCatalog>(
-    '/history/requirements',
+      body: JSON.stringify(
+        payload,
+      ),
+    },
   )
 }
 
 
-export function getRequirementHistory(
+/*
+ * Eski sayfalardaki isimlerle
+ * uyumluluğu koruyoruz.
+ */
+export const rankDefectChanges =
+  analyzeDefect
+
+export const analyzeDefectChanges =
+  analyzeDefect
+
+export const createDefectRanking =
+  analyzeDefect
+
+
+// =========================================================
+// HISTORY
+// =========================================================
+
+
+export async function getHistoryCatalog():
+Promise<HistoryCatalog> {
+  return getJson<
+    HistoryCatalog
+  >(
+    `${API_BASE_URL}/history/requirements`,
+    'Requirement geçmiş listesi alınamadı.',
+  )
+}
+
+
+export async function getRequirementHistory(
   requirementId: string,
 ): Promise<RequirementHistory> {
+  return getJson<
+    RequirementHistory
+  >(
+    `${API_BASE_URL}/history/requirements/${encodeURIComponent(
+      requirementId,
+    )}`,
+    'Requirement geçmişi alınamadı.',
+  )
+}
 
-  return request<RequirementHistory>(
-    `/history/requirements/${
-      encodeURIComponent(
-        requirementId,
+
+// =========================================================
+// EXCEL REPORT DOWNLOAD
+// =========================================================
+
+
+function getDownloadFilename(
+  response: Response,
+  analysisId: number,
+): string {
+  const contentDisposition =
+    response.headers.get(
+      'content-disposition',
+    )
+
+  if (
+    contentDisposition
+  ) {
+    const utfMatch =
+      contentDisposition.match(
+        /filename\*=UTF-8''([^;]+)/i,
       )
-    }`,
+
+    if (
+      utfMatch
+      && utfMatch[1]
+    ) {
+      return decodeURIComponent(
+        utfMatch[1],
+      )
+    }
+
+    const filenameMatch =
+      contentDisposition.match(
+        /filename="?([^";]+)"?/i,
+      )
+
+    if (
+      filenameMatch
+      && filenameMatch[1]
+    ) {
+      return filenameMatch[1]
+    }
+  }
+
+  return (
+    `ScopeDiff_Analysis_`
+    + `${analysisId}.xlsx`
   )
 }
 
@@ -226,7 +729,6 @@ export function getRequirementHistory(
 export async function downloadAnalysisReport(
   analysisId: number,
 ): Promise<void> {
-
   const response =
     await fetch(
       `${API_BASE_URL}/analyses/${analysisId}/report`,
@@ -234,15 +736,24 @@ export async function downloadAnalysisReport(
 
   if (!response.ok) {
     throw new Error(
-      `Report download failed: ${response.status}`,
+      await getErrorMessage(
+        response,
+        'Excel raporu indirilemedi.',
+      ),
     )
   }
 
   const blob =
     await response.blob()
 
-  const downloadUrl =
-    window.URL.createObjectURL(
+  const filename =
+    getDownloadFilename(
+      response,
+      analysisId,
+    )
+
+  const objectUrl =
+    URL.createObjectURL(
       blob,
     )
 
@@ -252,10 +763,10 @@ export async function downloadAnalysisReport(
     )
 
   link.href =
-    downloadUrl
+    objectUrl
 
   link.download =
-    `ScopeDiff_Analysis_${analysisId}.xlsx`
+    filename
 
   document.body.appendChild(
     link,
@@ -265,7 +776,34 @@ export async function downloadAnalysisReport(
 
   link.remove()
 
-  window.URL.revokeObjectURL(
-    downloadUrl,
+  URL.revokeObjectURL(
+    objectUrl,
   )
+}
+
+
+// =========================================================
+// DELETE ANALYSIS
+// =========================================================
+
+
+export async function deleteAnalysis(
+  analysisId: number,
+): Promise<void> {
+  const response =
+    await fetch(
+      `${API_BASE_URL}/analyses/${analysisId}`,
+      {
+        method: 'DELETE',
+      },
+    )
+
+  if (!response.ok) {
+    throw new Error(
+      await getErrorMessage(
+        response,
+        'Analiz silinemedi.',
+      ),
+    )
+  }
 }

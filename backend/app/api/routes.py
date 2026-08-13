@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import shutil
 from datetime import datetime
@@ -13,12 +14,17 @@ from fastapi import (
     File,
     Form,
     HTTPException,
+    Response,
     UploadFile,
     status,
 )
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
-from sqlalchemy import delete, select
+from sqlalchemy import (
+    delete,
+    select,
+    update,
+)
 from sqlalchemy.orm import (
     Session,
     selectinload,
@@ -28,15 +34,22 @@ from starlette.background import BackgroundTask
 from backend.app.api.history_routes import (
     router as history_router,
 )
-from backend.app.data_loader import (
-    FileLoadingError,
-    load_requirements_excel,
+from backend.app.api.process_tracking import (
+    router as process_tracking_router,
 )
-from backend.app.database.database import get_db
+from backend.app.data_loader import (
+    detect_requirement_columns,
+    load_requirements_excel,
+    standardize_column_names,
+)
+from backend.app.database.database import (
+    get_db,
+)
 from backend.app.database.models import (
     AnalysisRun,
     DefectRanking,
     RequirementChange,
+    WorkItem,
 )
 from backend.app.defects.defect_change_ranker import (
     DefectChangeRanker,
@@ -55,9 +68,17 @@ from backend.app.reports.excel_report import (
 router = APIRouter()
 
 router.include_router(
-    history_router
+    history_router,
 )
 
+router.include_router(
+    process_tracking_router,
+)
+
+
+# =========================================================
+# ANALYSIS REQUEST / RESPONSE MODELS
+# =========================================================
 
 # =========================================================
 # ANALYSIS REQUEST / RESPONSE MODELS
@@ -95,7 +116,9 @@ class RequirementChangeCreate(BaseModel):
 
 class DefectRankingCreate(BaseModel):
     defect_id: str | None = None
+
     defect_text: str
+
     change_id: str | None = None
 
     relevance_score: float = Field(
@@ -118,6 +141,31 @@ class AnalysisCreate(BaseModel):
 
     source_version: str | None = None
     target_version: str | None = None
+
+    created_by_user_id: str | None = Field(
+        default=None,
+        max_length=200,
+    )
+
+    created_by_name: str | None = Field(
+        default=None,
+        max_length=200,
+    )
+
+    created_by_email: str | None = Field(
+        default=None,
+        max_length=320,
+    )
+
+    created_by_department: str | None = Field(
+        default=None,
+        max_length=200,
+    )
+
+    created_by_role: str | None = Field(
+        default=None,
+        max_length=200,
+    )
 
     requirement_changes: list[
         RequirementChangeCreate
@@ -146,10 +194,17 @@ class DefectRankingResponse(
 
 class AnalysisSummary(BaseModel):
     id: int
+
     analysis_name: str
 
     source_version: str | None
     target_version: str | None
+
+    created_by_user_id: str | None
+    created_by_name: str | None
+    created_by_email: str | None
+    created_by_department: str | None
+    created_by_role: str | None
 
     created_at: datetime
 
@@ -159,10 +214,17 @@ class AnalysisSummary(BaseModel):
 
 class AnalysisDetail(BaseModel):
     id: int
+
     analysis_name: str
 
     source_version: str | None
     target_version: str | None
+
+    created_by_user_id: str | None
+    created_by_name: str | None
+    created_by_email: str | None
+    created_by_department: str | None
+    created_by_role: str | None
 
     created_at: datetime
 
@@ -232,6 +294,7 @@ class DefectCandidateResponse(BaseModel):
 
 class DefectAnalysisResponse(BaseModel):
     analysis_id: int
+
     analysis_name: str
 
     defect_id: str
@@ -244,8 +307,24 @@ class DefectAnalysisResponse(BaseModel):
     ]
 
 
+class ContentTranslationRequest(BaseModel):
+    texts: list[str] = Field(
+        default_factory=list,
+        max_length=80,
+    )
+
+    target_language: str = Field(
+        min_length=2,
+        max_length=2,
+    )
+
+
+class ContentTranslationResponse(BaseModel):
+    translations: list[str]
+
+
 # =========================================================
-# RESPONSE HELPERS
+# ANALYSIS HELPERS
 # =========================================================
 
 
@@ -254,13 +333,47 @@ def _to_summary(
 ) -> AnalysisSummary:
     return AnalysisSummary(
         id=analysis.id,
-        analysis_name=analysis.analysis_name,
-        source_version=analysis.source_version,
-        target_version=analysis.target_version,
-        created_at=analysis.created_at,
+
+        analysis_name=(
+            analysis.analysis_name
+        ),
+
+        source_version=(
+            analysis.source_version
+        ),
+
+        target_version=(
+            analysis.target_version
+        ),
+
+        created_by_user_id=(
+            analysis.created_by_user_id
+        ),
+
+        created_by_name=(
+            analysis.created_by_name
+        ),
+
+        created_by_email=(
+            analysis.created_by_email
+        ),
+
+        created_by_department=(
+            analysis.created_by_department
+        ),
+
+        created_by_role=(
+            analysis.created_by_role
+        ),
+
+        created_at=(
+            analysis.created_at
+        ),
+
         requirement_change_count=len(
             analysis.requirement_changes
         ),
+
         defect_ranking_count=len(
             analysis.defect_rankings
         ),
@@ -270,93 +383,133 @@ def _to_summary(
 def _to_detail(
     analysis: AnalysisRun,
 ) -> AnalysisDetail:
+    requirement_changes = [
+        RequirementChangeResponse(
+            id=change.id,
+
+            old_requirement_id=(
+                change.old_requirement_id
+            ),
+
+            new_requirement_id=(
+                change.new_requirement_id
+            ),
+
+            old_requirement_text=(
+                change.old_requirement_text
+            ),
+
+            new_requirement_text=(
+                change.new_requirement_text
+            ),
+
+            detailed_change_types=list(
+                change.detailed_change_types
+                or []
+            ),
+
+            change_type=(
+                change.change_type
+            ),
+
+            risk_score=float(
+                change.risk_score
+            ),
+
+            risk_level=(
+                change.risk_level
+            ),
+
+            confidence=(
+                change.confidence
+            ),
+
+            explanation=(
+                change.explanation
+            ),
+        )
+        for change
+        in analysis.requirement_changes
+    ]
+
+    defect_rankings = [
+        DefectRankingResponse(
+            id=ranking.id,
+
+            defect_id=(
+                ranking.defect_id
+            ),
+
+            defect_text=(
+                ranking.defect_text
+            ),
+
+            change_id=(
+                ranking.change_id
+            ),
+
+            relevance_score=float(
+                ranking.relevance_score
+            ),
+
+            rank_position=(
+                ranking.rank_position
+            ),
+
+            reason=(
+                ranking.reason
+            ),
+        )
+        for ranking
+        in analysis.defect_rankings
+    ]
+
     return AnalysisDetail(
         id=analysis.id,
-        analysis_name=analysis.analysis_name,
-        source_version=analysis.source_version,
-        target_version=analysis.target_version,
-        created_at=analysis.created_at,
 
-        requirement_changes=[
-            RequirementChangeResponse(
-                id=change.id,
+        analysis_name=(
+            analysis.analysis_name
+        ),
 
-                old_requirement_id=(
-                    change.old_requirement_id
-                ),
+        source_version=(
+            analysis.source_version
+        ),
 
-                new_requirement_id=(
-                    change.new_requirement_id
-                ),
+        target_version=(
+            analysis.target_version
+        ),
 
-                old_requirement_text=(
-                    change.old_requirement_text
-                ),
+        created_by_user_id=(
+            analysis.created_by_user_id
+        ),
 
-                new_requirement_text=(
-                    change.new_requirement_text
-                ),
+        created_by_name=(
+            analysis.created_by_name
+        ),
 
-                detailed_change_types=list(
-                    change.detailed_change_types
-                    or []
-                ),
+        created_by_email=(
+            analysis.created_by_email
+        ),
 
-                change_type=(
-                    change.change_type
-                ),
+        created_by_department=(
+            analysis.created_by_department
+        ),
 
-                risk_score=(
-                    change.risk_score
-                ),
+        created_by_role=(
+            analysis.created_by_role
+        ),
 
-                risk_level=(
-                    change.risk_level
-                ),
+        created_at=(
+            analysis.created_at
+        ),
 
-                confidence=(
-                    change.confidence
-                ),
+        requirement_changes=(
+            requirement_changes
+        ),
 
-                explanation=(
-                    change.explanation
-                ),
-            )
-            for change
-            in analysis.requirement_changes
-        ],
-
-        defect_rankings=[
-            DefectRankingResponse(
-                id=ranking.id,
-
-                defect_id=(
-                    ranking.defect_id
-                ),
-
-                defect_text=(
-                    ranking.defect_text
-                ),
-
-                change_id=(
-                    ranking.change_id
-                ),
-
-                relevance_score=(
-                    ranking.relevance_score
-                ),
-
-                rank_position=(
-                    ranking.rank_position
-                ),
-
-                reason=(
-                    ranking.reason
-                ),
-            )
-            for ranking
-            in analysis.defect_rankings
-        ],
+        defect_rankings=(
+            defect_rankings
+        ),
     )
 
 
@@ -365,7 +518,9 @@ def _load_analysis(
     database: Session,
 ) -> AnalysisRun:
     statement = (
-        select(AnalysisRun)
+        select(
+            AnalysisRun
+        )
         .options(
             selectinload(
                 AnalysisRun.requirement_changes
@@ -381,7 +536,8 @@ def _load_analysis(
     )
 
     analysis = (
-        database.scalars(
+        database
+        .scalars(
             statement
         )
         .first()
@@ -401,7 +557,7 @@ def _load_analysis(
 
 
 # =========================================================
-# COMMON HELPERS
+# VALUE HELPERS
 # =========================================================
 
 
@@ -412,8 +568,11 @@ def _optional_string(
         return None
 
     try:
-        if pd.isna(value):
+        if pd.isna(
+            value
+        ):
             return None
+
     except (
         TypeError,
         ValueError,
@@ -427,7 +586,10 @@ def _optional_string(
     if (
         not text
         or text.lower()
-        == "nan"
+        in {
+            "nan",
+            "none",
+        }
     ):
         return None
 
@@ -441,17 +603,27 @@ def _optional_float(
         return None
 
     try:
-        if pd.isna(value):
+        if pd.isna(
+            value
+        ):
             return None
+
     except (
         TypeError,
         ValueError,
     ):
         return None
 
-    return float(
-        value
-    )
+    try:
+        return float(
+            value
+        )
+
+    except (
+        TypeError,
+        ValueError,
+    ):
+        return None
 
 
 def _string_list(
@@ -470,14 +642,16 @@ def _string_list(
     ):
         return [
             str(item).strip()
-            for item
-            in value
+            for item in value
             if str(item).strip()
         ]
 
     try:
-        if pd.isna(value):
+        if pd.isna(
+            value
+        ):
             return []
+
     except (
         TypeError,
         ValueError,
@@ -521,11 +695,23 @@ def _validate_excel_upload(
                 status.HTTP_400_BAD_REQUEST
             ),
             detail=(
-                "Yalnızca .xlsx uzantılı "
-                "Excel dosyaları "
-                "desteklenmektedir."
+                "Yalnızca .xlsx "
+                "uzantılı Excel "
+                "dosyaları desteklenmektedir."
             ),
         )
+
+
+def _delete_temp_file(
+    file_path: str,
+) -> None:
+    try:
+        os.remove(
+            file_path
+        )
+
+    except FileNotFoundError:
+        pass
 
 
 def _save_upload_to_temp(
@@ -573,17 +759,6 @@ def _save_upload_to_temp(
         )
 
     return temporary_path
-
-
-def _delete_temp_file(
-    file_path: str,
-) -> None:
-    try:
-        os.remove(
-            file_path
-        )
-    except FileNotFoundError:
-        pass
 
 
 def _extract_version(
@@ -647,7 +822,10 @@ def _next_defect_id(
             f"{index:03d}"
         )
 
-        if candidate not in used_ids:
+        if (
+            candidate
+            not in used_ids
+        ):
             return candidate
 
         index += 1
@@ -665,33 +843,26 @@ def _build_changes_dataframe(
     ):
         rows.append(
             {
-                "change_id": str(
-                    change.id
-                ),
+                "change_id":
+                    str(change.id),
 
-                "old_requirement_id": (
-                    change.old_requirement_id
-                ),
+                "old_requirement_id":
+                    change.old_requirement_id,
 
-                "new_requirement_id": (
-                    change.new_requirement_id
-                ),
+                "new_requirement_id":
+                    change.new_requirement_id,
 
-                "old_text": (
-                    change.old_requirement_text
-                ),
+                "old_text":
+                    change.old_requirement_text,
 
-                "new_text": (
-                    change.new_requirement_text
-                ),
+                "new_text":
+                    change.new_requirement_text,
 
-                "change_type": (
-                    change.change_type
-                ),
+                "change_type":
+                    change.change_type,
 
-                "risk_score": (
-                    change.risk_score
-                ),
+                "risk_score":
+                    change.risk_score,
             }
         )
 
@@ -710,20 +881,7 @@ def _build_changes_dataframe(
 
 
 # =========================================================
-# REPORT HELPERS
-# =========================================================
-
-
-def _delete_temp_report(
-    file_path: str,
-) -> None:
-    _delete_temp_file(
-        file_path
-    )
-
-
-# =========================================================
-# MANUAL ANALYSIS CREATE
+# CREATE ANALYSIS
 # =========================================================
 
 
@@ -736,20 +894,42 @@ def _delete_temp_report(
 )
 def create_analysis(
     payload: AnalysisCreate,
+
     database: Session = Depends(
         get_db
     ),
 ) -> AnalysisDetail:
-
     analysis = AnalysisRun(
         analysis_name=(
             payload.analysis_name
         ),
+
         source_version=(
             payload.source_version
         ),
+
         target_version=(
             payload.target_version
+        ),
+
+        created_by_user_id=(
+            payload.created_by_user_id
+        ),
+
+        created_by_name=(
+            payload.created_by_name
+        ),
+
+        created_by_email=(
+            payload.created_by_email
+        ),
+
+        created_by_department=(
+            payload.created_by_department
+        ),
+
+        created_by_role=(
+            payload.created_by_role
         ),
     )
 
@@ -831,24 +1011,96 @@ def create_analysis(
             )
         )
 
-    database.add(
-        analysis
-    )
+    try:
+        database.add(
+            analysis
+        )
 
-    database.commit()
+        database.commit()
 
-    database.refresh(
-        analysis
-    )
+        analysis = _load_analysis(
+            analysis_id=analysis.id,
+            database=database,
+        )
 
-    return _to_detail(
-        analysis
-    )
+        return _to_detail(
+            analysis
+        )
+
+    except Exception:
+        database.rollback()
+
+        raise
 
 
 # =========================================================
-# EXCEL COMPARISON
+# COMPARE EXCEL FILES
 # =========================================================
+
+
+@router.post("/requirements/preview")
+def preview_requirement_file(
+    file: UploadFile = File(...),
+):
+    if not (file.filename or "").lower().endswith(".xlsx"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Yalnızca .xlsx dosyaları destekleniyor.",
+        )
+
+    temporary_path: str | None = None
+    try:
+        temporary_path = _save_upload_to_temp(file)
+        workbook = pd.read_excel(
+            temporary_path,
+            sheet_name=None,
+            engine="openpyxl",
+        )
+        sheets = []
+        for sheet_name, frame in workbook.items():
+            if frame.empty and len(frame.columns) == 0:
+                continue
+            normalized = standardize_column_names(frame)
+            mapping = detect_requirement_columns(list(normalized.columns))
+            sample = normalized.head(5).where(pd.notna(normalized.head(5)), None)
+            sheets.append({
+                "name": str(sheet_name),
+                "rows": int(len(frame.index)),
+                "columns": [str(column) for column in normalized.columns],
+                "mapping": mapping,
+                "sample_rows": sample.to_dict(orient="records"),
+                "warnings": (
+                    ["Gereksinim metni kolonu otomatik bulunamadı."]
+                    if not mapping.get("requirement_text")
+                    else []
+                ),
+            })
+
+        if not sheets:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Dosyada okunabilir bir sayfa bulunamadı.",
+            )
+
+        selected = next(
+            (sheet for sheet in sheets if sheet["mapping"].get("requirement_text")),
+            sheets[0],
+        )
+        return {
+            "filename": file.filename,
+            "selected_sheet": selected["name"],
+            "sheets": sheets,
+        }
+    except HTTPException:
+        raise
+    except Exception as error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Dosya önizlenemedi: {error}",
+        ) from error
+    finally:
+        if temporary_path and Path(temporary_path).exists():
+            Path(temporary_path).unlink(missing_ok=True)
 
 
 @router.post(
@@ -862,17 +1114,47 @@ def compare_uploaded_requirements(
     source_file: UploadFile = File(
         ...
     ),
+
     target_file: UploadFile = File(
         ...
     ),
+
     analysis_name: str = Form(
         default="",
     ),
+
+    created_by_user_id: str = Form(
+        default="",
+    ),
+
+    created_by_name: str = Form(
+        default="",
+    ),
+
+    created_by_email: str = Form(
+        default="",
+    ),
+
+    created_by_department: str = Form(
+        default="",
+    ),
+
+    created_by_role: str = Form(
+        default="",
+    ),
+
+    source_sheet: str = Form(default=""),
+
+    target_sheet: str = Form(default=""),
+
+    source_mapping_json: str = Form(default="{}"),
+
+    target_mapping_json: str = Form(default="{}"),
+
     database: Session = Depends(
         get_db
     ),
 ) -> AnalysisDetail:
-
     source_path: str | None = None
     target_path: str | None = None
 
@@ -889,17 +1171,36 @@ def compare_uploaded_requirements(
             )
         )
 
-        old_dataframe = (
-            load_requirements_excel(
-                source_path
-            )
-        )
+        try:
+            source_mapping = json.loads(source_mapping_json or "{}")
+            target_mapping = json.loads(target_mapping_json or "{}")
 
-        new_dataframe = (
-            load_requirements_excel(
-                target_path
+            old_dataframe = (
+                load_requirements_excel(
+                    source_path,
+                    sheet_name=source_sheet or 0,
+                    column_mapping=source_mapping,
+                )
             )
-        )
+
+            new_dataframe = (
+                load_requirements_excel(
+                    target_path,
+                    sheet_name=target_sheet or 0,
+                    column_mapping=target_mapping,
+                )
+            )
+
+        except Exception as error:
+            raise HTTPException(
+                status_code=(
+                    status.HTTP_400_BAD_REQUEST
+                ),
+
+                detail=str(
+                    error
+                ),
+            ) from error
 
         matcher = (
             SemanticRequirementMatcher()
@@ -916,9 +1217,11 @@ def compare_uploaded_requirements(
                 old_dataframe=(
                     old_dataframe
                 ),
+
                 new_dataframe=(
                     new_dataframe
                 ),
+
                 top_k=5,
             )
         )
@@ -959,30 +1262,61 @@ def compare_uploaded_requirements(
             target_version=(
                 target_version
             ),
+
+            created_by_user_id=(
+                _optional_string(
+                    created_by_user_id
+                )
+            ),
+
+            created_by_name=(
+                _optional_string(
+                    created_by_name
+                )
+            ),
+
+            created_by_email=(
+                _optional_string(
+                    created_by_email
+                )
+            ),
+
+            created_by_department=(
+                _optional_string(
+                    created_by_department
+                )
+            ),
+
+            created_by_role=(
+                _optional_string(
+                    created_by_role
+                )
+            ),
         )
 
         for (
             _,
             row,
         ) in result_dataframe.iterrows():
-
             change_type = str(
-                row[
-                    "change_type"
-                ]
+                row.get(
+                    "change_type",
+                    "",
+                )
             ).strip()
 
             if (
-                change_type.lower()
+                not change_type
+                or change_type.lower()
                 == "unchanged"
             ):
                 continue
 
             detailed_change_types = (
                 _string_list(
-                    row[
+                    row.get(
                         "detailed_change_types"
-                    ]
+                    )
                 )
             )
 
@@ -990,33 +1324,33 @@ def compare_uploaded_requirements(
                 RequirementChange(
                     old_requirement_id=(
                         _optional_string(
-                            row[
+                            row.get(
                                 "old_requirement_id"
-                            ]
+                            )
                         )
                     ),
 
                     new_requirement_id=(
                         _optional_string(
-                            row[
+                            row.get(
                                 "new_requirement_id"
-                            ]
+                            )
                         )
                     ),
 
                     old_requirement_text=(
                         _optional_string(
-                            row[
+                            row.get(
                                 "old_text"
-                            ]
+                            )
                         )
                     ),
 
                     new_requirement_text=(
                         _optional_string(
-                            row[
+                            row.get(
                                 "new_text"
-                            ]
+                            )
                         )
                     ),
 
@@ -1029,30 +1363,32 @@ def compare_uploaded_requirements(
                     ),
 
                     risk_score=float(
-                        row[
-                            "risk_score"
-                        ]
+                        row.get(
+                            "risk_score",
+                            0.0,
+                        )
                     ),
 
                     risk_level=str(
-                        row[
-                            "risk_level"
-                        ]
+                        row.get(
+                            "risk_level",
+                            "low",
+                        )
                     ).strip(),
 
                     confidence=(
                         _optional_float(
-                            row[
+                            row.get(
                                 "confidence"
-                            ]
+                            )
                         )
                     ),
 
                     explanation=(
                         _optional_string(
-                            row[
+                            row.get(
                                 "risk_explanation"
-                            ]
+                            )
                         )
                     ),
                 )
@@ -1064,8 +1400,9 @@ def compare_uploaded_requirements(
 
         database.commit()
 
-        database.refresh(
-            analysis
+        analysis = _load_analysis(
+            analysis_id=analysis.id,
+            database=database,
         )
 
         return _to_detail(
@@ -1074,19 +1411,8 @@ def compare_uploaded_requirements(
 
     except HTTPException:
         database.rollback()
+
         raise
-
-    except FileLoadingError as error:
-        database.rollback()
-
-        raise HTTPException(
-            status_code=(
-                status.HTTP_400_BAD_REQUEST
-            ),
-            detail=str(
-                error
-            ),
-        ) from error
 
     except ValueError as error:
         database.rollback()
@@ -1095,6 +1421,7 @@ def compare_uploaded_requirements(
             status_code=(
                 status.HTTP_400_BAD_REQUEST
             ),
+
             detail=str(
                 error
             ),
@@ -1102,15 +1429,22 @@ def compare_uploaded_requirements(
 
     except Exception:
         database.rollback()
+
         raise
 
     finally:
-        if source_path is not None:
+        if (
+            source_path
+            is not None
+        ):
             _delete_temp_file(
                 source_path
             )
 
-        if target_path is not None:
+        if (
+            target_path
+            is not None
+        ):
             _delete_temp_file(
                 target_path
             )
@@ -1123,18 +1457,17 @@ def compare_uploaded_requirements(
 
 @router.post(
     "/analyses/{analysis_id}/defect-rankings",
-    response_model=(
-        DefectAnalysisResponse
-    ),
+    response_model=DefectAnalysisResponse,
 )
 def analyze_defect(
     analysis_id: int,
+
     payload: DefectAnalysisRequest,
+
     database: Session = Depends(
         get_db
     ),
 ) -> DefectAnalysisResponse:
-
     analysis = _load_analysis(
         analysis_id=analysis_id,
         database=database,
@@ -1148,6 +1481,7 @@ def analyze_defect(
             status_code=(
                 status.HTTP_400_BAD_REQUEST
             ),
+
             detail=(
                 "Bu analizde defect ile "
                 "karşılaştırılabilecek "
@@ -1156,19 +1490,25 @@ def analyze_defect(
         )
 
     defect_text = (
-        payload.defect_text.strip()
+        payload
+        .defect_text
+        .strip()
     )
 
-    defect_id = (
-        payload.defect_id.strip()
-        if (
-            payload.defect_id
-            and payload.defect_id.strip()
+    if (
+        payload.defect_id
+        and payload.defect_id.strip()
+    ):
+        defect_id = (
+            payload.defect_id.strip()
         )
-        else _next_defect_id(
-            analysis
+
+    else:
+        defect_id = (
+            _next_defect_id(
+                analysis
+            )
         )
-    )
 
     changes_dataframe = (
         _build_changes_dataframe(
@@ -1206,217 +1546,229 @@ def analyze_defect(
             status_code=(
                 status.HTTP_400_BAD_REQUEST
             ),
+
             detail=str(
                 error
             ),
         ) from error
 
-    database.execute(
-        delete(
-            DefectRanking
-        )
-        .where(
-            DefectRanking.analysis_run_id
-            == analysis.id
-        )
-        .where(
-            DefectRanking.defect_id
-            == defect_id
-        )
-    )
-
-    change_map = {
-        str(change.id): change
-        for change
-        in analysis.requirement_changes
-    }
-
-    candidates: list[
-        DefectCandidateResponse
-    ] = []
-
-    for (
-        _,
-        row,
-    ) in ranking_dataframe.iterrows():
-
-        change_id = (
-            _optional_string(
-                row[
-                    "change_id"
-                ]
+    try:
+        database.execute(
+            delete(
+                DefectRanking
+            )
+            .where(
+                DefectRanking.analysis_run_id
+                == analysis.id
+            )
+            .where(
+                DefectRanking.defect_id
+                == defect_id
             )
         )
 
-        if change_id is None:
-            continue
+        change_map = {
+            str(change.id): change
+            for change
+            in analysis.requirement_changes
+        }
 
-        change = (
-            change_map.get(
-                change_id
+        candidates: list[
+            DefectCandidateResponse
+        ] = []
+
+        for (
+            _,
+            row,
+        ) in ranking_dataframe.iterrows():
+            change_id = (
+                _optional_string(
+                    row.get(
+                        "change_id"
+                    )
+                )
             )
-        )
 
-        if change is None:
-            continue
+            if change_id is None:
+                continue
 
-        reason = (
-            _optional_string(
-                row[
-                    "reason"
-                ]
-            )
-            or (
-                "Bu değişiklik defect ile "
-                "ilişkili olabilecek "
-                "adaylardan biridir."
-            )
-        )
-
-        relevance_score = float(
-            row[
-                "relevance_score"
-            ]
-        )
-
-        rank_position = int(
-            row[
-                "rank"
-            ]
-        )
-
-        database.add(
-            DefectRanking(
-                analysis_run_id=(
-                    analysis.id
-                ),
-
-                defect_id=(
-                    defect_id
-                ),
-
-                defect_text=(
-                    defect_text
-                ),
-
-                change_id=(
+            change = (
+                change_map.get(
                     change_id
-                ),
-
-                relevance_score=(
-                    relevance_score
-                ),
-
-                rank_position=(
-                    rank_position
-                ),
-
-                reason=(
-                    reason
-                ),
+                )
             )
+
+            if change is None:
+                continue
+
+            reason = (
+                _optional_string(
+                    row.get(
+                        "reason"
+                    )
+                )
+                or (
+                    "Bu sonuç kesin kök "
+                    "neden değildir; "
+                    "incelenmesi gereken "
+                    "aday değişikliklerden "
+                    "biridir."
+                )
+            )
+
+            relevance_score = float(
+                row.get(
+                    "relevance_score",
+                    0.0,
+                )
+            )
+
+            rank_position = int(
+                row.get(
+                    "rank",
+                    len(candidates) + 1,
+                )
+            )
+
+            database.add(
+                DefectRanking(
+                    analysis_run_id=(
+                        analysis.id
+                    ),
+
+                    defect_id=(
+                        defect_id
+                    ),
+
+                    defect_text=(
+                        defect_text
+                    ),
+
+                    change_id=(
+                        change_id
+                    ),
+
+                    relevance_score=(
+                        relevance_score
+                    ),
+
+                    rank_position=(
+                        rank_position
+                    ),
+
+                    reason=(
+                        reason
+                    ),
+                )
+            )
+
+            candidates.append(
+                DefectCandidateResponse(
+                    change_id=(
+                        change_id
+                    ),
+
+                    old_requirement_id=(
+                        change.old_requirement_id
+                    ),
+
+                    new_requirement_id=(
+                        change.new_requirement_id
+                    ),
+
+                    old_requirement_text=(
+                        change.old_requirement_text
+                    ),
+
+                    new_requirement_text=(
+                        change.new_requirement_text
+                    ),
+
+                    detailed_change_types=list(
+                        change.detailed_change_types
+                        or []
+                    ),
+
+                    change_type=(
+                        change.change_type
+                    ),
+
+                    risk_score=float(
+                        change.risk_score
+                    ),
+
+                    risk_level=(
+                        change.risk_level
+                    ),
+
+                    confidence=(
+                        change.confidence
+                    ),
+
+                    semantic_similarity=float(
+                        row.get(
+                            "semantic_similarity",
+                            0.0,
+                        )
+                    ),
+
+                    keyword_overlap=float(
+                        row.get(
+                            "keyword_overlap",
+                            0.0,
+                        )
+                    ),
+
+                    relevance_score=(
+                        relevance_score
+                    ),
+
+                    rank=(
+                        rank_position
+                    ),
+
+                    reason=(
+                        reason
+                    ),
+                )
+            )
+
+        database.commit()
+
+        return DefectAnalysisResponse(
+            analysis_id=(
+                analysis.id
+            ),
+
+            analysis_name=(
+                analysis.analysis_name
+            ),
+
+            defect_id=(
+                defect_id
+            ),
+
+            defect_text=(
+                defect_text
+            ),
+
+            candidate_count=len(
+                candidates
+            ),
+
+            candidates=(
+                candidates
+            ),
         )
 
-        candidates.append(
-            DefectCandidateResponse(
-                change_id=(
-                    change_id
-                ),
+    except Exception:
+        database.rollback()
 
-                old_requirement_id=(
-                    change.old_requirement_id
-                ),
-
-                new_requirement_id=(
-                    change.new_requirement_id
-                ),
-
-                old_requirement_text=(
-                    change.old_requirement_text
-                ),
-
-                new_requirement_text=(
-                    change.new_requirement_text
-                ),
-
-                detailed_change_types=list(
-                    change.detailed_change_types
-                    or []
-                ),
-
-                change_type=(
-                    change.change_type
-                ),
-
-                risk_score=float(
-                    change.risk_score
-                ),
-
-                risk_level=(
-                    change.risk_level
-                ),
-
-                confidence=(
-                    change.confidence
-                ),
-
-                semantic_similarity=float(
-                    row[
-                        "semantic_similarity"
-                    ]
-                ),
-
-                keyword_overlap=float(
-                    row[
-                        "keyword_overlap"
-                    ]
-                ),
-
-                relevance_score=(
-                    relevance_score
-                ),
-
-                rank=(
-                    rank_position
-                ),
-
-                reason=(
-                    reason
-                ),
-            )
-        )
-
-    database.commit()
-
-    return DefectAnalysisResponse(
-        analysis_id=(
-            analysis.id
-        ),
-
-        analysis_name=(
-            analysis.analysis_name
-        ),
-
-        defect_id=(
-            defect_id
-        ),
-
-        defect_text=(
-            defect_text
-        ),
-
-        candidate_count=len(
-            candidates
-        ),
-
-        candidates=(
-            candidates
-        ),
-    )
+        raise
 
 
 # =========================================================
-# ANALYSIS LIST
+# LIST ANALYSES
 # =========================================================
 
 
@@ -1430,8 +1782,9 @@ def list_analyses(
     database: Session = Depends(
         get_db
     ),
-) -> list[AnalysisSummary]:
-
+) -> list[
+    AnalysisSummary
+]:
     statement = (
         select(
             AnalysisRun
@@ -1440,6 +1793,7 @@ def list_analyses(
             selectinload(
                 AnalysisRun.requirement_changes
             ),
+
             selectinload(
                 AnalysisRun.defect_rankings
             ),
@@ -1450,7 +1804,8 @@ def list_analyses(
     )
 
     analyses = (
-        database.scalars(
+        database
+        .scalars(
             statement
         )
         .all()
@@ -1472,17 +1827,15 @@ def list_analyses(
 
 @router.get(
     "/analyses/{analysis_id}",
-    response_model=(
-        AnalysisDetail
-    ),
+    response_model=AnalysisDetail,
 )
 def get_analysis(
     analysis_id: int,
+
     database: Session = Depends(
         get_db
     ),
 ) -> AnalysisDetail:
-
     analysis = _load_analysis(
         analysis_id=analysis_id,
         database=database,
@@ -1504,11 +1857,11 @@ def get_analysis(
 )
 def download_analysis_report(
     analysis_id: int,
+
     database: Session = Depends(
         get_db
     ),
 ) -> FileResponse:
-
     analysis = _load_analysis(
         analysis_id=analysis_id,
         database=database,
@@ -1529,20 +1882,18 @@ def download_analysis_report(
 
         generator.generate(
             analysis=analysis,
-            output_path=(
-                output_path
-            ),
+            output_path=output_path,
         )
 
     except Exception:
-        _delete_temp_report(
+        _delete_temp_file(
             output_path
         )
 
         raise
 
-    download_filename = (
-        "ScopeDiff_Analysis_"
+    filename = (
+        f"ScopeDiff_Analysis_"
         f"{analysis.id}.xlsx"
     )
 
@@ -1556,12 +1907,164 @@ def download_analysis_report(
             "spreadsheetml.sheet"
         ),
 
-        filename=(
-            download_filename
-        ),
+        filename=filename,
 
-        background=BackgroundTask(
-            _delete_temp_report,
-            output_path,
+        background=(
+            BackgroundTask(
+                _delete_temp_file,
+                output_path,
+            )
         ),
+    )
+
+
+# =========================================================
+# DELETE ANALYSIS
+# =========================================================
+
+
+@router.delete(
+    "/analyses/{analysis_id}",
+    status_code=(
+        status.HTTP_204_NO_CONTENT
+    ),
+)
+def delete_analysis(
+    analysis_id: int,
+
+    database: Session = Depends(
+        get_db
+    ),
+) -> Response:
+    analysis = _load_analysis(
+        analysis_id=analysis_id,
+        database=database,
+    )
+
+    try:
+        # -------------------------------------------------
+        # SÜREÇ BAĞLANTISINI KOPAR
+        # -------------------------------------------------
+        # Analiz silindiğinde süreç kaydı silinmez.
+        # Sadece WorkItem -> Analysis ilişkisi kaldırılır.
+
+        database.execute(
+            update(
+                WorkItem
+            )
+            .where(
+                WorkItem.analysis_run_id
+                == analysis.id
+            )
+            .values(
+                analysis_run_id=None
+            )
+        )
+
+        # -------------------------------------------------
+        # DEFECT ADAYLARI
+        # -------------------------------------------------
+
+        database.execute(
+            delete(
+                DefectRanking
+            ).where(
+                DefectRanking.analysis_run_id
+                == analysis.id
+            )
+        )
+
+        # -------------------------------------------------
+        # REQUIREMENT DEĞİŞİKLİKLERİ
+        # -------------------------------------------------
+
+        database.execute(
+            delete(
+                RequirementChange
+            ).where(
+                RequirementChange.analysis_run_id
+                == analysis.id
+            )
+        )
+
+        # -------------------------------------------------
+        # ANA ANALİZ
+        # -------------------------------------------------
+
+        database.execute(
+            delete(
+                AnalysisRun
+            ).where(
+                AnalysisRun.id
+                == analysis.id
+            )
+        )
+
+        database.commit()
+
+    except Exception:
+        database.rollback()
+        raise
+
+    return Response(
+        status_code=(
+            status.HTTP_204_NO_CONTENT
+        )
+    )
+
+
+@router.post(
+    "/translate/content",
+    response_model=ContentTranslationResponse,
+)
+def translate_content_endpoint(
+    request: ContentTranslationRequest,
+) -> ContentTranslationResponse:
+    target_language = (
+        request.target_language
+        .strip()
+        .lower()
+    )
+
+    if target_language not in {
+        "tr",
+        "en",
+        "de",
+        "fr",
+        "es",
+    }:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "Desteklenmeyen hedef dil: "
+                f"{request.target_language}"
+            ),
+        )
+
+    try:
+        from backend.app.translation.content_translator import (
+            translate_content_batch,
+        )
+
+        translations = translate_content_batch(
+            request.texts,
+            target_language,
+        )
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error),
+        ) from error
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=(
+                "İçerik çeviri modeli kullanılamıyor."
+            ),
+        ) from error
+
+    return ContentTranslationResponse(
+        translations=translations,
     )

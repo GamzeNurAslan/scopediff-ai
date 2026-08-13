@@ -49,29 +49,14 @@ def validate_requirements_dataframe(dataframe: pd.DataFrame) -> None:
         # Gerekli sütunlar yoksa aşağıdaki kontroller güvenli çalışamaz.
         raise DataValidationError(errors)
 
-    blank_requirement_ids = _get_blank_mask(dataframe["requirement_id"])
-    if blank_requirement_ids.any():
-        errors.append(
-            f"{int(blank_requirement_ids.sum())} satırda requirement_id boş."
-        )
-
     blank_requirement_texts = _get_blank_mask(dataframe["requirement_text"])
     if blank_requirement_texts.any():
         errors.append(
             f"{int(blank_requirement_texts.sum())} satırda requirement_text boş."
         )
 
-    blank_modules = _get_blank_mask(dataframe["module"])
-    if blank_modules.any():
-        errors.append(f"{int(blank_modules.sum())} satırda module boş.")
-
-    blank_versions = _get_blank_mask(dataframe["version"])
-    if blank_versions.any():
-        errors.append(f"{int(blank_versions.sum())} satırda version boş.")
-
-    valid_ids = dataframe.loc[
-        ~blank_requirement_ids, "requirement_id"
-    ].astype(str).str.strip()
+    blank_requirement_ids = _get_blank_mask(dataframe["requirement_id"])
+    valid_ids = dataframe.loc[~blank_requirement_ids, "requirement_id"].astype(str).str.strip()
 
     duplicate_ids = sorted(
         valid_ids[valid_ids.duplicated(keep=False)].unique().tolist()
@@ -81,6 +66,18 @@ def validate_requirements_dataframe(dataframe: pd.DataFrame) -> None:
         errors.append(
             "Tekrarlanan requirement_id değerleri: "
             + ", ".join(duplicate_ids)
+        )
+
+    blank_modules = _get_blank_mask(dataframe["module"])
+    if blank_modules.any():
+        errors.append(
+            f"{int(blank_modules.sum())} satırda module boş."
+        )
+
+    blank_versions = _get_blank_mask(dataframe["version"])
+    if blank_versions.any():
+        errors.append(
+            f"{int(blank_versions.sum())} satırda version boş."
         )
 
     if errors:

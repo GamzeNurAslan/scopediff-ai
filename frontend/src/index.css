@@ -8,30 +8,136 @@
     "Segoe UI",
     sans-serif;
 
-  color: #ffffff;
-  background: #070d1a;
+  color: #172033;
+  background: #07142e;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* ScopeDiff design tokens */
+
+  --sd-navy-950: #061126;
+  --sd-navy-900: #07162f;
+  --sd-navy-800: #0d2344;
+
+  --sd-orange: #f97316;
+  --sd-orange-light: #f59e0b;
+
+  --sd-surface: #ffffff;
+  --sd-page: #f5f7fb;
+
+  --sd-text: #172033;
+  --sd-muted: #667085;
+
+  --sd-border: #e4e8ef;
+
+  --sd-radius-sm: 8px;
+  --sd-radius-md: 12px;
+  --sd-radius-lg: 16px;
+
+  --sd-shadow:
+    0 1px 2px rgba(16, 24, 40, .025),
+    0 8px 26px rgba(15, 23, 42, .045);
+
+  --sd-shadow-hover:
+    0 4px 8px rgba(16, 24, 40, .035),
+    0 16px 38px rgba(15, 23, 42, .075);
 }
+
 
 * {
   box-sizing: border-box;
 }
 
+
 html {
-  background: #070d1a;
+  min-width: 320px;
+  min-height: 100%;
+
+  background: #07142e;
 }
+
 
 body {
   margin: 0;
+
   min-width: 320px;
   min-height: 100vh;
+
+  background: #07142e;
 }
+
 
 button,
 input,
 textarea,
 select {
   font: inherit;
+}
+
+
+button {
+  -webkit-tap-highlight-color:
+    transparent;
+}
+
+
+a {
+  color: inherit;
+}
+
+
+::selection {
+  background:
+    rgba(249, 115, 22, .18);
+
+  color: #172033;
+}
+
+
+/* =====================================================
+   SCROLLBAR
+   ===================================================== */
+
+* {
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    #c5ccd8
+    transparent;
+}
+
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+*::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+
+  border-radius: 999px;
+
+  background:
+    #c5ccd8;
+
+  background-clip:
+    padding-box;
+}
+
+
+*::-webkit-scrollbar-thumb:hover {
+  background:
+    #98a2b3;
+
+  background-clip:
+    padding-box;
 }

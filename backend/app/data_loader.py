@@ -11,6 +11,43 @@ class FileLoadingError(ValueError):
     """Excel dosyası okunamadığında oluşan hatayı temsil eder."""
 
 
+REQUIREMENT_COLUMN_ALIASES = {
+    "requirement_id": {
+        "requirementid", "reqid", "id", "kod", "gereksinimid", "gereksinimno", "ref", "key",
+    },
+    "requirement_text": {
+        "requirementtext", "requirement", "description", "details", "text", "aciklama", "gereksinim", "gereksinimmetni", "isregeli", "isgereksinimi",
+    },
+    "module": {
+        "module", "component", "area", "category", "modul", "menu", "menukategori", "fonksiyon",
+    },
+    "version": {
+        "version", "release", "sprint", "versiyon", "surum", "surumno",
+    },
+}
+
+
+def _header_key(value: object) -> str:
+    text = str(value).strip().lower()
+    replacements = str.maketrans("ıişğüöç", "iisguoc")
+    text = text.translate(replacements)
+    return re.sub(r"[^a-z0-9]+", "", text)
+
+
+def detect_requirement_columns(columns: list[object]) -> dict[str, str | None]:
+    """Farklı şirket kolon adlarını ScopeDiff alanlarına eşler."""
+    normalized = {_header_key(column): str(column) for column in columns}
+    mapping: dict[str, str | None] = {}
+
+    for canonical, aliases in REQUIREMENT_COLUMN_ALIASES.items():
+        mapping[canonical] = next(
+            (normalized[alias] for alias in aliases if alias in normalized),
+            None,
+        )
+
+    return mapping
+
+
 def standardize_column_name(column_name: object) -> str:
     """
     Sütun adlarını standart formata dönüştürür.
@@ -20,6 +57,7 @@ def standardize_column_name(column_name: object) -> str:
     'Requirement-Text' -> 'requirement_text'
     """
     name = str(column_name).strip().lower()
+    name = name.translate(str.maketrans("ıişğüöç", "iisguoc"))
     name = re.sub(r"[\s\-]+", "_", name)
     name = re.sub(r"[^a-z0-9_]", "", name)
     name = re.sub(r"_+", "_", name)
@@ -41,6 +79,8 @@ def standardize_column_names(dataframe: pd.DataFrame) -> pd.DataFrame:
 def load_requirements_excel(
     file_path: str | Path,
     sheet_name: str | int = 0,
+    column_mapping: dict[str, str] | None = None,
+    version_fallback: str | None = None,
 ) -> pd.DataFrame:
     """
     Gereksinim Excel dosyasını okur, doğrular ve metinleri işler.
@@ -77,6 +117,35 @@ def load_requirements_excel(
 
     dataframe = standardize_column_names(dataframe)
 
+    detected_mapping = detect_requirement_columns(list(dataframe.columns))
+    selected_mapping = {
+        **detected_mapping,
+        **(column_mapping or {}),
+    }
+
+    text_column = selected_mapping.get("requirement_text")
+    if not text_column or text_column not in dataframe.columns:
+        raise FileLoadingError(
+            "Gereksinim metni kolonu bulunamadı. "
+            "Description, Requirement veya Açıklama benzeri bir kolon seçin."
+        )
+
+    rename_map = {
+        source: canonical
+        for canonical, source in selected_mapping.items()
+        if source and source in dataframe.columns
+    }
+    dataframe = dataframe.rename(columns=rename_map)
+
+    row_count = len(dataframe.index)
+    if "requirement_id" not in dataframe.columns:
+        dataframe["requirement_id"] = ""
+    dataframe["requirement_id"] = dataframe["requirement_id"].fillna("")
+    blank_ids = dataframe["requirement_id"].astype(str).str.strip().eq("")
+    dataframe.loc[blank_ids, "requirement_id"] = [
+        f"AUTO-{index:04d}"
+        for index in range(1, int(blank_ids.sum()) + 1)
+    ]
     validate_requirements_dataframe(dataframe)
 
     processed_texts = dataframe["requirement_text"].apply(preprocess_text)

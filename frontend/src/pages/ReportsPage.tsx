@@ -1,13 +1,17 @@
 import {
+  AlertTriangle,
   Archive,
+  ArrowRight,
   Bug,
   CalendarDays,
   Download,
   FileSpreadsheet,
-  GitCompareArrows,
+  GitCompare,
   Loader2,
   Search,
-  ShieldCheck,
+  ShieldAlert,
+  Trash2,
+  X,
 } from 'lucide-react'
 
 import {
@@ -16,24 +20,46 @@ import {
   useState,
 } from 'react'
 
+import {
+  useNavigate,
+} from 'react-router'
+
 import './ReportsPage.css'
 
 import {
+  deleteAnalysis,
   downloadAnalysisReport,
   getAnalyses,
+  getAnalysis,
 } from '../services/api'
 
 import type {
+  AnalysisDetail,
   AnalysisSummary,
 } from '../types/api'
 
 
+// =====================================================
+// HELPERS
+// =====================================================
+
 function formatDate(
   value: string,
 ): string {
-  const date = new Date(
-    value,
-  )
+  const hasTimezone =
+    /(?:Z|[+-]\d{2}:\d{2})$/i.test(
+      value,
+    )
+
+  const normalizedValue =
+    hasTimezone
+      ? value
+      : `${value}Z`
+
+  const date =
+    new Date(
+      normalizedValue,
+    )
 
   if (
     Number.isNaN(
@@ -46,22 +72,109 @@ function formatDate(
   return new Intl.DateTimeFormat(
     'tr-TR',
     {
-      dateStyle: 'medium',
-      timeStyle: 'short',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     },
-  ).format(
-    date,
+  ).format(date)
+}
+
+
+function getInitials(
+  value: string | null,
+): string {
+  if (!value) {
+    return '—'
+  }
+
+  const parts =
+    value
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+
+  if (
+    parts.length === 0
+  ) {
+    return '—'
+  }
+
+  if (
+    parts.length === 1
+  ) {
+    return parts[0]
+      .slice(0, 2)
+      .toLocaleUpperCase(
+        'tr-TR',
+      )
+  }
+
+  return (
+    parts[0][0]
+    + parts[
+      parts.length - 1
+    ][0]
+  ).toLocaleUpperCase(
+    'tr-TR',
   )
 }
 
 
+function formatChangeType(
+  value: string,
+): string {
+  return value
+    .replaceAll(
+      '_',
+      ' ',
+    )
+    .replace(
+      /\b\w/g,
+      (letter) =>
+        letter.toUpperCase(),
+    )
+}
+
+
+function clampPercentage(
+  value: number,
+): number {
+  return Math.max(
+    0,
+    Math.min(
+      100,
+      value,
+    ),
+  )
+}
+
+
+// =====================================================
+// PAGE
+// =====================================================
+
 function ReportsPage() {
+  const navigate =
+    useNavigate()
+
+
   const [
     analyses,
     setAnalyses,
   ] = useState<
     AnalysisSummary[]
   >([])
+
+
+  const [
+    latestDetail,
+    setLatestDetail,
+  ] = useState<
+    AnalysisDetail | null
+  >(null)
+
 
   const [
     loading,
@@ -70,19 +183,6 @@ function ReportsPage() {
     true,
   )
 
-  const [
-    searchText,
-    setSearchText,
-  ] = useState(
-    '',
-  )
-
-  const [
-    downloadingId,
-    setDownloadingId,
-  ] = useState<
-    number | null
-  >(null)
 
   const [
     error,
@@ -91,6 +191,40 @@ function ReportsPage() {
     string | null
   >(null)
 
+
+  const [
+    searchTerm,
+    setSearchTerm,
+  ] = useState('')
+
+
+  const [
+    downloadingId,
+    setDownloadingId,
+  ] = useState<
+    number | null
+  >(null)
+
+
+  const [
+    deletingId,
+    setDeletingId,
+  ] = useState<
+    number | null
+  >(null)
+
+
+  const [
+    analysisPendingDelete,
+    setAnalysisPendingDelete,
+  ] = useState<
+    AnalysisSummary | null
+  >(null)
+
+
+  // =====================================================
+  // LOAD ANALYSES
+  // =====================================================
 
   useEffect(() => {
     async function loadAnalyses() {
@@ -103,11 +237,24 @@ function ReportsPage() {
           null,
         )
 
-        const response =
+
+        const result =
           await getAnalyses()
 
+
+        const ordered =
+          [...result].sort(
+            (
+              left,
+              right,
+            ) =>
+              right.id
+              - left.id,
+          )
+
+
         setAnalyses(
-          response,
+          ordered,
         )
 
       } catch (
@@ -134,9 +281,83 @@ function ReportsPage() {
       }
     }
 
+
     void loadAnalyses()
   }, [])
 
+
+  // =====================================================
+  // LATEST ANALYSIS
+  // =====================================================
+
+  const latestAnalysis =
+    useMemo(
+      () =>
+        analyses[0]
+        ?? null,
+      [
+        analyses,
+      ],
+    )
+
+
+  useEffect(() => {
+    if (
+      latestAnalysis
+      === null
+    ) {
+      setLatestDetail(
+        null,
+      )
+
+      return
+    }
+
+
+    async function loadLatestDetail(
+      analysisId: number,
+    ) {
+      try {
+        const detail =
+          await getAnalysis(
+            analysisId,
+          )
+
+        setLatestDetail(
+          detail,
+        )
+
+      } catch (
+        caughtError
+      ) {
+        setLatestDetail(
+          null,
+        )
+
+        if (
+          caughtError
+          instanceof Error
+        ) {
+          setError(
+            caughtError.message,
+          )
+        }
+      }
+    }
+
+
+    void loadLatestDetail(
+      latestAnalysis.id,
+    )
+
+  }, [
+    latestAnalysis,
+  ])
+
+
+  // =====================================================
+  // GLOBAL METRICS
+  // =====================================================
 
   const totalChanges =
     useMemo(
@@ -176,66 +397,316 @@ function ReportsPage() {
     )
 
 
+  // =====================================================
+  // LATEST ANALYSIS METRICS
+  // =====================================================
+
+  const latestMetrics =
+    useMemo(
+      () => {
+        const changes =
+          latestDetail
+            ?.requirement_changes
+          ?? []
+
+
+        const low =
+          changes.filter(
+            (change) =>
+              change
+                .risk_level
+                .toLowerCase()
+              === 'low',
+          ).length
+
+
+        const medium =
+          changes.filter(
+            (change) =>
+              change
+                .risk_level
+                .toLowerCase()
+              === 'medium',
+          ).length
+
+
+        const high =
+          changes.filter(
+            (change) =>
+              change
+                .risk_level
+                .toLowerCase()
+              === 'high',
+          ).length
+
+
+        const critical =
+          changes.filter(
+            (change) =>
+              change
+                .risk_level
+                .toLowerCase()
+              === 'critical',
+          ).length
+
+
+        const averageRisk =
+          changes.length > 0
+            ? changes.reduce(
+                (
+                  total,
+                  change,
+                ) =>
+                  total
+                  + change.risk_score,
+                0,
+              )
+              / changes.length
+            : 0
+
+
+        const confidenceValues =
+          changes.flatMap(
+            (change) =>
+              change.confidence
+              === null
+                ? []
+                : [
+                    change.confidence,
+                  ],
+          )
+
+
+        const averageConfidence =
+          confidenceValues.length > 0
+            ? confidenceValues.reduce(
+                (
+                  total,
+                  confidence,
+                ) =>
+                  total
+                  + confidence,
+                0,
+              )
+              / confidenceValues.length
+              * 100
+            : 0
+
+
+        return {
+          total:
+            changes.length,
+
+          low,
+          medium,
+          high,
+          critical,
+
+          priority:
+            high
+            + critical,
+
+          averageRisk,
+
+          averageConfidence,
+        }
+      },
+      [
+        latestDetail,
+      ],
+    )
+
+
+  // =====================================================
+  // CHANGE PROFILE
+  // =====================================================
+
+  const changeProfile =
+    useMemo(
+      () => {
+        const counts =
+          new Map<
+            string,
+            number
+          >()
+
+
+        const changes =
+          latestDetail
+            ?.requirement_changes
+          ?? []
+
+
+        for (
+          const change
+          of changes
+        ) {
+          const types =
+            change
+              .detailed_change_types
+            && change
+              .detailed_change_types
+              .length > 0
+              ? change
+                  .detailed_change_types
+              : [
+                  change
+                    .change_type,
+                ]
+
+
+          for (
+            const type
+            of types
+          ) {
+            counts.set(
+              type,
+              (
+                counts.get(
+                  type,
+                )
+                ?? 0
+              ) + 1,
+            )
+          }
+        }
+
+
+        return Array
+          .from(
+            counts.entries(),
+          )
+          .map(
+            (
+              [
+                type,
+                count,
+              ],
+            ) => ({
+              type,
+              label:
+                formatChangeType(
+                  type,
+                ),
+              count,
+            }),
+          )
+          .sort(
+            (
+              left,
+              right,
+            ) =>
+              right.count
+              - left.count,
+          )
+          .slice(
+            0,
+            6,
+          )
+      },
+      [
+        latestDetail,
+      ],
+    )
+
+
+  const maxChangeProfileCount =
+    useMemo(
+      () =>
+        Math.max(
+          1,
+          ...changeProfile.map(
+            (item) =>
+              item.count,
+          ),
+        ),
+      [
+        changeProfile,
+      ],
+    )
+
+
+  // =====================================================
+  // SEARCH
+  // =====================================================
+
   const filteredAnalyses =
     useMemo(
       () => {
-        const normalizedSearch =
-          searchText
+        const search =
+          searchTerm
             .trim()
             .toLowerCase()
 
-        if (
-          !normalizedSearch
-        ) {
+
+        if (!search) {
           return analyses
         }
 
+
         return analyses.filter(
           (analysis) => {
-
-            const values = [
-              analysis.analysis_name,
-
-              analysis.source_version
-              ?? '',
-
-              analysis.target_version
-              ?? '',
-
-              String(
+            const searchable =
+              [
                 analysis.id,
-              ),
-            ]
 
-            return values.some(
-              (value) =>
-                value
-                  .toLowerCase()
-                  .includes(
-                    normalizedSearch,
-                  ),
+                analysis
+                  .analysis_name,
+
+                analysis
+                  .source_version
+                ?? '',
+
+                analysis
+                  .target_version
+                ?? '',
+
+                analysis
+                  .created_by_name
+                ?? '',
+
+                analysis
+                  .created_by_department
+                ?? '',
+
+                analysis
+                  .created_by_role
+                ?? '',
+              ]
+                .join(' ')
+                .toLowerCase()
+
+
+            return searchable.includes(
+              search,
             )
           },
         )
       },
       [
         analyses,
-        searchText,
+        searchTerm,
       ],
     )
 
 
+  // =====================================================
+  // DOWNLOAD
+  // =====================================================
+
   async function handleDownload(
-    analysis: AnalysisSummary,
+    analysis:
+      AnalysisSummary,
   ) {
     try {
+      setError(
+        null,
+      )
+
       setDownloadingId(
         analysis.id,
       )
 
-      setError(
-        null,
-      )
 
       await downloadAnalysisReport(
         analysis.id,
@@ -266,71 +737,223 @@ function ReportsPage() {
   }
 
 
-  if (loading) {
-    return (
-      <div className="dashboard-message">
-        Raporlar yükleniyor...
-      </div>
+  // =====================================================
+  // DELETE
+  // =====================================================
+
+  function openDeleteModal(
+    analysis:
+      AnalysisSummary,
+  ) {
+    setError(
+      null,
+    )
+
+    setAnalysisPendingDelete(
+      analysis,
     )
   }
 
 
-  return (
-    <div className="reports-page">
+  function closeDeleteModal() {
+    if (
+      deletingId
+      !== null
+    ) {
+      return
+    }
 
-      <section className="reports-header">
+    setAnalysisPendingDelete(
+      null,
+    )
+  }
+
+
+  async function confirmDelete() {
+    if (
+      analysisPendingDelete
+      === null
+    ) {
+      return
+    }
+
+
+    const analysisToDelete =
+      analysisPendingDelete
+
+
+    try {
+      setError(
+        null,
+      )
+
+      setDeletingId(
+        analysisToDelete.id,
+      )
+
+
+      await deleteAnalysis(
+        analysisToDelete.id,
+      )
+
+
+      setAnalyses(
+        (current) =>
+          current.filter(
+            (analysis) =>
+              analysis.id
+              !== analysisToDelete.id,
+          ),
+      )
+
+
+      setAnalysisPendingDelete(
+        null,
+      )
+
+    } catch (
+      caughtError
+    ) {
+      if (
+        caughtError
+        instanceof Error
+      ) {
+        setError(
+          caughtError.message,
+        )
+
+      } else {
+        setError(
+          'Analiz silinemedi.',
+        )
+      }
+
+    } finally {
+      setDeletingId(
+        null,
+      )
+    }
+  }
+
+
+  // =====================================================
+  // RENDER
+  // =====================================================
+
+  return (
+    <div className="rpt-page">
+
+      {/* =================================================
+          HEADER
+          ================================================= */}
+
+      <header className="rpt-header">
 
         <div>
 
-          <span className="section-label">
+          <span className="rpt-kicker">
             RAPOR MERKEZİ
           </span>
 
-          <h2>
+
+          <h1>
             Analiz Raporları
-          </h2>
+          </h1>
+
 
           <p>
-            Tamamlanan ScopeDiff AI
-            analizlerini görüntüle ve
-            ayrıntılı Excel raporlarını
-            indir.
+            Analiz sonuçlarını,
+            risk profilini ve geçmiş
+            rapor kayıtlarını tek
+            ekrandan yönet.
           </p>
 
         </div>
 
 
-        <div className="reports-header-badge">
+        <div className="rpt-format-badge">
 
           <FileSpreadsheet
-            size={17}
+            size={16}
           />
 
-          <span>
-            Excel Export
-          </span>
+          <div>
 
-        </div>
+            <span>
+              RAPOR FORMATI
+            </span>
 
-      </section>
+            <strong>
+              XLSX
+            </strong>
 
-
-      {error && (
-        <div className="dashboard-message error">
-          {error}
-        </div>
-      )}
-
-
-      <section className="reports-kpi-grid">
-
-        <article className="reports-kpi-card">
-
-          <div className="reports-kpi-icon blue">
-            <Archive
-              size={18}
-            />
           </div>
+
+        </div>
+
+      </header>
+
+
+      {/* =================================================
+          ERROR
+          ================================================= */}
+
+      {
+        error
+        && (
+          <div
+            className="rpt-error"
+            role="alert"
+          >
+
+            <AlertTriangle
+              size={17}
+            />
+
+
+            <span>
+              {error}
+            </span>
+
+
+            <button
+              type="button"
+              aria-label="Hata mesajını kapat"
+              onClick={
+                () =>
+                  setError(
+                    null,
+                  )
+              }
+            >
+
+              <X
+                size={15}
+              />
+
+            </button>
+
+          </div>
+        )
+      }
+
+
+      {/* =================================================
+          KPI
+          ================================================= */}
+
+      <section className="rpt-kpis">
+
+        <article className="rpt-kpi navy">
+
+          <div className="rpt-kpi-icon">
+
+            <Archive
+              size={19}
+            />
+
+          </div>
+
 
           <div>
 
@@ -339,23 +962,28 @@ function ReportsPage() {
             </span>
 
             <strong>
-              {
-                analyses.length
-              }
+              {analyses.length}
             </strong>
+
+            <small>
+              kayıtlı karşılaştırma
+            </small>
 
           </div>
 
         </article>
 
 
-        <article className="reports-kpi-card">
+        <article className="rpt-kpi orange">
 
-          <div className="reports-kpi-icon orange">
-            <GitCompareArrows
-              size={18}
+          <div className="rpt-kpi-icon">
+
+            <GitCompare
+              size={19}
             />
+
           </div>
+
 
           <div>
 
@@ -364,58 +992,72 @@ function ReportsPage() {
             </span>
 
             <strong>
-              {
-                totalChanges
-              }
+              {totalChanges}
             </strong>
+
+            <small>
+              tespit edilen değişiklik
+            </small>
 
           </div>
 
         </article>
 
 
-        <article className="reports-kpi-card">
+        <article className="rpt-kpi purple">
 
-          <div className="reports-kpi-icon purple">
+          <div className="rpt-kpi-icon">
+
             <Bug
-              size={18}
+              size={19}
             />
+
           </div>
+
 
           <div>
 
             <span>
-              Toplam Defect Aday Kaydı
+              Defect Aday Kaydı
             </span>
 
             <strong>
-              {
-                totalDefectRankings
-              }
+              {totalDefectRankings}
             </strong>
+
+            <small>
+              önceliklendirilmiş aday
+            </small>
 
           </div>
 
         </article>
 
 
-        <article className="reports-kpi-card">
+        <article className="rpt-kpi red">
 
-          <div className="reports-kpi-icon green">
-            <ShieldCheck
-              size={18}
+          <div className="rpt-kpi-icon">
+
+            <ShieldAlert
+              size={19}
             />
+
           </div>
+
 
           <div>
 
             <span>
-              Rapor Formatı
+              Son Analiz Öncelikli Risk
             </span>
 
-            <strong className="reports-format-text">
-              XLSX
+            <strong>
+              {latestMetrics.priority}
             </strong>
+
+            <small>
+              yüksek + kritik
+            </small>
 
           </div>
 
@@ -424,293 +1066,1244 @@ function ReportsPage() {
       </section>
 
 
-      <section className="reports-toolbar">
+      {/* =================================================
+          LOADING
+          ================================================= */}
 
-        <div className="reports-search">
+      {
+        loading
+        ? (
+          <div className="rpt-state">
 
-          <Search
-            size={16}
-          />
+            <Loader2
+              size={24}
+              className="rpt-spinner"
+            />
 
-          <input
-            type="text"
-            value={
-              searchText
-            }
-            placeholder={
-              'Analiz adı, versiyon veya ID ara...'
-            }
-            onChange={
-              (event) =>
-                setSearchText(
-                  event
-                    .target
-                    .value,
+            <strong>
+              Raporlar yükleniyor
+            </strong>
+
+            <p>
+              Analiz kayıtları getiriliyor.
+            </p>
+
+          </div>
+        )
+
+        : analyses.length === 0
+          ? (
+            <div className="rpt-state">
+
+              <Archive
+                size={32}
+              />
+
+              <strong>
+                Henüz rapor bulunmuyor
+              </strong>
+
+              <p>
+                Yeni bir karşılaştırma
+                oluşturduğunda rapor
+                burada görünecek.
+              </p>
+
+            </div>
+          )
+
+          : (
+            <>
+
+              {/* =========================================
+                  LATEST ANALYSIS
+                  ========================================= */}
+
+              {
+                latestAnalysis
+                && (
+                  <section className="rpt-latest">
+
+                    <div className="rpt-latest-head">
+
+                      <div>
+
+                        <span className="rpt-section-label">
+                          SON ANALİZ
+                        </span>
+
+
+                        <h2>
+                          {
+                            latestAnalysis
+                              .analysis_name
+                          }
+                        </h2>
+
+
+                        <p>
+                          Analiz #
+                          {
+                            latestAnalysis.id
+                          }
+                        </p>
+
+                      </div>
+
+
+                      <div className="rpt-latest-actions">
+
+                        <button
+                          type="button"
+                          className="rpt-secondary-button"
+                          onClick={
+                            () =>
+                              navigate(
+                                '/comparison',
+                              )
+                          }
+                        >
+
+                          <GitCompare
+                            size={15}
+                          />
+
+                          Karşılaştırmayı İncele
+
+                        </button>
+
+
+                        <button
+                          type="button"
+                          className="rpt-primary-button"
+                          disabled={
+                            downloadingId
+                            === latestAnalysis.id
+                          }
+                          onClick={
+                            () =>
+                              void handleDownload(
+                                latestAnalysis,
+                              )
+                          }
+                        >
+
+                          {
+                            downloadingId
+                            === latestAnalysis.id
+                              ? (
+                                <Loader2
+                                  size={15}
+                                  className="rpt-spinner"
+                                />
+                              )
+                              : (
+                                <Download
+                                  size={15}
+                                />
+                              )
+                          }
+
+                          {
+                            downloadingId
+                            === latestAnalysis.id
+                              ? 'Hazırlanıyor...'
+                              : 'Excel Raporu'
+                          }
+
+                        </button>
+
+                      </div>
+
+                    </div>
+
+
+                    <div className="rpt-latest-context">
+
+                      <div className="rpt-version-flow">
+
+                        <div>
+
+                          <span>
+                            KAYNAK
+                          </span>
+
+                          <strong>
+                            {
+                              latestAnalysis
+                                .source_version
+                              ?? '—'
+                            }
+                          </strong>
+
+                        </div>
+
+
+                        <div className="rpt-version-arrow">
+
+                          <ArrowRight
+                            size={16}
+                          />
+
+                        </div>
+
+
+                        <div className="target">
+
+                          <span>
+                            HEDEF
+                          </span>
+
+                          <strong>
+                            {
+                              latestAnalysis
+                                .target_version
+                              ?? '—'
+                            }
+                          </strong>
+
+                        </div>
+
+                      </div>
+
+
+                      <div className="rpt-context-line" />
+
+
+                      <div className="rpt-creator">
+
+                        <div className="rpt-avatar">
+
+                          {
+                            getInitials(
+                              latestAnalysis
+                                .created_by_name,
+                            )
+                          }
+
+                        </div>
+
+
+                        <div>
+
+                          <span>
+                            ANALİZİ OLUŞTURAN
+                          </span>
+
+                          <strong>
+                            {
+                              latestAnalysis
+                                .created_by_name
+                              ?? 'Kullanıcı bilgisi yok'
+                            }
+                          </strong>
+
+                          {
+                            latestAnalysis
+                              .created_by_name
+                            && (
+                              <small>
+
+                                {
+                                  [
+                                    latestAnalysis
+                                      .created_by_department,
+
+                                    latestAnalysis
+                                      .created_by_role,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(' · ')
+                                }
+
+                              </small>
+                            )
+                          }
+
+                        </div>
+
+                      </div>
+
+
+                      <div className="rpt-created">
+
+                        <span>
+                          OLUŞTURULMA
+                        </span>
+
+                        <strong>
+                          {
+                            formatDate(
+                              latestAnalysis
+                                .created_at,
+                            )
+                          }
+                        </strong>
+
+                      </div>
+
+                    </div>
+
+
+                    {/* LATEST METRICS */}
+
+                    <div className="rpt-latest-metrics">
+
+                      <div>
+
+                        <span>
+                          DEĞİŞİKLİK
+                        </span>
+
+                        <strong>
+                          {
+                            latestAnalysis
+                              .requirement_change_count
+                          }
+                        </strong>
+
+                      </div>
+
+
+                      <div>
+
+                        <span>
+                          YÜKSEK RİSK
+                        </span>
+
+                        <strong className="high">
+                          {
+                            latestMetrics.high
+                          }
+                        </strong>
+
+                      </div>
+
+
+                      <div>
+
+                        <span>
+                          KRİTİK RİSK
+                        </span>
+
+                        <strong className="critical">
+                          {
+                            latestMetrics.critical
+                          }
+                        </strong>
+
+                      </div>
+
+
+                      <div>
+
+                        <span>
+                          DEFECT ADAYI
+                        </span>
+
+                        <strong>
+                          {
+                            latestAnalysis
+                              .defect_ranking_count
+                          }
+                        </strong>
+
+                      </div>
+
+                    </div>
+
+
+                    {/* SCORE */}
+
+                    <div className="rpt-score-row">
+
+                      <div className="rpt-score-block">
+
+                        <div className="rpt-score-head">
+
+                          <span>
+                            Ortalama Risk Skoru
+                          </span>
+
+                          <strong>
+                            {
+                              latestMetrics
+                                .averageRisk
+                                .toFixed(1)
+                            }
+
+                            <small>
+                              /100
+                            </small>
+                          </strong>
+
+                        </div>
+
+
+                        <div className="rpt-progress">
+
+                          <span
+                            className="risk"
+                            style={{
+                              width:
+                                `${clampPercentage(
+                                  latestMetrics
+                                    .averageRisk,
+                                )}%`,
+                            }}
+                          />
+
+                        </div>
+
+                      </div>
+
+
+                      <div className="rpt-confidence">
+
+                        <span>
+                          Ortalama Confidence
+                        </span>
+
+                        <strong>
+                          {
+                            latestMetrics
+                              .averageConfidence
+                              .toFixed(0)
+                          }%
+                        </strong>
+
+                      </div>
+
+                    </div>
+
+                  </section>
                 )
-            }
-          />
-
-        </div>
+              }
 
 
-        <span className="reports-result-count">
-          {
-            filteredAnalyses
-              .length
-          } rapor
-        </span>
+              {/* =========================================
+                  INSIGHTS
+                  ========================================= */}
 
-      </section>
+              <section className="rpt-insights">
+
+                {/* RISK PROFILE */}
+
+                <article className="rpt-panel">
+
+                  <div className="rpt-panel-head">
+
+                    <div>
+
+                      <span>
+                        SON ANALİZ
+                      </span>
+
+                      <h3>
+                        Risk Profili
+                      </h3>
+
+                      <p>
+                        Risk seviyelerinin
+                        dağılımı
+                      </p>
+
+                    </div>
 
 
-      {analyses.length === 0 ? (
-
-        <section className="reports-empty">
-
-          <FileSpreadsheet
-            size={34}
-          />
-
-          <h3>
-            Henüz rapor oluşturulmadı
-          </h3>
-
-          <p>
-            Bir gereksinim
-            karşılaştırması
-            tamamlandığında raporu
-            burada görüntüleyebilirsin.
-          </p>
-
-        </section>
-
-      ) : filteredAnalyses.length === 0 ? (
-
-        <section className="reports-empty">
-
-          <Search
-            size={32}
-          />
-
-          <h3>
-            Sonuç bulunamadı
-          </h3>
-
-          <p>
-            Arama kriterine uygun
-            analiz raporu bulunmuyor.
-          </p>
-
-        </section>
-
-      ) : (
-
-        <section className="reports-list">
-
-          {filteredAnalyses.map(
-            (analysis) => {
-
-              const isDownloading =
-                downloadingId
-                === analysis.id
-
-              return (
-                <article
-                  key={
-                    analysis.id
-                  }
-                  className="report-card"
-                >
-
-                  <div className="report-card-icon">
-
-                    <FileSpreadsheet
-                      size={22}
+                    <ShieldAlert
+                      size={18}
                     />
 
                   </div>
 
 
-                  <div className="report-card-content">
+                  <div className="rpt-risk-list">
 
-                    <div className="report-card-header">
+                    {
+                      [
+                        {
+                          key:
+                            'low',
 
-                      <div>
+                          label:
+                            'Düşük',
 
-                        <span className="report-id">
-                          ANALİZ #
-                          {
-                            analysis.id
-                          }
-                        </span>
+                          value:
+                            latestMetrics.low,
+                        },
+                        {
+                          key:
+                            'medium',
 
-                        <h3>
-                          {
-                            analysis
-                              .analysis_name
-                          }
-                        </h3>
+                          label:
+                            'Orta',
 
-                      </div>
+                          value:
+                            latestMetrics.medium,
+                        },
+                        {
+                          key:
+                            'high',
 
+                          label:
+                            'Yüksek',
 
-                      <div className="report-version">
+                          value:
+                            latestMetrics.high,
+                        },
+                        {
+                          key:
+                            'critical',
 
-                        <span>
-                          {
-                            analysis
-                              .source_version
-                            ?? '—'
-                          }
-                        </span>
+                          label:
+                            'Kritik',
 
-                        <strong>
-                          →
-                        </strong>
+                          value:
+                            latestMetrics.critical,
+                        },
+                      ].map(
+                        (item) => {
+                          const percentage =
+                            latestMetrics.total > 0
+                              ? (
+                                  item.value
+                                  / latestMetrics.total
+                                )
+                                * 100
+                              : 0
 
-                        <span>
-                          {
-                            analysis
-                              .target_version
-                            ?? '—'
-                          }
-                        </span>
+                          return (
+                            <div
+                              className="rpt-risk-row"
+                              key={
+                                item.key
+                              }
+                            >
 
-                      </div>
+                              <div className="rpt-risk-row-head">
 
-                    </div>
+                                <div>
 
+                                  <span
+                                    className={
+                                      `rpt-risk-dot ${item.key}`
+                                    }
+                                  />
 
-                    <div className="report-meta-grid">
+                                  <strong>
+                                    {
+                                      item.label
+                                    }
+                                  </strong>
 
-                      <div>
+                                </div>
 
-                        <GitCompareArrows
-                          size={15}
-                        />
+                                <b>
+                                  {
+                                    item.value
+                                  }
+                                </b>
 
-                        <div>
-
-                          <span>
-                            DEĞİŞİKLİK
-                          </span>
-
-                          <strong>
-                            {
-                              analysis
-                                .requirement_change_count
-                            }
-                          </strong>
-
-                        </div>
-
-                      </div>
-
-
-                      <div>
-
-                        <Bug
-                          size={15}
-                        />
-
-                        <div>
-
-                          <span>
-                            DEFECT ADAY KAYDI
-                          </span>
-
-                          <strong>
-                            {
-                              analysis
-                                .defect_ranking_count
-                            }
-                          </strong>
-
-                        </div>
-
-                      </div>
+                              </div>
 
 
-                      <div>
+                              <div className="rpt-risk-track">
 
-                        <CalendarDays
-                          size={15}
-                        />
+                                <span
+                                  className={
+                                    item.key
+                                  }
+                                  style={{
+                                    width:
+                                      `${percentage}%`,
+                                  }}
+                                />
 
-                        <div>
+                              </div>
 
-                          <span>
-                            OLUŞTURULMA
-                          </span>
-
-                          <strong>
-                            {
-                              formatDate(
-                                analysis
-                                  .created_at,
-                              )
-                            }
-                          </strong>
-
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-
-                  <div className="report-card-action">
-
-                    <button
-                      type="button"
-                      disabled={
-                        isDownloading
-                      }
-                      onClick={
-                        () =>
-                          void handleDownload(
-                            analysis,
+                            </div>
                           )
-                      }
-                    >
-
-                      {isDownloading ? (
-                        <>
-                          <Loader2
-                            size={15}
-                            className="reports-spinner"
-                          />
-
-                          Hazırlanıyor...
-                        </>
-                      ) : (
-                        <>
-                          <Download
-                            size={15}
-                          />
-
-                          Excel Raporunu İndir
-                        </>
-                      )}
-
-                    </button>
-
-                    <span>
-                      .xlsx
-                    </span>
+                        },
+                      )
+                    }
 
                   </div>
 
                 </article>
-              )
-            },
-          )}
 
-        </section>
 
-      )}
+                {/* CHANGE PROFILE */}
+
+                <article className="rpt-panel">
+
+                  <div className="rpt-panel-head">
+
+                    <div>
+
+                      <span>
+                        DEĞİŞİM PROFİLİ
+                      </span>
+
+                      <h3>
+                        Öne Çıkan Değişimler
+                      </h3>
+
+                      <p>
+                        Son analizde tespit
+                        edilen değişim türleri
+                      </p>
+
+                    </div>
+
+
+                    <GitCompare
+                      size={18}
+                    />
+
+                  </div>
+
+
+                  {
+                    changeProfile.length > 0
+                      ? (
+                        <div className="rpt-change-profile">
+
+                          {
+                            changeProfile.map(
+                              (
+                                item,
+                                index,
+                              ) => {
+                                const percentage =
+                                  (
+                                    item.count
+                                    / maxChangeProfileCount
+                                  )
+                                  * 100
+
+                                return (
+                                  <div
+                                    className="rpt-change-row"
+                                    key={
+                                      item.type
+                                    }
+                                  >
+
+                                    <div className="rpt-change-row-head">
+
+                                      <span>
+                                        {
+                                          item.label
+                                        }
+                                      </span>
+
+                                      <strong>
+                                        {
+                                          item.count
+                                        }
+                                      </strong>
+
+                                    </div>
+
+
+                                    <div className="rpt-change-track">
+
+                                      <span
+                                        className={
+                                          `tone-${
+                                            (
+                                              index
+                                              % 4
+                                            )
+                                            + 1
+                                          }`
+                                        }
+                                        style={{
+                                          width:
+                                            `${percentage}%`,
+                                        }}
+                                      />
+
+                                    </div>
+
+                                  </div>
+                                )
+                              },
+                            )
+                          }
+
+                        </div>
+                      )
+                      : (
+                        <div className="rpt-panel-empty">
+                          Değişim profili
+                          bulunmuyor.
+                        </div>
+                      )
+                  }
+
+                </article>
+
+              </section>
+
+
+              {/* =========================================
+                  ARCHIVE
+                  ========================================= */}
+
+              <section className="rpt-archive">
+
+                <div className="rpt-archive-head">
+
+                  <div>
+
+                    <span>
+                      RAPOR ARŞİVİ
+                    </span>
+
+                    <h2>
+                      Tüm Analizler
+                    </h2>
+
+                    <p>
+                      Geçmiş analiz raporlarını
+                      görüntüle ve yönet.
+                    </p>
+
+                  </div>
+
+
+                  <span className="rpt-count">
+                    {
+                      filteredAnalyses.length
+                    } rapor
+                  </span>
+
+                </div>
+
+
+                <div className="rpt-toolbar">
+
+                  <div className="rpt-search">
+
+                    <Search
+                      size={16}
+                    />
+
+                    <input
+                      type="text"
+                      value={
+                        searchTerm
+                      }
+                      placeholder="Analiz adı, versiyon veya kullanıcı ara..."
+                      onChange={
+                        (event) =>
+                          setSearchTerm(
+                            event
+                              .target
+                              .value,
+                          )
+                      }
+                    />
+
+                  </div>
+
+                </div>
+
+
+                {
+                  filteredAnalyses.length === 0
+                    ? (
+                      <div className="rpt-archive-empty">
+
+                        <Search
+                          size={24}
+                        />
+
+                        <strong>
+                          Eşleşen rapor bulunamadı
+                        </strong>
+
+                        <span>
+                          Arama ifadesini
+                          değiştirerek tekrar dene.
+                        </span>
+
+                      </div>
+                    )
+                    : (
+                      <div className="rpt-report-list">
+
+                        {
+                          filteredAnalyses.map(
+                            (analysis) => {
+                              const downloading =
+                                downloadingId
+                                === analysis.id
+
+                              const deleting =
+                                deletingId
+                                === analysis.id
+
+                              return (
+                                <article
+                                  className="rpt-report-row"
+                                  key={
+                                    analysis.id
+                                  }
+                                >
+
+                                  <div className="rpt-report-icon">
+
+                                    <FileSpreadsheet
+                                      size={18}
+                                    />
+
+                                  </div>
+
+
+                                  <div className="rpt-report-main">
+
+                                    <span>
+                                      ANALİZ #
+                                      {
+                                        analysis.id
+                                      }
+                                    </span>
+
+
+                                    <h3>
+                                      {
+                                        analysis
+                                          .analysis_name
+                                      }
+                                    </h3>
+
+
+                                    <div className="rpt-report-meta">
+
+                                      <div>
+
+                                        <GitCompare
+                                          size={13}
+                                        />
+
+                                        <span>
+
+                                          {
+                                            analysis
+                                              .source_version
+                                            ?? '—'
+                                          }
+
+                                          {' → '}
+
+                                          {
+                                            analysis
+                                              .target_version
+                                            ?? '—'
+                                          }
+
+                                        </span>
+
+                                      </div>
+
+
+                                      <div>
+
+                                        <CalendarDays
+                                          size={13}
+                                        />
+
+                                        <span>
+                                          {
+                                            formatDate(
+                                              analysis
+                                                .created_at,
+                                            )
+                                          }
+                                        </span>
+
+                                      </div>
+
+                                    </div>
+
+                                  </div>
+
+
+                                  <div className="rpt-report-creator">
+
+                                    <div className="rpt-small-avatar">
+
+                                      {
+                                        getInitials(
+                                          analysis
+                                            .created_by_name,
+                                        )
+                                      }
+
+                                    </div>
+
+
+                                    <div>
+
+                                      <span>
+                                        OLUŞTURAN
+                                      </span>
+
+                                      <strong>
+                                        {
+                                          analysis
+                                            .created_by_name
+                                          ?? 'Bilgi yok'
+                                        }
+                                      </strong>
+
+                                    </div>
+
+                                  </div>
+
+
+                                  <div className="rpt-report-numbers">
+
+                                    <div>
+
+                                      <span>
+                                        DEĞİŞİKLİK
+                                      </span>
+
+                                      <strong>
+                                        {
+                                          analysis
+                                            .requirement_change_count
+                                        }
+                                      </strong>
+
+                                    </div>
+
+
+                                    <div>
+
+                                      <span>
+                                        DEFECT ADAYI
+                                      </span>
+
+                                      <strong>
+                                        {
+                                          analysis
+                                            .defect_ranking_count
+                                        }
+                                      </strong>
+
+                                    </div>
+
+                                  </div>
+
+
+                                  <div className="rpt-report-actions">
+
+                                    <button
+                                      type="button"
+                                      className="rpt-download-icon-button"
+                                      title="Excel raporunu indir"
+                                      aria-label="Excel raporunu indir"
+                                      disabled={
+                                        downloading
+                                        || deleting
+                                      }
+                                      onClick={
+                                        () =>
+                                          void handleDownload(
+                                            analysis,
+                                          )
+                                      }
+                                    >
+
+                                      {
+                                        downloading
+                                          ? (
+                                            <Loader2
+                                              size={15}
+                                              className="rpt-spinner"
+                                            />
+                                          )
+                                          : (
+                                            <Download
+                                              size={15}
+                                            />
+                                          )
+                                      }
+
+                                    </button>
+
+
+                                    <button
+                                      type="button"
+                                      className="rpt-delete-icon-button"
+                                      title="Analizi sil"
+                                      aria-label="Analizi sil"
+                                      disabled={
+                                        downloading
+                                        || deleting
+                                      }
+                                      onClick={
+                                        () =>
+                                          openDeleteModal(
+                                            analysis,
+                                          )
+                                      }
+                                    >
+
+                                      {
+                                        deleting
+                                          ? (
+                                            <Loader2
+                                              size={15}
+                                              className="rpt-spinner"
+                                            />
+                                          )
+                                          : (
+                                            <Trash2
+                                              size={15}
+                                            />
+                                          )
+                                      }
+
+                                    </button>
+
+                                  </div>
+
+                                </article>
+                              )
+                            },
+                          )
+                        }
+
+                      </div>
+                    )
+                }
+
+              </section>
+
+            </>
+          )
+      }
+
+
+      {/* =================================================
+          DELETE MODAL
+          ================================================= */}
+
+      {
+        analysisPendingDelete
+        && (
+          <div
+            className="rpt-modal-backdrop"
+            role="presentation"
+            onMouseDown={
+              (event) => {
+                if (
+                  event.target
+                  === event.currentTarget
+                ) {
+                  closeDeleteModal()
+                }
+              }
+            }
+          >
+
+            <section
+              className="rpt-delete-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="rpt-delete-title"
+            >
+
+              <button
+                type="button"
+                className="rpt-modal-close"
+                aria-label="Pencereyi kapat"
+                disabled={
+                  deletingId
+                  !== null
+                }
+                onClick={
+                  closeDeleteModal
+                }
+              >
+
+                <X
+                  size={17}
+                />
+
+              </button>
+
+
+              <div className="rpt-delete-icon">
+
+                <Trash2
+                  size={21}
+                />
+
+              </div>
+
+
+              <span className="rpt-delete-kicker">
+                ANALİZİ SİL
+              </span>
+
+
+              <h3 id="rpt-delete-title">
+                Bu analizi silmek
+                istediğine emin misin?
+              </h3>
+
+
+              <p className="rpt-delete-description">
+
+                <strong>
+                  {
+                    analysisPendingDelete
+                      .analysis_name
+                  }
+                </strong>
+
+                {' '}analizi kalıcı olarak
+                silinecek.
+
+              </p>
+
+
+              <div className="rpt-delete-summary">
+
+                <div>
+
+                  <span>
+                    ANALİZ
+                  </span>
+
+                  <strong>
+                    #
+                    {
+                      analysisPendingDelete
+                        .id
+                    }
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    DEĞİŞİKLİK
+                  </span>
+
+                  <strong>
+                    {
+                      analysisPendingDelete
+                        .requirement_change_count
+                    }
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    DEFECT ADAYI
+                  </span>
+
+                  <strong>
+                    {
+                      analysisPendingDelete
+                        .defect_ranking_count
+                    }
+                  </strong>
+
+                </div>
+
+              </div>
+
+
+              <div className="rpt-delete-warning">
+
+                <AlertTriangle
+                  size={17}
+                />
+
+                <p>
+                  Bu işlem geri alınamaz.
+                  Analize bağlı değişiklik
+                  ve defect aday kayıtları
+                  da silinir.
+                </p>
+
+              </div>
+
+
+              <div className="rpt-modal-actions">
+
+                <button
+                  type="button"
+                  className="rpt-cancel-button"
+                  disabled={
+                    deletingId
+                    !== null
+                  }
+                  onClick={
+                    closeDeleteModal
+                  }
+                >
+                  Vazgeç
+                </button>
+
+
+                <button
+                  type="button"
+                  className="rpt-confirm-delete-button"
+                  disabled={
+                    deletingId
+                    !== null
+                  }
+                  onClick={
+                    () =>
+                      void confirmDelete()
+                  }
+                >
+
+                  {
+                    deletingId !== null
+                      ? (
+                        <>
+                          <Loader2
+                            size={15}
+                            className="rpt-spinner"
+                          />
+                          Siliniyor...
+                        </>
+                      )
+                      : (
+                        <>
+                          <Trash2
+                            size={15}
+                          />
+                          Analizi Kalıcı Olarak Sil
+                        </>
+                      )
+                  }
+
+                </button>
+
+              </div>
+
+            </section>
+
+          </div>
+        )
+      }
 
     </div>
   )
