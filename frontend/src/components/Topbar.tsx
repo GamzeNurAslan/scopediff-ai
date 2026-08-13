@@ -29,6 +29,7 @@ import {
 
 import {
   useProfile,
+  normalizeProfileField,
 } from '../context/ProfileContext'
 
 import type {
@@ -314,7 +315,11 @@ export function localizeProfileValue(
   kind: ProfileValueKind,
   language: SupportedLanguage,
 ): string {
-  const key = value.trim().toLocaleLowerCase('tr-TR')
+  const normalizedValue = normalizeProfileField(
+    value,
+    kind,
+  )
+  const key = normalizedValue.toLocaleLowerCase('tr-TR')
 
   if (
     kind === 'role'
@@ -335,7 +340,7 @@ export function localizeProfileValue(
 
   return (
     profileValueTranslations[kind][key]?.[language]
-    ?? value
+    ?? normalizedValue
   )
 }
 

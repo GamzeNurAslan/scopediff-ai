@@ -92,8 +92,8 @@ const DEMO_TEAM_LEAD = {
   userId: 'USR-TEAM-001',
   fullName: 'Takim Lideri',
   corporateEmail: 'lider@company.com',
-  department: '??z?m Gelistirme',
-  role: 'Takim Lideri',
+  department: 'Çözüm Geliştirme',
+  role: 'Takım Lideri',
 }
 
 
@@ -173,7 +173,7 @@ function LoginPage() {
                   .replace(/[._-]+/g, ' ')
                   .replace(/\b\w/g, (letter) => letter.toUpperCase()),
               corporateEmail: normalizedEmail,
-              department: '??z?m Gelistirme',
+              department: 'Çözüm Geliştirme',
               role: 'Team Member',
             }
 

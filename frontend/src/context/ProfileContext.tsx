@@ -40,6 +40,55 @@ export interface UserProfile {
 }
 
 
+export type ProfileFieldKind =
+  | 'department'
+  | 'role'
+
+
+export function normalizeProfileField(
+  value: string,
+  kind: ProfileFieldKind,
+): string {
+  const trimmed = value.trim()
+  const key = trimmed.toLocaleLowerCase('tr-TR')
+
+  if (
+    kind === 'department'
+    && (
+      key === 'çözüm geliştirme'
+      || key === '??z?m gelistirme'
+      || key.includes('çözüm')
+      || key.includes('z?m')
+    )
+  ) {
+    return 'Çözüm Geliştirme'
+  }
+
+  if (
+    kind === 'role'
+    && (
+      key === 'takım lideri'
+      || key === 'takim lideri'
+    )
+  ) {
+    return 'Takım Lideri'
+  }
+
+  if (
+    kind === 'role'
+    && (
+      key === 'kullanıcı'
+      || key === 'team member'
+      || key.includes('ekip')
+    )
+  ) {
+    return 'Ekip Üyesi'
+  }
+
+  return trimmed
+}
+
+
 interface ProfileContextValue {
   profile: UserProfile | null
   authenticated: boolean
@@ -107,10 +156,16 @@ UserProfile | null {
         parsed.corporateEmail,
 
       department:
-        parsed.department,
+        normalizeProfileField(
+          parsed.department,
+          'department',
+        ),
 
       role:
-        parsed.role,
+        normalizeProfileField(
+          parsed.role,
+          'role',
+        ),
 
       avatarId:
         typeof parsed.avatarId === 'string'
@@ -159,15 +214,27 @@ export function ProfileProvider(
   function saveProfile(
     newProfile: UserProfile,
   ) {
+    const normalizedProfile = {
+      ...newProfile,
+      department: normalizeProfileField(
+        newProfile.department,
+        'department',
+      ),
+      role: normalizeProfileField(
+        newProfile.role,
+        'role',
+      ),
+    }
+
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify(
-        newProfile,
+        normalizedProfile,
       ),
     )
 
     setProfile(
-      newProfile,
+      normalizedProfile,
     )
 
     localStorage.setItem(
