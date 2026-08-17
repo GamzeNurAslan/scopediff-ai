@@ -104,17 +104,9 @@ function ScopeDiffLogo() {
       viewBox="0 0 44 44"
       aria-hidden="true"
     >
-      <circle cx="22" cy="22" r="15.5" fill="none" stroke="url(#login-scope-gradient)" strokeWidth="2.2" />
-      <text x="22" y="26" textAnchor="middle" fontFamily="Arial, sans-serif" fontSize="11.5" fontWeight="800" letterSpacing="-0.8" fill="currentColor">SD</text>
-      <circle cx="8" cy="22" r="2.6" fill="#ff7900" />
-      <circle cx="36" cy="22" r="2.6" fill="#a88cff" />
-      <defs>
-        <linearGradient id="login-scope-gradient" x1="6" y1="7" x2="38" y2="37" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#ff9a3d" />
-          <stop offset="0.52" stopColor="#ffd166" />
-          <stop offset="1" stopColor="#a88cff" />
-        </linearGradient>
-      </defs>
+      <rect x="16" y="9.5" width="19" height="25" rx="9.5" fill="#c8b7e8" fillOpacity=".2" stroke="#b5a4d8" strokeWidth="1.8" />
+      <rect x="9" y="9.5" width="19" height="25" rx="9.5" fill="#f4b18e" fillOpacity=".25" stroke="#e99468" strokeWidth="1.8" />
+      <path d="M15 19.5h7M15 24h4.6" fill="none" stroke="#d9794e" strokeLinecap="round" strokeWidth="1.6" opacity=".88" />
     </svg>
   )
 }
@@ -205,7 +197,19 @@ function LoginPage() {
             <div className="brand-visual-orbit orbit-a" />
             <div className="brand-visual-orbit orbit-b" />
             <div className="brand-visual-orbit orbit-c" />
-            <div className="brand-visual-core"><strong>SD</strong><span>CHANGE<br />INTELLIGENCE</span></div>
+            <div className="brand-visual-core">
+              <div className="brand-core-sheet brand-core-sheet-back" />
+              <div className="brand-core-sheet brand-core-sheet-front">
+                <div className="brand-core-meta"><span>SCOPEDIFF</span><b>CHANGE MAP</b><i>02</i></div>
+                <div className="brand-core-title"><strong>SD</strong><span>REQUIREMENTS<br />VERSIONING</span></div>
+                <div className="brand-core-compare">
+                  <div className="brand-core-version"><small>v1</small><i /><i /><i /></div>
+                  <b className="brand-core-arrow">→</b>
+                  <div className="brand-core-version active"><small>v2</small><i /><i /><i /></div>
+                </div>
+                <div className="brand-core-footer"><span>12 changes detected</span><b>+24%</b></div>
+              </div>
+            </div>
             <span className="brand-visual-tag tag-one">CHANGE</span>
             <span className="brand-visual-tag tag-two">INSIGHT</span>
             <span className="brand-visual-tag tag-three">ACTION</span>

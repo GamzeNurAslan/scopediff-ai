@@ -157,25 +157,38 @@ function Sidebar() {
             role="img"
             aria-label="ScopeDiff"
           >
-            <defs>
-              <linearGradient
-                id="scope-diff-logo-line"
-                x1="6"
-                y1="7"
-                x2="38"
-                y2="37"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stopColor="#ff9a3d" />
-                <stop offset="0.52" stopColor="#ffd166" />
-                <stop offset="1" stopColor="#a88cff" />
-              </linearGradient>
-            </defs>
-
-            <circle cx="22" cy="22" r="15.5" fill="none" stroke="url(#scope-diff-logo-line)" strokeWidth="2.2" />
-            <text x="22" y="26" textAnchor="middle" fontFamily="Arial, sans-serif" fontSize="11.5" fontWeight="800" letterSpacing="-0.8" fill="currentColor">SD</text>
-            <circle cx="8" cy="22" r="2.6" fill="#ff7900" />
-            <circle cx="36" cy="22" r="2.6" fill="#a88cff" />
+            <rect
+              x="16"
+              y="9.5"
+              width="19"
+              height="25"
+              rx="9.5"
+              fill="#c8b7e8"
+              fillOpacity=".2"
+              stroke="#c8b7e8"
+              strokeOpacity=".9"
+              strokeWidth="1.8"
+            />
+            <rect
+              x="9"
+              y="9.5"
+              width="19"
+              height="25"
+              rx="9.5"
+              fill="#f4b18e"
+              fillOpacity=".25"
+              stroke="#f4b18e"
+              strokeOpacity=".98"
+              strokeWidth="1.8"
+            />
+            <path
+              d="M15 19.5h7M15 24h4.6"
+              fill="none"
+              stroke="#ffe1cf"
+              strokeLinecap="round"
+              strokeWidth="1.6"
+              opacity=".88"
+            />
           </svg>
 
         </div>

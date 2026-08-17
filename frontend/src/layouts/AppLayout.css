@@ -186,18 +186,18 @@ body {
 .sd-brand-symbol {
   position: relative;
 
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
 
   display: grid;
   place-items: center;
 
   flex: 0 0 auto;
 
-  border-radius: 10px;
+  border-radius: 14px;
 
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, .13), rgba(255, 255, 255, .035));
+    linear-gradient(145deg, rgba(246, 190, 158, .18), rgba(194, 178, 228, .11));
 
   color:
     #f3a17d;
@@ -208,49 +208,21 @@ body {
       255,
       255,
       255,
-      0.08
+      0.11
     );
 
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .12),
-    0 10px 24px rgba(0, 0, 0, .14);
+    inset 0 1px 0 rgba(255, 255, 255, .16),
+    0 8px 22px rgba(0, 0, 0, .10);
 }
 
 
 .sd-brand-logo {
-  width: 31px;
-  height: 31px;
+  width: 34px;
+  height: 34px;
   display: block;
   overflow: visible;
-  filter: drop-shadow(0 3px 7px rgba(255, 121, 0, .18));
-}
-
-
-.sd-brand-node {
-  position: absolute;
-
-  width: 5px;
-  height: 5px;
-
-  border-radius: 50%;
-
-  background:
-    var(--orange);
-}
-
-
-.sd-brand-node.first {
-  top: 6px;
-  left: 6px;
-}
-
-
-.sd-brand-node.last {
-  right: 6px;
-  bottom: 6px;
-
-  background:
-    #9184ce;
+  filter: drop-shadow(0 3px 7px rgba(241, 164, 124, .10));
 }
 
 
