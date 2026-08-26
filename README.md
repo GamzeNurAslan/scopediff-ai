@@ -8,6 +8,10 @@ ScopeDiff AI is an AI-assisted requirement comparison and change intelligence pl
 
 The goal is simple: replace hours of manual document review with a focused view of the changes that deserve attention first.
 
+## Product preview
+
+![ScopeDiff AI login and workspace preview](docs/scopediff-login.png)
+
 ## Why ScopeDiff AI?
 
 Requirement documents evolve constantly. A changed number, a new obligation, a removed condition, or a subtle wording difference can affect development, testing, and production behaviour.
