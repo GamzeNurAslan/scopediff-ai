@@ -195,4 +195,4 @@ ScopeDiff AI is an active prototype and academic project. The core comparison, s
 
 ## License
 
-No license has been specified yet.
+This project is licensed under the [MIT License](LICENSE).
