@@ -195,4 +195,11 @@ ScopeDiff AI is an active prototype and academic project. The core comparison, s
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is released under a proprietary commercial license.
+
+Copyright (c) 2026 Gamze Nur Aslan. All rights reserved.
+
+The software, source code, design, documentation and related materials may
+not be copied, modified, distributed, sublicensed, reverse engineered or used
+commercially without prior written permission. Commercial use requires a
+separate written agreement. See [LICENSE](LICENSE) for the full terms.
