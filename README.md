@@ -10,7 +10,7 @@ The goal is simple: replace hours of manual document review with a focused view 
 
 ## Product preview
 
-![ScopeDiff AI login and workspace preview](docs/scopediff-login_kısmı.png)
+![ScopeDiff AI login and workspace preview](https://github.com/GamzeNurAslan/scopediff-ai/blob/main/docs/login_k%C4%B1sm%C4%B1.png)
 
 ## Why ScopeDiff AI?
 
