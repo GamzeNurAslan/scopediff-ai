@@ -56,9 +56,9 @@ export function normalizeProfileField(
     kind === 'department'
     && (
       key === 'çözüm geliştirme'
-      || key === '??z?m gelistirme'
+      || key === 'cozum gelistirme'
       || key.includes('çözüm')
-      || key.includes('z?m')
+      || key.includes('cozum')
     )
   ) {
     return 'Çözüm Geliştirme'

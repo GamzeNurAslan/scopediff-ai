@@ -11,19 +11,19 @@ export interface RegisteredUser {
 export const REGISTERED_USERS: RegisteredUser[] = [
   {
     id: 'USR-001',
-    fullName: 'Demo Kullanici',
+    fullName: 'Demo Kullanıcı',
     corporateEmail: 'demo@company.com',
-    department: 'Veri Bilimi & Yapay Zek?',
+    department: 'Veri Bilimi & Yapay Zekâ',
     role: 'Stajyer',
     isActive: true,
   },
 
   {
     id: 'USR-002',
-    fullName: 'Ayse Demir',
+    fullName: 'Ayşe Demir',
     corporateEmail: 'ayse.demir@company.com',
-    department: 'Is Analizi',
-    role: 'Is Analisti',
+    department: 'İş Analizi',
+    role: 'İş Analisti',
     isActive: true,
   },
 
@@ -31,8 +31,8 @@ export const REGISTERED_USERS: RegisteredUser[] = [
     id: 'USR-003',
     fullName: 'Mert Kaya',
     corporateEmail: 'mert.kaya@company.com',
-    department: 'Yazilim Gelistirme',
-    role: 'Yazilim Gelistirici',
+    department: 'Yazılım Geliştirme',
+    role: 'Yazılım Geliştirici',
     isActive: true,
   },
 
@@ -40,8 +40,8 @@ export const REGISTERED_USERS: RegisteredUser[] = [
     id: 'USR-004',
     fullName: 'Selin Arslan',
     corporateEmail: 'selin.arslan@company.com',
-    department: 'Kalite G?vence / Test',
-    role: 'QA / Test M?hendisi',
+    department: 'Kalite Güvence / Test',
+    role: 'QA / Test Mühendisi',
     isActive: true,
   },
 

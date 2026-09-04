@@ -63,7 +63,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'ANALIZ',
+    'ANALİZ',
     'ANALYSIS',
     'ANALYSE',
     'ANALYSE',
@@ -79,7 +79,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'OLUSTURULMA',
+    'OLUŞTURULMA',
     'CREATED',
     'ERSTELLT',
     'CR?? LE',
@@ -87,7 +87,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'ANALIZI OLUSTURAN',
+    'ANALİZİ OLUŞTURAN',
     'CREATED BY',
     'ERSTELLT VON',
     'CR?? PAR',
@@ -95,7 +95,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'D?s?k',
+    'Düşük',
     'Low',
     'Niedrig',
     'Faible',
@@ -111,7 +111,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Y?ksek',
+    'Yüksek',
     'High',
     'Hoch',
     '?lev?',
@@ -127,7 +127,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'D?s?k Risk',
+    'Düşük Risk',
     'Low Risk',
     'Niedriges Risiko',
     'Risque faible',
@@ -143,7 +143,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Y?ksek Risk',
+    'Yüksek Risk',
     'High Risk',
     'Hohes Risiko',
     'Risque ?lev?',
@@ -159,7 +159,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Toplam Degisiklik',
+    'Toplam Değişiklik',
     'Total Changes',
     'Gesamt?nderungen',
     'Total des modifications',
@@ -252,7 +252,7 @@ TranslationEntry[] = [
 const DEFECT:
 TranslationEntry[] = [
   e(
-    'DEFECT ANALIZI',
+    'DEFECT ANALİZİ',
     'DEFECT ANALYSIS',
     'DEFEKTANALYSE',
     'ANALYSE DES D?FAUTS',
@@ -260,7 +260,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Defect ile Iliskili Degisiklikleri ?nceliklendir',
+    'Defect ile İlişkili Değişiklikleri Önceliklendir',
     'Prioritize Changes Related to the Defect',
     'Defektbezogene ?nderungen priorisieren',
     'Prioriser les modifications li?es au d?faut',
@@ -268,7 +268,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Defect a?iklamasini se?ili gereksinim degisiklikleriyle anlamsal olarak karsilastir. Sonu?lar kesin k?k neden degildir; incelenmesi gereken aday degisikliklerdir.',
+    'Defect açıklamasını seçili gereksinim değişiklikleriyle anlamsal olarak karşılaştır. Sonuçlar kesin kök neden değildir; incelenmesi gereken aday değişikliklerdir.',
     'Semantically compare the defect description with the selected requirement changes. Results are not definitive root causes; they are candidate changes that require review.',
     'Vergleichen Sie die Defektbeschreibung semantisch mit den ausgew?hlten Anforderungs?nderungen. Die Ergebnisse sind keine endg?ltigen Grundursachen, sondern zu pr?fende Kandidaten?nderungen.',
     'Comparez s?mantiquement la description du d?faut avec les modifications d?exigences s?lectionn?es. Les r?sultats ne constituent pas des causes racines d?finitives, mais des modifications candidates ? examiner.',
@@ -276,7 +276,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'ANALIZ EDILECEK DEGISIKLIK',
+    'ANALİZ EDİLECEK DEĞİŞİKLİK',
     'CHANGES TO ANALYZE',
     'ZU ANALYSIERENDE ?NDERUNGEN',
     'MODIFICATIONS ? ANALYSER',
@@ -284,7 +284,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Defect A?iklamasi',
+    'Defect Açıklaması',
     'Defect Description',
     'Defektbeschreibung',
     'Description du d?faut',
@@ -292,7 +292,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Hata kaydindaki davranisi, belirtileri ve ilgili baglami m?mk?n oldugunca a?ik yaz.',
+    'Hata kaydındaki davranışı, belirtileri ve ilgili bağlamı mümkün olduğunca açık yaz.',
     'Describe the behavior, symptoms and relevant context from the defect record as clearly as possible.',
     'Beschreiben Sie Verhalten, Symptome und relevanten Kontext des Defekteintrags so klar wie m?glich.',
     'D?crivez aussi clairement que possible le comportement, les sympt?mes et le contexte du d?faut.',
@@ -300,7 +300,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    '?rn. Aktivasyon sirasinda port dogrulamasi tamamlanmadan kaynak rezervasyonu yapilabiliyor...',
+    'Örn. Aktivasyon sırasında port doğrulaması tamamlanmadan kaynak rezervasyonu yapılabiliyor...',
     'E.g. Resource reservation can occur before port validation is completed during activation...',
     'Z. B. kann w?hrend der Aktivierung eine Ressourcenreservierung erfolgen, bevor die Portvalidierung abgeschlossen ist...',
     'Ex. Une r?servation de ressource peut ?tre effectu?e avant la fin de la validation du port lors de l?activation...',
@@ -316,7 +316,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Defect?i Analiz Et',
+    'Defect’i Analiz Et',
     'Analyze Defect',
     'Defekt analysieren',
     'Analyser le d?faut',
@@ -332,7 +332,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Hen?z defect analizi yapilmadi',
+    'Henüz defect analizi yapılmadı',
     'No defect analysis yet',
     'Noch keine Defektanalyse',
     'Aucune analyse de d?faut pour le moment',
@@ -340,7 +340,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Bir defect a?iklamasi girerek se?ili analizdeki degisiklikleri ?nceliklendirebilirsin.',
+    'Bir defect açıklaması girerek seçili analizdeki değişiklikleri önceliklendirebilirsin.',
     'Enter a defect description to prioritize changes in the selected analysis.',
     'Geben Sie eine Defektbeschreibung ein, um ?nderungen in der ausgew?hlten Analyse zu priorisieren.',
     'Saisissez une description du d?faut pour prioriser les modifications de l?analyse s?lectionn?e.',
@@ -348,7 +348,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Incelenmesi Gereken Aday Degisiklikler',
+    'İncelenmesi Gereken Aday Değişiklikler',
     'Candidate Changes Requiring Review',
     'Zu pr?fende Kandidaten?nderungen',
     'Modifications candidates ? examiner',
@@ -356,7 +356,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    '?NCEKI GEREKSINIM',
+    'ÖNCEKİ GEREKSİNİM',
     'PREVIOUS REQUIREMENT',
     'VORHERIGE ANFORDERUNG',
     'EXIGENCE PR?C?DENTE',
@@ -364,7 +364,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'YENI GEREKSINIM',
+    'YENİ GEREKSİNİM',
     'NEW REQUIREMENT',
     'NEUE ANFORDERUNG',
     'NOUVELLE EXIGENCE',
@@ -404,7 +404,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Gerek?e',
+    'Gerekçe',
     'Reason',
     'Begr?ndung',
     'Justification',
@@ -412,7 +412,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Bu sonu? kesin k?k neden degildir; incelenmesi gereken aday degisikliklerden biridir.',
+    'Bu sonuç kesin kök neden değildir; incelenmesi gereken aday değişikliklerden biridir.',
     'This result is not a definitive root cause; it is one of the candidate changes that should be reviewed.',
     'Dieses Ergebnis ist keine endg?ltige Grundursache, sondern eine der zu pr?fenden Kandidaten?nderungen.',
     'Ce r?sultat n?est pas une cause racine d?finitive ; il s?agit d?une modification candidate ? examiner.',
@@ -420,7 +420,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Defect analizi ger?eklestirilemedi.',
+    'Defect analizi gerçekleştirilemedi.',
     'Defect analysis could not be completed.',
     'Die Defektanalyse konnte nicht abgeschlossen werden.',
     'L?analyse du d?faut n?a pas pu ?tre effectu?e.',
@@ -433,7 +433,7 @@ TranslationEntry[] = [
 const PROCESS:
 TranslationEntry[] = [
   e(
-    'OPERASYONEL TAKIP',
+    'OPERASYONEL TAKİP',
     'OPERATIONAL TRACKING',
     'OPERATIVE VERFOLGUNG',
     'SUIVI OP?RATIONNEL',
@@ -441,7 +441,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'S?re? Takibi',
+    'Süreç Takibi',
     'Process Tracking',
     'Prozessverfolgung',
     'Suivi des processus',
@@ -449,7 +449,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Gelistirme ve test s?re?lerini tek ekrandan takip et. S?re? sorumlulari kullanici tarafindan atanir.',
+    'Geliştirme ve test süreçlerini tek ekrandan takip et. Süreç sorumluları kullanıcı tarafından atanır.',
     'Track development and testing processes from a single screen. Process owners are assigned by users.',
     'Verfolgen Sie Entwicklungs- und Testprozesse auf einem Bildschirm. Prozessverantwortliche werden von Benutzern zugewiesen.',
     'Suivez les processus de d?veloppement et de test depuis un seul ?cran. Les responsables sont attribu?s par les utilisateurs.',
@@ -457,7 +457,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Excel Y?kle',
+    'Excel Yükle',
     'Upload Excel',
     'Excel hochladen',
     'T?l?verser Excel',
@@ -513,7 +513,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'S?re?, sorumlu, analist veya mod?l ara...',
+    'Süreç, sorumlu, analist veya modül ara...',
     'Search process, owner, analyst or module...',
     'Prozess, Verantwortlichen, Analysten oder Modul suchen...',
     'Rechercher un processus, un responsable, un analyste ou un module...',
@@ -521,7 +521,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'T?m Asamalar',
+    'Tüm Aşamalar',
     'All Stages',
     'Alle Phasen',
     'Toutes les ?tapes',
@@ -529,7 +529,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'T?m Kayitlar',
+    'Tüm Kayıtlar',
     'All Records',
     'Alle Eintr?ge',
     'Tous les enregistrements',
@@ -537,7 +537,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'S?RE?LER',
+    'SÜREÇLER',
     'PROCESSES',
     'PROZESSE',
     'PROCESSUS',
@@ -545,7 +545,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'G?ncel Is Listesi',
+    'Güncel İş Listesi',
     'Current Work List',
     'Aktuelle Arbeitsliste',
     'Liste de travail actuelle',
@@ -553,7 +553,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'S?RE? / IS',
+    'SÜREÇ / İŞ',
     'PROCESS / WORK',
     'PROZESS / AUFGABE',
     'PROCESSUS / T?CHE',
@@ -593,7 +593,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'ASAMA',
+    'AŞAMA',
     'STAGE',
     'PHASE',
     '?TAPE',
@@ -601,7 +601,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Asama',
+    'Aşama',
     'Stage',
     'Phase',
     '?tape',
@@ -625,7 +625,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Atanmamis',
+    'Atanmamış',
     'Unassigned',
     'Nicht zugewiesen',
     'Non attribu?',
@@ -633,7 +633,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Atanmadi',
+    'Atanmadı',
     'Unassigned',
     'Nicht zugewiesen',
     'Non attribu?',
@@ -641,7 +641,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Tamamlandi',
+    'Tamamlandı',
     'Completed',
     'Abgeschlossen',
     'Termin?',
@@ -649,7 +649,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Teslim Hazir',
+    'Teslim Hazır',
     'Ready for Delivery',
     'Lieferbereit',
     'Pr?t pour livraison',
@@ -665,7 +665,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Tasarim',
+    'Tasarım',
     'Design',
     'Design',
     'Conception',
@@ -673,7 +673,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Gelistirme',
+    'Geliştirme',
     'Development',
     'Entwicklung',
     'D?veloppement',
@@ -689,7 +689,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Bagli degil',
+    'Bağlı değil',
     'Not linked',
     'Nicht verkn?pft',
     'Non li?',
@@ -697,7 +697,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'S?RE? DETAYI',
+    'SÜREÇ DETAYI',
     'PROCESS DETAILS',
     'PROZESSDETAILS',
     'D?TAILS DU PROCESSUS',
@@ -713,7 +713,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Yazilimci',
+    'Yazılımcı',
     'Developer',
     'Entwickler',
     'D?veloppeur',
@@ -721,7 +721,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Bitis',
+    'Bitiş',
     'Due',
     'F?llig',
     '?ch?ance',
@@ -729,7 +729,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Mod?l',
+    'Modül',
     'Module',
     'Modul',
     'Module',
@@ -737,7 +737,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'DURUM VERILERI',
+    'DURUM VERİLERİ',
     'STATUS DATA',
     'STATUSDATEN',
     'DONN?ES DE STATUT',
@@ -761,7 +761,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Varsayilan olarak asama, Excel durum bilgilerinden otomatik hesaplanir.',
+    'Varsayılan olarak aşama, Excel durum bilgilerinden otomatik hesaplanır.',
     'By default, the stage is automatically calculated from the Excel status information.',
     'Standardm??ig wird die Phase automatisch aus den Excel-Statusinformationen berechnet.',
     'Par d?faut, l??tape est calcul?e automatiquement ? partir des informations de statut Excel.',
@@ -769,7 +769,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Analiz Baglantisi',
+    'Analiz Bağlantısı',
     'Analysis Link',
     'Analyseverkn?pfung',
     'Lien d?analyse',
@@ -777,7 +777,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Analiz bagli degil',
+    'Analiz bağlı değil',
     'No analysis linked',
     'Keine Analyse verkn?pft',
     'Aucune analyse li?e',
@@ -801,7 +801,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Hayir',
+    'Hayır',
     'No',
     'Nein',
     'Non',
@@ -830,7 +830,7 @@ TranslationEntry[] = [
 const REPORTS:
 TranslationEntry[] = [
   e(
-    'RAPOR MERKEZI',
+    'RAPOR MERKEZİ',
     'REPORT CENTER',
     'BERICHTSZENTRUM',
     'CENTRE DE RAPPORTS',
@@ -838,7 +838,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Analiz Raporlari',
+    'Analiz Raporları',
     'Analysis Reports',
     'Analyseberichte',
     'Rapports d?analyse',
@@ -846,7 +846,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Analiz sonu?larini, risk profilini ve ge?mis rapor kayitlarini tek ekrandan y?net.',
+    'Analiz sonuçlarını, risk profilini ve geçmiş rapor kayıtlarını tek ekrandan yönet.',
     'Manage analysis results, risk profiles and historical report records from a single screen.',
     'Verwalten Sie Analyseergebnisse, Risikoprofile und fr?here Berichte auf einem Bildschirm.',
     'G?rez les r?sultats d?analyse, les profils de risque et l?historique des rapports depuis un seul ?cran.',
@@ -854,7 +854,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Olusturulan analizleri g?r?nt?le, Excel raporlarini indir veya artik gerekli olmayan analizleri kaldir.',
+    'Oluşturulan analizleri görüntüle, Excel raporlarını indir veya artık gerekli olmayan analizleri kaldır.',
     'View generated analyses, download Excel reports or remove analyses that are no longer needed.',
     'Erstellte Analysen anzeigen, Excel-Berichte herunterladen oder nicht mehr ben?tigte Analysen entfernen.',
     'Consultez les analyses cr??es, t?l?chargez les rapports Excel ou supprimez les analyses devenues inutiles.',
@@ -870,7 +870,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Rapor Formati',
+    'Rapor Formatı',
     'Report Format',
     'Berichtsformat',
     'Format du rapport',
@@ -886,7 +886,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'kayitli karsilastirma',
+    'kayıtlı karşılaştırma',
     'saved comparisons',
     'gespeicherte Vergleiche',
     'comparaisons enregistr?es',
@@ -894,7 +894,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'tespit edilen degisiklik',
+    'tespit edilen değişiklik',
     'detected changes',
     'erkannte ?nderungen',
     'modifications d?tect?es',
@@ -902,7 +902,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Defect Aday Kaydi',
+    'Defect Aday Kaydı',
     'Defect Candidate Records',
     'Defektkandidaten',
     'Candidats de d?faut',
@@ -910,7 +910,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Toplam Defect Adayi Kaydi',
+    'Toplam Defect Adayı Kaydı',
     'Total Defect Candidate Records',
     'Defektkandidaten gesamt',
     'Total des candidats de d?faut',
@@ -918,7 +918,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    '?nceliklendirilmis aday',
+    'önceliklendirilmiş aday',
     'prioritized candidates',
     'priorisierte Kandidaten',
     'candidats prioris?s',
@@ -926,7 +926,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Son Analiz ?ncelikli Risk',
+    'Son Analiz Öncelikli Risk',
     'Latest Analysis Priority Risk',
     'Priorit?tsrisiko der letzten Analyse',
     'Risque prioritaire de la derni?re analyse',
@@ -934,7 +934,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'y?ksek + kritik',
+    'yüksek + kritik',
     'high + critical',
     'hoch + kritisch',
     '?lev? + critique',
@@ -942,7 +942,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'SON ANALIZ',
+    'SON ANALİZ',
     'LATEST ANALYSIS',
     'LETZTE ANALYSE',
     'DERNI?RE ANALYSE',
@@ -950,7 +950,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Karsilastirmayi Incele',
+    'Karşılaştırmayı İncele',
     'Review Comparison',
     'Vergleich pr?fen',
     'Examiner la comparaison',
@@ -966,7 +966,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Excel Raporunu Indir',
+    'Excel Raporunu İndir',
     'Download Excel Report',
     'Excel-Bericht herunterladen',
     'T?l?charger le rapport Excel',
@@ -982,7 +982,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'DEGISIKLIK',
+    'DEĞİŞİKLİK',
     'CHANGES',
     '?NDERUNGEN',
     'MODIFICATIONS',
@@ -990,7 +990,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Y?KSEK RISK',
+    'YÜKSEK RİSK',
     'HIGH RISK',
     'HOHES RISIKO',
     'RISQUE ?LEV?',
@@ -998,7 +998,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'KRITIK RISK',
+    'KRİTİK RİSK',
     'CRITICAL RISK',
     'KRITISCHES RISIKO',
     'RISQUE CRITIQUE',
@@ -1030,7 +1030,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'RISK PROFILI',
+    'RİSK PROFİLİ',
     'RISK PROFILE',
     'RISIKOPROFIL',
     'PROFIL DE RISQUE',
@@ -1046,7 +1046,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Risk seviyelerinin dagilimi',
+    'Risk seviyelerinin dağılımı',
     'Distribution of risk levels',
     'Verteilung der Risikostufen',
     'R?partition des niveaux de risque',
@@ -1054,7 +1054,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'DEGISIM PROFILI',
+    'DEĞİŞİM PROFİLİ',
     'CHANGE PROFILE',
     '?NDERUNGSPROFIL',
     'PROFIL DES MODIFICATIONS',
@@ -1062,7 +1062,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    '?ne ?ikan Degisimler',
+    'Öne Çıkan Değişimler',
     'Highlighted Changes',
     'Wesentliche ?nderungen',
     'Modifications principales',
@@ -1070,7 +1070,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Son analizde tespit edilen degisim t?rleri',
+    'Son analizde tespit edilen değişim türleri',
     'Change types detected in the latest analysis',
     'In der letzten Analyse erkannte ?nderungstypen',
     'Types de modifications d?tect?s dans la derni?re analyse',
@@ -1078,7 +1078,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Raporlar y?kleniyor',
+    'Raporlar yükleniyor',
     'Loading reports',
     'Berichte werden geladen',
     'Chargement des rapports',
@@ -1086,7 +1086,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Analiz kayitlari getiriliyor.',
+    'Analiz kayıtları getiriliyor.',
     'Loading analysis records.',
     'Analysedatens?tze werden geladen.',
     'Chargement des enregistrements d?analyse.',
@@ -1094,7 +1094,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Hen?z rapor bulunmuyor',
+    'Henüz rapor bulunmuyor',
     'No reports yet',
     'Noch keine Berichte',
     'Aucun rapport pour le moment',
@@ -1102,7 +1102,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Y?kleme ekranindan yeni bir karsilastirma olusturdugunda rapor burada g?r?necek.',
+    'Yükleme ekranından yeni bir karşılaştırma oluşturduğunda rapor burada görünecek.',
     'When you create a new comparison from the Upload page, the report will appear here.',
     'Wenn Sie auf der Upload-Seite einen neuen Vergleich erstellen, erscheint der Bericht hier.',
     'Lorsque vous cr?ez une nouvelle comparaison depuis la page de t?l?versement, le rapport appara?t ici.',
@@ -1110,7 +1110,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Eslesen rapor bulunamadi',
+    'Eşleşen rapor bulunamadı',
     'No matching reports found',
     'Keine passenden Berichte gefunden',
     'Aucun rapport correspondant',
@@ -1126,7 +1126,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Vazge?',
+    'Vazgeç',
     'Cancel',
     'Abbrechen',
     'Annuler',
@@ -1142,7 +1142,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Analiz raporlari y?klenemedi.',
+    'Analiz raporları yüklenemedi.',
     'Analysis reports could not be loaded.',
     'Analyseberichte konnten nicht geladen werden.',
     'Les rapports d?analyse n?ont pas pu ?tre charg?s.',
@@ -1166,7 +1166,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Analiz adi, versiyon veya ID ara...',
+    'Analiz adı, versiyon veya ID ara...',
     'Search analysis name, version or ID...',
     'Analysename, Version oder ID suchen...',
     'Rechercher un nom d?analyse, une version ou un ID...',
@@ -1265,7 +1265,7 @@ TranslationEntry[] = [
 const DASHBOARD:
 TranslationEntry[] = [
   e(
-    'KARSILASTIRMA',
+    'KARŞILAŞTIRMA',
     'COMPARISON',
     'VERGLEICH',
     'COMPARAISON',
@@ -1273,7 +1273,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Degisim Dagilimi',
+    'Değişim Dağılımı',
     'Change Distribution',
     '?nderungsverteilung',
     'R?partition des modifications',
@@ -1281,7 +1281,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Tespit edilen degisiklik t?rlerinin dagilimi',
+    'Tespit edilen değişiklik türlerinin dağılımı',
     'Distribution of detected change types',
     'Verteilung der erkannten ?nderungstypen',
     'R?partition des types de modifications d?tect?s',
@@ -1289,7 +1289,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Risk Seviyesi Dagilimi',
+    'Risk Seviyesi Dağılımı',
     'Risk Level Distribution',
     'Risikostufenverteilung',
     'R?partition des niveaux de risque',
@@ -1297,7 +1297,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Degisikliklerin risk seviyelerine g?re dagilimi',
+    'Değişikliklerin risk seviyelerine göre dağılımı',
     'Distribution of changes by risk level',
     'Verteilung der ?nderungen nach Risikostufe',
     'R?partition des modifications selon le niveau de risque',
@@ -1305,7 +1305,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Gereksinim Degisiklikleri',
+    'Gereksinim Değişiklikleri',
     'Requirement Changes',
     'Anforderungs?nderungen',
     'Modifications des exigences',
@@ -1318,7 +1318,7 @@ TranslationEntry[] = [
 const COUNT_UNITS:
 TranslationEntry[] = [
   e(
-    'kayit',
+    'kayıt',
     'records',
     'Eintr?ge',
     'enregistrements',
@@ -1342,7 +1342,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'sonu?',
+    'sonuç',
     'results',
     'Ergebnisse',
     'r?sultats',
@@ -1350,7 +1350,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'degisiklik',
+    'değişiklik',
     'changes',
     '?nderungen',
     'modifications',
@@ -1379,7 +1379,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Subat',
+    'Şubat',
     'February',
     'Februar',
     'f?vrier',
@@ -1403,7 +1403,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Mayis',
+    'Mayıs',
     'May',
     'Mai',
     'mai',
@@ -1427,7 +1427,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Agustos',
+    'Ağustos',
     'August',
     'August',
     'ao?t',
@@ -1435,7 +1435,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Eyl?l',
+    'Eylül',
     'September',
     'September',
     'septembre',
@@ -1451,7 +1451,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Kasim',
+    'Kasım',
     'November',
     'November',
     'novembre',
@@ -1459,7 +1459,7 @@ TranslationEntry[] = [
   ),
 
   e(
-    'Aralik',
+    'Aralık',
     'December',
     'Dezember',
     'd?cembre',
@@ -1471,13 +1471,13 @@ TranslationEntry[] = [
 const SHORT_MONTHS:
 TranslationEntry[] = [
   e('Oca', 'Jan', 'Jan', 'janv', 'ene'),
-  e('Sub', 'Feb', 'Feb', 'f?vr', 'feb'),
+  e('Şub', 'Feb', 'Feb', 'f?vr', 'feb'),
   e('Mar', 'Mar', 'M?r', 'mars', 'mar'),
   e('Nis', 'Apr', 'Apr', 'avr', 'abr'),
   e('May', 'May', 'Mai', 'mai', 'may'),
   e('Haz', 'Jun', 'Jun', 'juin', 'jun'),
   e('Tem', 'Jul', 'Jul', 'juil', 'jul'),
-  e('Agu', 'Aug', 'Aug', 'ao?t', 'ago'),
+  e('Ağu', 'Aug', 'Aug', 'ao?t', 'ago'),
   e('Eyl', 'Sep', 'Sep', 'sept', 'sep'),
   e('Eki', 'Oct', 'Okt', 'oct', 'oct'),
   e('Kas', 'Nov', 'Nov', 'nov', 'nov'),
