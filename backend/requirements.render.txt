@@ -1,0 +1,11 @@
+# Lightweight production dependencies for the public demo service.
+# The full NLP models remain available in requirements.txt for local use.
+pandas
+openpyxl
+python-docx
+pydantic
+scikit-learn
+fastapi
+uvicorn[standard]
+sqlalchemy
+python-multipart

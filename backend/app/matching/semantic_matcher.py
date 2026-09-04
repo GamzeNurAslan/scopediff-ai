@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import os
 from typing import Any
 
 import numpy as np
 import pandas as pd
-from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -86,7 +86,12 @@ class SemanticRequirementMatcher:
 
         Böylece sınıf oluşturulduğunda model hemen indirilmez.
         """
+        if os.getenv("SCOPEDIFF_LIGHTWEIGHT_MODE", "false").lower() == "true":
+            raise RuntimeError("Lightweight deployment disables Sentence Transformers.")
+
         if self._model is None:
+            from sentence_transformers import SentenceTransformer
+
             self._model = SentenceTransformer(
                 self.model_name,
                 device=self.device,

@@ -1,12 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
-
-import torch
-from transformers import (
-    AutoModelForSeq2SeqLM,
-    AutoTokenizer,
-)
+import os
 
 
 SUPPORTED_LANGUAGES = {
@@ -38,6 +33,12 @@ GERMAN_SECOND_MODEL = (
 def _load_model(
     model_name: str,
 ):
+    import torch
+    from transformers import (
+        AutoModelForSeq2SeqLM,
+        AutoTokenizer,
+    )
+
     tokenizer = (
         AutoTokenizer
         .from_pretrained(
@@ -77,6 +78,8 @@ def _translate_with_model(
 ) -> list[str]:
     if not texts:
         return []
+
+    import torch
 
     tokenizer, model, device = (
         _load_model(
@@ -183,6 +186,9 @@ def translate_content_batch(
 
     if not non_empty_indexes:
         return result
+
+    if os.getenv("SCOPEDIFF_LIGHTWEIGHT_MODE", "false").lower() == "true":
+        return normalized_texts
 
     non_empty_texts = [
         normalized_texts[index]
