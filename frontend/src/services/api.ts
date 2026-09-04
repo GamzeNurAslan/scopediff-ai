@@ -10,7 +10,7 @@ import type {
 
 export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL
-  ?? 'http://127.0.0.1:8000'
+  ?? 'http://127.0.0.1:8001'
 
 
 export async function translateContentBatch(
@@ -267,7 +267,7 @@ export async function previewRequirementFile(
 
   return getJson<RequirementFilePreview>(
     `${API_BASE_URL}/requirements/preview`,
-    'Excel dosyası önizlenemedi.',
+    'Gereksinim dosyası önizlenemedi.',
     {
       method: 'POST',
       body: formData,
@@ -359,7 +359,7 @@ export async function compareRequirementFiles(
       )
     ) {
       throw new Error(
-        'Hedef Excel dosyası eksik.',
+        'Hedef gereksinim dosyası eksik.',
       )
     }
 
@@ -388,7 +388,7 @@ export async function compareRequirementFiles(
     ) {
       throw new Error(
         'Kaynak veya hedef '
-        + 'Excel dosyası eksik.',
+        + 'gereksinim dosyası eksik.',
       )
     }
 

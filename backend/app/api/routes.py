@@ -39,7 +39,8 @@ from backend.app.api.process_tracking import (
 )
 from backend.app.data_loader import (
     detect_requirement_columns,
-    load_requirements_excel,
+    load_requirements_file,
+    load_requirements_word,
     standardize_column_names,
 )
 from backend.app.database.database import (
@@ -657,7 +658,7 @@ def _string_list(
 
 
 
-def _validate_excel_upload(
+def _validate_requirement_upload(
     upload_file: UploadFile,
 ) -> None:
     filename = (
@@ -671,14 +672,13 @@ def _validate_excel_upload(
         .lower()
     )
 
-    if extension != ".xlsx":
+    if extension not in {".xlsx", ".docx"}:
         raise HTTPException(
             status_code=(
                 status.HTTP_400_BAD_REQUEST
             ),
             detail=(
-                "Yalnızca .xlsx "
-                "uzantılı Excel "
+                "Yalnızca .xlsx Excel veya .docx Word "
                 "dosyaları desteklenmektedir."
             ),
         )
@@ -699,12 +699,14 @@ def _delete_temp_file(
 def _save_upload_to_temp(
     upload_file: UploadFile,
 ) -> str:
-    _validate_excel_upload(
+    _validate_requirement_upload(
         upload_file
     )
 
+    suffix = Path(upload_file.filename or "").suffix.lower()
+
     with NamedTemporaryFile(
-        suffix=".xlsx",
+        suffix=suffix,
         delete=False,
     ) as temporary_file:
         upload_file.file.seek(
@@ -1015,15 +1017,35 @@ def create_analysis(
 def preview_requirement_file(
     file: UploadFile = File(...),
 ):
-    if not (file.filename or "").lower().endswith(".xlsx"):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Yalnızca .xlsx dosyaları destekleniyor.",
-        )
-
     temporary_path: str | None = None
     try:
         temporary_path = _save_upload_to_temp(file)
+
+        extension = Path(file.filename or "").suffix.lower()
+        if extension == ".docx":
+            dataframe = load_requirements_word(temporary_path)
+            columns = [str(column) for column in dataframe.columns if column not in {
+                "original_text",
+                "normalized_text",
+            }]
+            sample = dataframe[columns].head(5).where(
+                pd.notna(dataframe[columns].head(5)),
+                None,
+            )
+            mapping = detect_requirement_columns(columns)
+            return {
+                "filename": file.filename,
+                "selected_sheet": "document",
+                "sheets": [{
+                    "name": "document",
+                    "rows": int(len(dataframe.index)),
+                    "columns": columns,
+                    "mapping": mapping,
+                    "sample_rows": sample.to_dict(orient="records"),
+                    "warnings": [],
+                }],
+            }
+
         workbook = pd.read_excel(
             temporary_path,
             sheet_name=None,
@@ -1149,18 +1171,20 @@ def compare_uploaded_requirements(
             target_mapping = json.loads(target_mapping_json or "{}")
 
             old_dataframe = (
-                load_requirements_excel(
+                load_requirements_file(
                     source_path,
                     sheet_name=source_sheet or 0,
                     column_mapping=source_mapping,
+                    version_fallback="source",
                 )
             )
 
             new_dataframe = (
-                load_requirements_excel(
+                load_requirements_file(
                     target_path,
                     sheet_name=target_sheet or 0,
                     column_mapping=target_mapping,
+                    version_fallback="target",
                 )
             )
 

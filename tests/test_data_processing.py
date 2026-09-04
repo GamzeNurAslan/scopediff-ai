@@ -1,9 +1,12 @@
 import pandas as pd
 import pytest
+from docx import Document
 
 from backend.app.data_loader import (
     FileLoadingError,
     load_requirements_excel,
+    load_requirements_file,
+    load_requirements_word,
     standardize_column_name,
 )
 
@@ -195,3 +198,93 @@ def test_load_requirements_excel_validates_required_columns(
         load_requirements_excel(file_path)
 
     assert "Eksik zorunlu sütunlar" in str(exception.value)
+
+
+def test_load_requirements_word_table_returns_processed_dataframe(
+    tmp_path,
+) -> None:
+    document = Document()
+    table = document.add_table(rows=1, cols=4)
+    for index, value in enumerate(
+        ["Requirement ID", "Requirement", "Module", "Version"]
+    ):
+        table.rows[0].cells[index].text = value
+
+    row = table.add_row().cells
+    for index, value in enumerate(
+        ["REQ-001", "The user can sign in", "Authentication", "1.0"]
+    ):
+        row[index].text = value
+
+    file_path = tmp_path / "requirements.docx"
+    document.save(file_path)
+
+    result = load_requirements_word(file_path)
+
+    assert result.loc[0, "requirement_id"] == "REQ-001"
+    assert result.loc[0, "requirement_text"] == "The user can sign in"
+    assert result.loc[0, "module"] == "Authentication"
+
+
+def test_load_requirements_word_accepts_preview_mapping(
+    tmp_path,
+) -> None:
+    document = Document()
+    table = document.add_table(rows=1, cols=4)
+    for index, value in enumerate(
+        ["Gereksinim ID", "Gereksinim", "Modül", "Versiyon"]
+    ):
+        table.rows[0].cells[index].text = value
+    row = table.add_row().cells
+    for index, value in enumerate(
+        ["REQ-001", "Kullanıcı giriş yapabilmelidir.", "Kimlik", "1.0"]
+    ):
+        row[index].text = value
+    file_path = tmp_path / "requirements.docx"
+    document.save(file_path)
+
+    result = load_requirements_word(
+        file_path,
+        column_mapping={
+            "requirement_id": "requirement_id",
+            "requirement_text": "requirement_text",
+            "module": "module",
+            "version": "version",
+        },
+    )
+
+    assert result.loc[0, "requirement_text"] == "Kullanıcı giriş yapabilmelidir."
+
+
+def test_load_requirements_file_reads_word_paragraphs(
+    tmp_path,
+) -> None:
+    document = Document()
+    document.add_paragraph("The user can sign in")
+    document.add_paragraph("The user can reset a password")
+    file_path = tmp_path / "requirements.docx"
+    document.save(file_path)
+
+    result = load_requirements_file(file_path)
+
+    assert len(result.index) == 2
+    assert result["requirement_id"].tolist() == ["AUTO-0001", "AUTO-0002"]
+    assert result["module"].tolist() == ["General", "General"]
+
+
+def test_load_requirements_word_supports_headerless_one_column_table(
+    tmp_path,
+) -> None:
+    document = Document()
+    table = document.add_table(rows=2, cols=1)
+    table.cell(0, 0).text = "Kullanıcı giriş yapabilmelidir."
+    table.cell(1, 0).text = "Kullanıcı çıkış yapabilmelidir."
+    file_path = tmp_path / "requirements.docx"
+    document.save(file_path)
+
+    result = load_requirements_word(file_path)
+
+    assert result["requirement_text"].tolist() == [
+        "Kullanıcı giriş yapabilmelidir.",
+        "Kullanıcı çıkış yapabilmelidir.",
+    ]

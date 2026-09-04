@@ -1,5 +1,6 @@
 pandas
 openpyxl
+python-docx
 pydantic
 pytest
 scikit-learn

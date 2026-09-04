@@ -2749,6 +2749,32 @@ body {
   gap: 20px;
 }
 
+.upload-format-control {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.upload-format-control label {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.upload-format-control select {
+  min-width: 145px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 
 .upload-grid::before {
   content: "";

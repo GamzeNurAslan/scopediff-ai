@@ -659,6 +659,32 @@
   gap: 18px;
 }
 
+.upload-format-control {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.upload-format-control label {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.upload-format-control select {
+  min-width: 145px;
+  padding: 9px 12px;
+  border: 1px solid #d8dee8;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #172033;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .upload-card {
   padding: 20px;
   border: 1px solid #e4e8ef;

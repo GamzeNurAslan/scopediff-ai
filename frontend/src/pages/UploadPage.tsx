@@ -2,6 +2,7 @@ import {
   ArrowRight,
   CheckCircle2,
   FileSpreadsheet,
+  FileText,
   UploadCloud,
   X,
 } from 'lucide-react'
@@ -46,6 +47,10 @@ import {
 type FileSlot =
   | 'source'
   | 'target'
+
+type RequirementFileType =
+  | 'xlsx'
+  | 'docx'
 
 
 const REQUIREMENT_FIELDS: Array<{
@@ -308,6 +313,12 @@ function UploadPage() {
 
 
   const [
+    fileType,
+    setFileType,
+  ] = useState<RequirementFileType>('xlsx')
+
+
+  const [
     sourcePreview,
     setSourcePreview,
   ] = useState<RequirementFilePreview | null>(
@@ -363,14 +374,10 @@ function UploadPage() {
     )
 
 
-  function isExcelFile(
+  function isSupportedFile(
     file: File,
   ): boolean {
-    return (
-      file.name
-        .toLowerCase()
-        .endsWith('.xlsx')
-    )
+    return file.name.toLowerCase().endsWith(`.${fileType}`)
   }
 
 
@@ -379,13 +386,13 @@ function UploadPage() {
     file: File,
   ) {
     if (
-      !isExcelFile(
+      !isSupportedFile(
         file,
       )
     ) {
       window.alert(
         t(
-          'upload.error.xlsx',
+          'upload.error.fileType',
         ),
       )
 
@@ -422,6 +429,25 @@ function UploadPage() {
     )
 
     void previewFile(slot, file)
+  }
+
+
+  function handleFileTypeChange(
+    nextType: RequirementFileType,
+  ) {
+    setFileType(nextType)
+    setSourceFile(null)
+    setTargetFile(null)
+    setSourcePreview(null)
+    setTargetPreview(null)
+    setAnalysisError(null)
+
+    if (sourceInputRef.current) {
+      sourceInputRef.current.value = ''
+    }
+    if (targetInputRef.current) {
+      targetInputRef.current.value = ''
+    }
   }
 
 
@@ -725,6 +751,24 @@ function UploadPage() {
 
 
 
+      <div className="upload-format-control">
+        <label htmlFor="requirement-file-type">
+          {t('upload.fileType')}
+        </label>
+        <select
+          id="requirement-file-type"
+          value={fileType}
+          disabled={analyzing}
+          onChange={(event) =>
+            handleFileTypeChange(event.target.value as RequirementFileType)
+          }
+        >
+          <option value="xlsx">{t('upload.fileType.excel')}</option>
+          <option value="docx">{t('upload.fileType.word')}</option>
+        </select>
+      </div>
+
+
       <section className="upload-grid">
 
 
@@ -766,7 +810,7 @@ function UploadPage() {
               sourceInputRef
             }
             type="file"
-            accept=".xlsx"
+            accept={`.${fileType}`}
             hidden
             disabled={
               analyzing
@@ -839,7 +883,7 @@ function UploadPage() {
 
 
                   <small>
-                    .xlsx
+                    .{fileType}
                   </small>
 
                 </div>
@@ -850,9 +894,11 @@ function UploadPage() {
 
                   <div className="file-icon">
 
-                    <FileSpreadsheet
-                      size={23}
-                    />
+                    {fileType === 'docx' ? (
+                      <FileText size={23} />
+                    ) : (
+                      <FileSpreadsheet size={23} />
+                    )}
 
                   </div>
 
@@ -964,7 +1010,7 @@ function UploadPage() {
               targetInputRef
             }
             type="file"
-            accept=".xlsx"
+            accept={`.${fileType}`}
             hidden
             disabled={
               analyzing
@@ -1037,7 +1083,7 @@ function UploadPage() {
 
 
                   <small>
-                    .xlsx
+                    .{fileType}
                   </small>
 
                 </div>
@@ -1048,9 +1094,11 @@ function UploadPage() {
 
                   <div className="file-icon">
 
-                    <FileSpreadsheet
-                      size={23}
-                    />
+                    {fileType === 'docx' ? (
+                      <FileText size={23} />
+                    ) : (
+                      <FileSpreadsheet size={23} />
+                    )}
 
                   </div>
 

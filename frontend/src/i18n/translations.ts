@@ -220,6 +220,15 @@ Record<
     'upload.step':
       'Dosyaları yükle',
 
+    'upload.fileType':
+      'Gereksinim dosyası formatı',
+
+    'upload.fileType.excel':
+      'Excel (.xlsx)',
+
+    'upload.fileType.word':
+      'Word (.docx)',
+
     'upload.source.title':
       'Kaynak Versiyon',
 
@@ -233,7 +242,7 @@ Record<
       'Karşılaştırmanın yeni gereksinim dosyası',
 
     'upload.drop.title':
-      'Excel dosyasını buraya bırak',
+      'Dosyayı buraya bırak',
 
     'upload.drop.subtitle':
       'veya dosya seçmek için tıkla',
@@ -263,7 +272,7 @@ Record<
       'ANALİZİ OLUŞTURAN',
 
     'upload.ready.select':
-      'Devam etmek için iki Excel dosyasını seç',
+      'Devam etmek için aynı formatta iki dosya seç',
 
     'upload.ready.ready':
       'İki dosya da karşılaştırmaya hazır',
@@ -279,6 +288,9 @@ Record<
 
     'upload.error.xlsx':
       'Lütfen .xlsx uzantılı bir Excel dosyası seç.',
+
+    'upload.error.fileType':
+      'Lütfen seçtiğin formatta bir dosya yükle.',
 
     'upload.error.profile':
       'Analizi başlatmak için kullanıcı profili gerekli.',
@@ -449,6 +461,15 @@ Record<
     'upload.step':
       'Upload files',
 
+    'upload.fileType':
+      'Requirement file format',
+
+    'upload.fileType.excel':
+      'Excel (.xlsx)',
+
+    'upload.fileType.word':
+      'Word (.docx)',
+
     'upload.source.title':
       'Source Version',
 
@@ -462,7 +483,7 @@ Record<
       'New requirement file for comparison',
 
     'upload.drop.title':
-      'Drop the Excel file here',
+      'Drop the file here',
 
     'upload.drop.subtitle':
       'or click to choose a file',
@@ -492,7 +513,7 @@ Record<
       'CREATED BY',
 
     'upload.ready.select':
-      'Select two Excel files to continue',
+      'Select two files in the same format to continue',
 
     'upload.ready.ready':
       'Both files are ready for comparison',
@@ -508,6 +529,9 @@ Record<
 
     'upload.error.xlsx':
       'Please select an Excel file with the .xlsx extension.',
+
+    'upload.error.fileType':
+      'Please upload a file in the selected format.',
 
     'upload.error.profile':
       'A user profile is required to start the analysis.',
@@ -678,6 +702,15 @@ Record<
     'upload.step':
       'Dateien hochladen',
 
+    'upload.fileType':
+      'Format der Anforderungsdatei',
+
+    'upload.fileType.excel':
+      'Excel (.xlsx)',
+
+    'upload.fileType.word':
+      'Word (.docx)',
+
     'upload.source.title':
       'Quellversion',
 
@@ -691,7 +724,7 @@ Record<
       'Neue Anforderungsdatei für den Vergleich',
 
     'upload.drop.title':
-      'Excel-Datei hier ablegen',
+      'Datei hier ablegen',
 
     'upload.drop.subtitle':
       'oder klicken, um eine Datei auszuwählen',
@@ -721,7 +754,7 @@ Record<
       'ERSTELLT VON',
 
     'upload.ready.select':
-      'Wählen Sie zwei Excel-Dateien aus, um fortzufahren',
+      'Wählen Sie zwei Dateien im gleichen Format aus',
 
     'upload.ready.ready':
       'Beide Dateien sind für den Vergleich bereit',
@@ -737,6 +770,9 @@ Record<
 
     'upload.error.xlsx':
       'Bitte wählen Sie eine Excel-Datei mit der Erweiterung .xlsx aus.',
+
+    'upload.error.fileType':
+      'Bitte laden Sie eine Datei im ausgewählten Format hoch.',
 
     'upload.error.profile':
       'Zum Starten der Analyse ist ein Benutzerprofil erforderlich.',
@@ -907,6 +943,15 @@ Record<
     'upload.step':
       'Téléverser les fichiers',
 
+    'upload.fileType':
+      'Format du fichier d’exigences',
+
+    'upload.fileType.excel':
+      'Excel (.xlsx)',
+
+    'upload.fileType.word':
+      'Word (.docx)',
+
     'upload.source.title':
       'Version source',
 
@@ -920,7 +965,7 @@ Record<
       'Nouveau fichier d’exigences pour la comparaison',
 
     'upload.drop.title':
-      'Déposez le fichier Excel ici',
+      'Déposez le fichier ici',
 
     'upload.drop.subtitle':
       'ou cliquez pour choisir un fichier',
@@ -950,7 +995,7 @@ Record<
       'CRÉÉ PAR',
 
     'upload.ready.select':
-      'Sélectionnez deux fichiers Excel pour continuer',
+      'Sélectionnez deux fichiers au même format pour continuer',
 
     'upload.ready.ready':
       'Les deux fichiers sont prêts pour la comparaison',
@@ -966,6 +1011,9 @@ Record<
 
     'upload.error.xlsx':
       'Veuillez sélectionner un fichier Excel avec l’extension .xlsx.',
+
+    'upload.error.fileType':
+      'Veuillez téléverser un fichier au format sélectionné.',
 
     'upload.error.profile':
       'Un profil utilisateur est requis pour démarrer l’analyse.',
@@ -1136,6 +1184,15 @@ Record<
     'upload.step':
       'Cargar archivos',
 
+    'upload.fileType':
+      'Formato del archivo de requisitos',
+
+    'upload.fileType.excel':
+      'Excel (.xlsx)',
+
+    'upload.fileType.word':
+      'Word (.docx)',
+
     'upload.source.title':
       'Versión de origen',
 
@@ -1149,7 +1206,7 @@ Record<
       'Nuevo archivo de requisitos para la comparación',
 
     'upload.drop.title':
-      'Suelta el archivo Excel aquí',
+      'Suelta el archivo aquí',
 
     'upload.drop.subtitle':
       'o haz clic para elegir un archivo',
@@ -1179,7 +1236,7 @@ Record<
       'CREADO POR',
 
     'upload.ready.select':
-      'Selecciona dos archivos Excel para continuar',
+      'Selecciona dos archivos del mismo formato para continuar',
 
     'upload.ready.ready':
       'Ambos archivos están listos para la comparación',
@@ -1195,6 +1252,9 @@ Record<
 
     'upload.error.xlsx':
       'Selecciona un archivo Excel con la extensión .xlsx.',
+
+    'upload.error.fileType':
+      'Selecciona un archivo con el formato elegido.',
 
     'upload.error.profile':
       'Se requiere un perfil de usuario para iniciar el análisis.',

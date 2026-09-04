@@ -4,7 +4,7 @@
 >
 > Because one small sentence can become a very large defect.
 
-ScopeDiff AI is an AI-assisted requirement comparison and change intelligence platform. It compares two versions of Excel-based requirement documents, explains what changed, highlights potentially risky updates, and helps teams investigate which changes may be related to a reported defect.
+ScopeDiff AI is an AI-assisted requirement comparison and change intelligence platform. It compares two versions of Excel or Word requirement documents, explains what changed, highlights potentially risky updates, and helps teams investigate which changes may be related to a reported defect.
 
 The goal is simple: replace hours of manual document review with a focused view of the changes that deserve attention first.
 
@@ -28,7 +28,8 @@ ScopeDiff AI brings these signals together in one workflow:
 
 ### Intelligent document comparison
 
-- Upload previous and current Excel requirement versions.
+- Select Excel (`.xlsx`) or Word (`.docx`) as the input format and upload previous and current requirement versions.
+- Read Word paragraphs or Word tables through the same normalized requirement pipeline as Excel files.
 - Match related requirements using TF-IDF and Sentence Transformer-based semantic similarity.
 - Detect changes even when the wording is not identical.
 - View old and new requirement text side by side.
@@ -57,8 +58,8 @@ ScopeDiff AI brings these signals together in one workflow:
 
 ```mermaid
 flowchart LR
-    A[Excel v1] --> C[Validation & preprocessing]
-    B[Excel v2] --> C
+    A[Excel or Word v1] --> C[Validation & preprocessing]
+    B[Excel or Word v2] --> C
     C --> D[Requirement matching]
     D --> E[Change detection]
     E --> F[Risk and impact analysis]
@@ -81,7 +82,7 @@ flowchart LR
 | Frontend | React, TypeScript, Vite, Recharts, Lucide React |
 | Backend | Python, FastAPI, Pydantic, Uvicorn |
 | NLP and analysis | Sentence Transformers, scikit-learn, Pandas, regular expressions |
-| Data and reporting | SQLite, SQLAlchemy, OpenPyXL |
+| Data and reporting | SQLite, SQLAlchemy, OpenPyXL, python-docx |
 | Testing | Pytest |
 
 ## Project structure
@@ -129,7 +130,7 @@ Activate the environment and install the backend dependencies.
 ```powershell
 .venv\Scripts\Activate.ps1
 pip install -r backend\requirements.txt
-python -m uvicorn backend.app.main:app --reload --port 8000
+python -m uvicorn backend.app.main:app --reload --port 8001
 ```
 
 **macOS/Linux**
@@ -137,10 +138,10 @@ python -m uvicorn backend.app.main:app --reload --port 8000
 ```bash
 source .venv/bin/activate
 pip install -r backend/requirements.txt
-python -m uvicorn backend.app.main:app --reload --port 8000
+python -m uvicorn backend.app.main:app --reload --port 8001
 ```
 
-The API is available at `http://127.0.0.1:8000` and its interactive documentation is available at `http://127.0.0.1:8000/docs`.
+The API is available at `http://127.0.0.1:8001` and its interactive documentation is available at `http://127.0.0.1:8001/docs`.
 
 ### 2. Start the frontend
 
