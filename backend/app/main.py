@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import (
@@ -18,6 +19,16 @@ from backend.app.database.database import (
 def create_app(
     initialize_database: bool = True,
 ) -> FastAPI:
+
+    configured_origins = os.getenv(
+        "FRONTEND_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173,https://gamzenuraslan.github.io",
+    )
+    allow_origins = [
+        origin.strip().rstrip("/")
+        for origin in configured_origins.split(",")
+        if origin.strip()
+    ]
 
     @asynccontextmanager
     async def lifespan(
@@ -40,10 +51,7 @@ def create_app(
 
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            "http://localhost:5173",
-            "http://127.0.0.1:5173",
-        ],
+        allow_origins=allow_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
