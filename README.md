@@ -12,6 +12,12 @@ The goal is simple: replace hours of manual document review with a focused view 
 
 ![ScopeDiff AI login and workspace preview](https://github.com/GamzeNurAslan/scopediff-ai/blob/main/docs/login_k%C4%B1sm%C4%B1.png)
 
+## Live demo
+
+The frontend is available on GitHub Pages:
+
+https://gamzenuraslan.github.io/scopediff-ai/
+
 ## Why ScopeDiff AI?
 
 Requirement documents evolve constantly. A changed number, a new obligation, a removed condition, or a subtle wording difference can affect development, testing, and production behaviour.
