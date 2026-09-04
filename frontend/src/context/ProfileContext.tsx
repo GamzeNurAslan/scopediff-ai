@@ -14,6 +14,30 @@ const AUTH_STORAGE_KEY =
   'scopediff_auth_session_v1'
 
 
+function normalizeLegacyTurkishText(
+  value: string,
+): string {
+  const replacements: Array<[string, string]> = [
+    ['Demo Kullanici', 'Demo Kullanıcı'],
+    ['Veri Bilimi & Yapay Zek?', 'Veri Bilimi & Yapay Zekâ'],
+    ['Yapay Zek?', 'Yapay Zekâ'],
+    ['Ayse Demir', 'Ayşe Demir'],
+    ['Is Analizi', 'İş Analizi'],
+    ['Is Analisti', 'İş Analisti'],
+    ['Yazilim Gelistirme', 'Yazılım Geliştirme'],
+    ['Yazilim Gelistirici', 'Yazılım Geliştirici'],
+    ['Kalite G?vence / Test', 'Kalite Güvence / Test'],
+    ['M?hendisi', 'Mühendisi'],
+  ]
+
+  return replacements.reduce(
+    (normalized, [from, to]) =>
+      normalized.replaceAll(from, to),
+    value,
+  )
+}
+
+
 export const ROLE_OPTIONS = [
   'Stajyer',
   'Yazılım Geliştirici',
@@ -156,20 +180,26 @@ UserProfile | null {
         parsed.userId,
 
       fullName:
-        parsed.fullName,
+        normalizeLegacyTurkishText(
+          parsed.fullName,
+        ),
 
       corporateEmail:
         parsed.corporateEmail,
 
       department:
         normalizeProfileField(
-          parsed.department,
+          normalizeLegacyTurkishText(
+            parsed.department,
+          ),
           'department',
         ),
 
       role:
         normalizeProfileField(
-          parsed.role,
+          normalizeLegacyTurkishText(
+            parsed.role,
+          ),
           'role',
         ),
 
